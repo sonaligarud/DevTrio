@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, IconButton, Modal, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import SchoolIcon from "@mui/icons-material/School";

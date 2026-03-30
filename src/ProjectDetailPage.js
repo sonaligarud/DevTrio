@@ -104,17 +104,17 @@ const projectData = {
         { icon: "🎫", label: "Returns", value: "4,000 Tickets", sub: "supporting request As during tasks." },
       ],
       slides: [
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
       ],
     },
     {
@@ -129,9 +129,9 @@ const projectData = {
         { icon: "🎫", label: "Returns", value: "2,500 Tickets", sub: "supporting request As during tasks." },
       ],
       slides: [
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
       ],
     },
     {
@@ -146,9 +146,9 @@ const projectData = {
         { icon: "🎫", label: "Returns", value: "1,800 Tickets", sub: "supporting request As during tasks." },
       ],
       slides: [
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
       ],
     },
     {
@@ -163,9 +163,9 @@ const projectData = {
         { icon: "🎫", label: "Returns", value: "1,200 Tickets", sub: "supporting request As during tasks." },
       ],
       slides: [
-        "/assets/images/group.png",
-        "/assets/images/group.png",
-        "/assets/images/group.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
+        "/assets/images/Comp_1_00033.png",
       ],
     },
   ],
@@ -179,7 +179,7 @@ const projectData = {
         { icon: "📊", label: "Traffic", value: "50,000+", sub: "Impressions" },
         { icon: "🎫", label: "Engagement", value: "8,000", sub: "interactions" },
       ],
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
+      slides: ["/assets/images/Comp_1_00033.png", "/assets/images/Comp_1_00033.png"],
     },
   ],
   "Print-Designs": [
@@ -192,7 +192,7 @@ const projectData = {
         { icon: "📊", label: "Deliverables", value: "24 Assets", sub: "print-ready files" },
         { icon: "🎫", label: "Formats", value: "6 Types", sub: "across media" },
       ],
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
+      slides: ["/assets/images/Comp_1_00033.png", "/assets/images/Comp_1_00033.png"],
     },
   ],
   "Video": [
@@ -205,7 +205,7 @@ const projectData = {
         { icon: "📊", label: "Duration", value: "2:30 min", sub: "final cut" },
         { icon: "🎫", label: "Views", value: "12,000+", sub: "in first week" },
       ],
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
+      slides: ["/assets/images/Comp_1_00033.png", "/assets/images/Comp_1_00033.png"],
     },
   ],
   "XR": [
@@ -218,7 +218,7 @@ const projectData = {
         { icon: "📊", label: "Scenes", value: "8 Environments", sub: "interactive" },
         { icon: "🎫", label: "Users", value: "500+", sub: "beta testers" },
       ],
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
+      slides: ["/assets/images/Comp_1_00033.png", "/assets/images/Comp_1_00033.png"],
     },
   ],
 };
@@ -278,26 +278,6 @@ const ProjectDetailPage = () => {
             p: "20px 24px 16px",
           }}
         >
-          {/* Green glow dot bottom-left */}
-          <Box sx={{
-            position: "absolute", bottom: 18, left: 22,
-            width: 10, height: 10, borderRadius: "50%",
-            background: "#b8ff6e", boxShadow: "0 0 18px 5px rgba(184,255,110,0.55)",
-            zIndex: 2,
-          }} />
-
-          {/* Green orb right edge */}
-          <Box sx={{
-            position: "absolute", right: "-38px", top: "50%",
-            transform: "translateY(-50%)",
-            width: "110px", height: "110px",
-            borderRadius: "50%", overflow: "hidden",
-            opacity: 0.95, zIndex: 3,
-          }}>
-            <video src="/assets/orb/Idle State.mp4" autoPlay loop muted playsInline
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          </Box>
-
           {/* Project tabs row */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
             {/* Back arrow */}
@@ -383,7 +363,7 @@ const ProjectDetailPage = () => {
                     component="img"
                     src={slides[currentSlide]}
                     alt={`slide-${currentSlide}`}
-                    sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+                    sx={{ width: "90%", height: "100%", objectFit: "contain" }}
                   />
                   {/* Expand icon */}
                   <Box sx={{
@@ -477,10 +457,6 @@ const ProjectDetailPage = () => {
               <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
             ))}
           </Box>
-        </Box>
-
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-          <Box sx={{ width: 40, height: 2, background: "#b8ff6e", borderRadius: 2, boxShadow: "0 0 6px #b8ff6e" }} />
         </Box>
       </Box>
     </PageWrapper>

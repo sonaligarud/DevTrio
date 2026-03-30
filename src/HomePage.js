@@ -1,17 +1,14 @@
 import { Box, Button, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AboutMe from "./AboutMe";
+import CinematicIntro from "./CinematicIntro";
 
 const PageWrapper = styled(Box)({
   height: "100vh",
   width: "100%",
-  backgroundImage: "url('/assets/images/bg-images/Background.jpg')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-  backgroundColor: "#05070a",
+  backgroundColor: "transparent",
   position: "relative",
   overflow: "hidden",
   color: "#fff",
@@ -55,10 +52,19 @@ const AboutButton = styled(Button)({
 const LandingPage = () => {
   const navigate = useNavigate();
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
 
   return (
-    <PageWrapper>
-      <AboutMe open={aboutOpen} onClose={() => setAboutOpen(false)} />
+    <>
+      <CinematicIntro onComplete={() => setIntroComplete(true)} />
+
+      <div style={{
+        opacity: introComplete ? 1 : 0,
+        transition: "opacity 0.8s ease",
+        pointerEvents: introComplete ? "auto" : "none",
+      }}>
+        <PageWrapper>
+          <AboutMe open={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       {/* ── DESKTOP layout ── */}
       <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", alignItems: "center" }}>
@@ -210,7 +216,9 @@ const LandingPage = () => {
           </Box>
         </Box>
       </Box>
-    </PageWrapper>
+        </PageWrapper>
+      </div>
+    </>
   );
 };
 
