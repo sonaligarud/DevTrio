@@ -20,15 +20,18 @@ const MainMenuTab = styled(Box)({
   display: "inline-flex",
   alignItems: "center",
   gap: "8px",
-  padding: "7px 20px 7px 24px",
-  border: "1px solid rgba(255,255,255,0.2)",
-  borderBottom: "none",
-  background: "rgba(255,255,255,0.04)",
+  padding: "7px 28px 7px 16px",
+  position: "relative",
+  background: "rgba(255,255,255,0.05)",
   backdropFilter: "blur(10px)",
   fontSize: "12px",
   color: "#ccc",
   cursor: "pointer",
-  clipPath: "polygon(14px 0%, 100% 0%, 100% 100%, 0% 100%)",
+  // Parallelogram: left edge vertical, right top corner angled
+  clipPath: "polygon(0% 0%, calc(100% - 14px) 0%, 100% 100%, 0% 100%)",
+  // Use drop-shadow filter to simulate border since clip-path clips real borders
+  filter: "drop-shadow(0 -1px 0 rgba(255,255,255,0.2)) drop-shadow(1px 0 0 rgba(255,255,255,0.2)) drop-shadow(-1px 0 0 rgba(255,255,255,0.2))",
+  letterSpacing: "0.4px",
 });
 
 const CategoryCard = styled(Box)({
@@ -65,17 +68,17 @@ const PillTab = styled(Button)(({ active }) => ({
 
 const desktopCategories = [
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
-  { label: "Social Media",  icon: "/assets/icons/social-media.svg" },
-  { label: "UI/UX",         icon: "/assets/icons/UX.svg" },
-  { label: "Video",         icon: "/assets/icons/Video.svg" },
-  { label: "XR",            icon: "/assets/icons/XR.svg" },
+  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
+  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
+  { label: "Video", icon: "/assets/icons/Video.svg" },
+  { label: "XR", icon: "/assets/icons/XR.svg" },
 ];
 
 const mobileCategories = [
-  { label: "UI/UX",         icon: "/assets/icons/UX.svg" },
-  { label: "Social Media",  icon: "/assets/icons/social-media.svg" },
-  { label: "XR",            icon: "/assets/icons/XR.svg" },
-  { label: "Video",         icon: "/assets/icons/Video.svg" },
+  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
+  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
+  { label: "XR", icon: "/assets/icons/XR.svg" },
+  { label: "Video", icon: "/assets/icons/Video.svg" },
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
 ];
 
@@ -89,13 +92,36 @@ const PortfolioPage = () => {
       <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", height: "100%", p: 4, pr: 6, position: "relative", zIndex: 1 }}>
 
         {/* Main Menu tab */}
-        <Box sx={{ mb: "-1px", zIndex: 2, ml: 0 }}>
-          <MainMenuTab onClick={() => navigate('/')}>
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-              <path d="M11 5H1M1 5L5 1M1 5L5 9" stroke="#aaa" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+        <Box sx={{ mb: "10px", zIndex: 2, display: "flex", justifyContent: "flex-start" }}>
+          <Button
+            variant="outlined"
+            sx={{
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.2)",
+              backdropFilter: "blur(10px)",
+              background: "rgba(255,255,255,0.05)",
+              padding: "7px 30px",
+              borderRadius: "12px",
+              textTransform: "none",
+              fontSize: "14px",
+              letterSpacing: "1px",
+              position: "relative",
+              overflow: "hidden",
+
+              // glow effect
+              boxShadow: "0 0 10px rgba(0,255,150,0.2)",
+
+              "&:hover": {
+                background: "rgba(255,255,255,0.1)",
+                borderColor: "rgba(0,255,150,0.6)",
+                boxShadow: "0 0 20px rgba(0,255,150,0.5)",
+              },
+              clipPath: "polygon(0 0, 109% 0, 100% 2%, 88% 100%, 0 100%)"
+            }}
+            onClick={() => navigate('/')}
+          >
             Main Menu
-          </MainMenuTab>
+          </Button>
         </Box>
 
         {/* Main card */}
@@ -129,15 +155,6 @@ const PortfolioPage = () => {
               zIndex: 2,
             }}
           />
-
-          {/* Green glow dot — bottom left */}
-          <Box sx={{
-            position: "absolute", bottom: 20, left: 24,
-            width: 10, height: 10, borderRadius: "50%",
-            background: "#00ff9c", boxShadow: "0 0 16px 4px rgba(0,255,150,0.6)",
-            zIndex: 3,
-          }} />
-
           {/* Right arrow pull-tab — outside card right edge */}
           <Box sx={{
             position: "absolute", right: -20, top: "50%",
@@ -154,16 +171,16 @@ const PortfolioPage = () => {
               cursor: "pointer",
               "&:hover": { borderColor: "rgba(0,255,150,0.4)" },
             }}>
-              <Box component="img" src="/assets/icons/Desktop_Right_Drawer_Arrow.svg" alt="" sx={{ width: 10 }} />
+              <Box component="img" src="/assets/icons/Desktop_Right_Drawer_Arrow.svg" alt="" sx={{ width: 30 }} />
             </Box>
           </Box>
 
           {/* Content */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 10, zIndex: 1, width: "100%", justifyContent: "center" }}>
             {/* Welcome text — left */}
-            <Box sx={{ minWidth: "160px" }}>
-              <Typography sx={{ color: "#888", fontSize: "13px", mb: 0.5, fontWeight: 400 }}>Welcome!</Typography>
-              <Typography sx={{ color: "#fff", fontSize: "26px", fontWeight: 700, lineHeight: 1.2 }}>
+            <Box sx={{ minWidth: "160px", textAlign: 'left' }}>
+              <Typography sx={{ fontSize: "13px", mb: 0.5, fontWeight: 400 }}>Welcome!</Typography>
+              <Typography sx={{ fontSize: "26px", fontWeight: 700, lineHeight: 1.2 }}>
                 Here is my work
               </Typography>
             </Box>
@@ -203,7 +220,9 @@ const PortfolioPage = () => {
         {/* Pill tabs */}
         <Box sx={{ display: "flex", gap: 1.5, mb: 2 }}>
           <PillTab active={1} onClick={() => navigate('/')}>Main Menu</PillTab>
+          <PillTab active={1} onClick={() => navigate('/')}>AI Mode</PillTab>
         </Box>
+
 
         {/* Card */}
         <Box sx={{
@@ -227,27 +246,10 @@ const PortfolioPage = () => {
               objectFit: "fill", pointerEvents: "none", zIndex: 0,
             }}
           />
-
-          {/* Green dot right edge */}
-          <Box sx={{
-            position: "absolute", right: 0, top: "35%",
-            width: 4, height: 28,
-            background: "#00ff9c", borderRadius: "4px 0 0 4px",
-            boxShadow: "0 0 8px #00ff9c", zIndex: 1,
-          }} />
-
-          {/* Green dot bottom-left */}
-          <Box sx={{
-            position: "absolute", bottom: 14, left: 16,
-            width: 8, height: 8, borderRadius: "50%",
-            background: "#00ff9c", boxShadow: "0 0 10px rgba(0,255,150,0.7)",
-            zIndex: 1,
-          }} />
-
           {/* Welcome text */}
           <Box sx={{ mb: 2.5, zIndex: 1 }}>
-            <Typography sx={{ color: "#888", fontSize: "12px" }}>Welcome!</Typography>
-            <Typography sx={{ color: "#fff", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 }}>
+            <Typography sx={{ fontSize: "12px",textAlign:"left" }}>Welcome!</Typography>
+            <Typography sx={{ fontSize: "22px", fontWeight: 700, textAlign:"left" }}>
               Here is my work
             </Typography>
           </Box>
@@ -274,11 +276,6 @@ const PortfolioPage = () => {
               </CategoryCard>
             ))}
           </Box>
-        </Box>
-
-        {/* Bottom green line */}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-          <Box sx={{ width: 40, height: 2, background: "#00ff9c", borderRadius: 2, boxShadow: "0 0 6px #00ff9c" }} />
         </Box>
       </Box>
 
