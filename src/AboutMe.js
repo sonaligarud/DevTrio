@@ -322,7 +322,7 @@ export default function AboutMe({ open, onClose }) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} sx={{ zIndex: 999999 }}>
       <>
         {isMobile ? <MobileView onClose={onClose} /> : <DesktopView onClose={onClose} />}
       </>

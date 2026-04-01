@@ -118,7 +118,7 @@ const PortfolioPage = () => {
               },
               clipPath: "polygon(0 0, 109% 0, 100% 2%, 88% 100%, 0 100%)"
             }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/portfolio')}
           >
             Main Menu
           </Button>
@@ -219,7 +219,7 @@ const PortfolioPage = () => {
       }}>
         {/* Pill tabs */}
         <Box sx={{ display: "flex", gap: 1.5, mb: 2 }}>
-          <PillTab active={1} onClick={() => navigate('/')}>Main Menu</PillTab>
+          <PillTab active={1} onClick={() => navigate('/portfolio')}>Main Menu</PillTab>
           <PillTab active={1} onClick={() => navigate('/')}>AI Mode</PillTab>
         </Box>
 
