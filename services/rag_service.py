@@ -45,7 +45,10 @@ STRICT RULES — you MUST follow these without exception:
 5. Never answer general knowledge questions (cricket, news, science, IPL, weather, etc.) — even if you know the answer.
 
 Context from the knowledge base (this is the ONLY source you may use):
-{context}"""
+{context}
+
+Previous conversation history (use this to understand follow-up questions like "tell me about the first one", but DO NOT invent facts outside the context):
+{chat_history}"""
 
 RAG_HUMAN_PROMPT = "{question}"
 
@@ -85,6 +88,7 @@ class RAGService:
         query: str,
         mode: str = "ai",
         project_id: Optional[str] = None,
+        chat_history: Optional[List[Dict[str, str]]] = None,
         k: int = 5,
     ) -> Dict[str, Any]:
         """
@@ -104,9 +108,20 @@ class RAGService:
                 - project_id  (str|None): Project used (if any)
         """
         logger.info(f"RAG chat | mode='{mode}' | project_id='{project_id}' | query='{query[:60]}'")
+        
+        chat_history = chat_history or []
 
         # Step 1: Retrieve relevant documents
-        documents = self._retrieve_documents(query, mode, project_id, k)
+        # Expand query with recent history to ensure follow-up questions retrieve relevant docs
+        search_query = query
+        if chat_history:
+            recent_msgs = []
+            for i in range(max(0, len(chat_history) - 2), len(chat_history)):
+                recent_msgs.append(chat_history[i].get("content", ""))
+            recent_context = " ".join(recent_msgs)
+            search_query = f"{recent_context} {query}"
+
+        documents = self._retrieve_documents(search_query, mode, project_id, k)
 
         # Short-circuit: if no relevant documents found, refuse immediately
         # (don't waste an LLM call on an out-of-scope query)
@@ -122,7 +137,7 @@ class RAGService:
         context = self._build_context(documents)
 
         # Step 3: Generate response from LLM
-        answer = self._generate_answer(query, context)
+        answer = self._generate_answer(query, context, chat_history)
 
         # Step 4: Extract metadata from sources (for frontend)
         # We also want to remove duplicate sources if they exist
@@ -185,15 +200,24 @@ class RAGService:
 
         return "\n\n---\n\n".join(context_parts)
 
-    def _generate_answer(self, question: str, context: str) -> str:
+    def _generate_answer(self, question: str, context: str, chat_history: List[Dict[str, str]]) -> str:
         """
         Build the final prompt and call the LLM.
         Uses LangChain's LCEL (LangChain Expression Language) chain.
         """
+        history_str = ""
+        for msg in chat_history:
+            role = "User" if msg.get("role") == "user" else "Assistant"
+            history_str += f"{role}: {msg.get('content')}\n"
+
         try:
             # Build LCEL chain: prompt → LLM → parse string output
             chain = self.prompt_template | self.llm | StrOutputParser()
-            answer = chain.invoke({"context": context, "question": question})
+            answer = chain.invoke({
+                "context": context, 
+                "question": question,
+                "chat_history": history_str
+            })
             
             # Remove DeepSeek <think>...</think> blocks if present
             answer = re.sub(r"<think>.*?</think>\n*", "", answer, flags=re.DOTALL).strip()

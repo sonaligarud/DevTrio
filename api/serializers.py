@@ -34,8 +34,15 @@ class ChatRequestSerializer(serializers.Serializer):
     project_id = serializers.CharField(
         required=False,
         allow_blank=True,
+        allow_null=True,
         default=None,
         help_text="Project ID to scope the query (required when mode='web').",
+    )
+    chat_history = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+        default=list,
+        help_text="Optional list of previous messages [{'role': 'user'|'assistant', 'content': '...'}].",
     )
 
     def validate(self, data):

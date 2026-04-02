@@ -100,6 +100,7 @@ class ChatView(APIView):
         query = validated["query"]
         mode = validated["mode"]
         project_id = validated.get("project_id")
+        chat_history = validated.get("chat_history", [])
 
         # Step 2: Get RAG service (lazy initialized singleton)
         try:
@@ -120,6 +121,7 @@ class ChatView(APIView):
                 query=query,
                 mode=mode,
                 project_id=project_id,
+                chat_history=chat_history,
             )
         except Exception as e:
             logger.error(f"RAG pipeline error: {e}", exc_info=True)
