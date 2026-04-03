@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import VideoFlow from "./VideoFlow";
+import ChatbotUI from "./ChatbotUI";
 
 const PageWrapper = styled(Box)({
   height: "100vh",
@@ -40,6 +41,7 @@ const LandingPage = () => {
   const [introComplete, setIntroComplete] = useState(alreadySeen);
   const introCompleteRef = useRef(alreadySeen);
   const reverseCalledRef = useRef(false);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   const handleIntroComplete = () => {
     sessionStorage.setItem("introSeen", "true");
@@ -66,7 +68,7 @@ const LandingPage = () => {
     };
     window.addEventListener("wheel", onWheel, { passive: true });
     return () => window.removeEventListener("wheel", onWheel);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -75,7 +77,9 @@ const LandingPage = () => {
         onComplete={handleIntroComplete}
         skipIntro={alreadySeen}
         introComplete={introComplete}
+        onOpenChatbot={() => setChatbotOpen(true)}
       />
+      {chatbotOpen && <ChatbotUI onClose={() => setChatbotOpen(false)} />}
       <div style={{
         opacity: introComplete ? 1 : 0,
         transition: "opacity 1s ease",
@@ -113,6 +117,7 @@ const LandingPage = () => {
                   Welcome to the Portfolio
                 </Typography>
                 <Button
+                  onClick={() => setChatbotOpen(true)}
                   sx={{
                     width: "70%", padding: "11px 36px", borderRadius: "10px",
                     border: "1px solid rgba(255,255,255,0.2)", color: "#bbb",
@@ -226,7 +231,7 @@ const LandingPage = () => {
               </Box>
 
               {/* Buttons stacked */}
-              <GlassButton>Talk with my AI Assistant</GlassButton>
+              <GlassButton onClick={() => setChatbotOpen(true)}>Talk with my AI Assistant</GlassButton>
               <GlassButton onClick={() => navigate('/portfolio')}>Jump on Web Mode</GlassButton>
             </Box>
           </Box>

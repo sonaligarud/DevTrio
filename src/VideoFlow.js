@@ -14,7 +14,7 @@ const framePath = (i) => {
   return `/assets/images/final-sequence/High/Final_${n}.jpg`;
 };
 
-export default function VideoFlow({ onComplete, skipIntro, introComplete }) {
+export default function VideoFlow({ onComplete, skipIntro, introComplete, onOpenChatbot }) {
   const canvasRef = useRef(null);
   const navigate = useNavigate();
 
@@ -226,7 +226,7 @@ export default function VideoFlow({ onComplete, skipIntro, introComplete }) {
                 Select as per your preference ?
               </Typography>
               <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, width: "100%" }}>
-                <OptionButton label="Talk with my AI Assistant" />
+                <OptionButton label="Talk with my AI Assistant" onClick={onOpenChatbot} />
                 <OptionButton label="Scroll to Continue Story" highlight
                   onClick={() => {
                     setStoppedSync(false);
