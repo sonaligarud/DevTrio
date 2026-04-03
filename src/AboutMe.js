@@ -60,14 +60,29 @@ const SkillItem = ({ children }) => (
   </Box>
 );
 
+
 const CertCard = styled(Box)({
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: "12px",
-  padding: "16px 20px",
   display: "flex",
+  flexDirection: "row",
   alignItems: "center",
-  gap: "16px",
+  justifyContent: "flex-start",
+  gap: "15px",
+  padding: "15px 30px",
+
+  borderRadius: "15px",
+
+  backdropFilter: "blur(38.1px)",
+  WebkitBackdropFilter: "blur(38.1px)",
+
+  boxShadow:
+    "0 6px 13px 0 rgba(0, 0, 0, 0.3), inset 0 1px 2px 0 rgba(0, 0, 0, 0.25)",
+
+  border: "1px solid transparent",
+
+  background: `
+    linear-gradient(#0b0b0b, #0b0b0b) padding-box,
+    linear-gradient(100deg, #8f8f8f 1%, #636363 27%, #00cd1f 48%, #636363 69%, #8f8f8f 97%) border-box
+  `,
 });
 
 const SocialBtn = styled(Box)({
@@ -83,6 +98,22 @@ const SocialBtn = styled(Box)({
   "&:hover": { color: "#00ff9c" },
 });
 
+const SocialIcons = styled(Box)({
+  borderRadius: "14px",
+  border: "1.5px solid rgba(255,255,255,0.22)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(255,255,255,0.06)",
+  boxShadow: "inset 0 0 8px rgba(255,255,255,0.03)",
+  transition: "border 0.2s, box-shadow 0.2s",
+  "&:hover": {
+    border: "1.5px solid rgb(82, 196, 26)",
+    boxShadow: "0 0 10px rgb(82, 196, 26)",
+  },
+  padding: '10px'
+})
+
 const experiences = [
   { company: "Publicis Sapient", role: "Art Director", period: "2022 – Present" },
   { company: "Evonix Technologies", role: "Art Director", period: "2019 – 2022" },
@@ -96,11 +127,11 @@ const skillsLeft = ["Product Design", "Design Systems", "Interaction Design", "B
 const skillsRight = ["Motion Design", "Creative Direction", "Team Leadership", "UX Design"];
 
 const socials = [
-  { label: "Dribbble",  Icon: SportsBasketballIcon },
-  { label: "Behance",   Icon: BrushIcon },
-  { label: "LinkedIn",  Icon: LinkedInIcon },
-  { label: "Mobile",    Icon: SmartphoneIcon },
-  { label: "Mail",      Icon: EmailIcon },
+  { label: "Dribbble", Icon: SportsBasketballIcon },
+  { label: "Behance", Icon: BrushIcon },
+  { label: "LinkedIn", Icon: LinkedInIcon },
+  { label: "Mobile", Icon: SmartphoneIcon },
+  { label: "Mail", Icon: EmailIcon },
 ];
 
 /* ────────────────────────────────────────────
@@ -113,7 +144,7 @@ function MobileView({ onClose }) {
       <Box sx={{ flex: 1, overflowY: "auto", pb: "90px", "&::-webkit-scrollbar": { display: "none" } }}>
         {/* Back button */}
         <Box sx={{ p: 2, pt: 3 }}>
-            <Box component="img" src="/assets/icons/cancle.svg" alt="close" />
+          <Box component="img" src="/assets/icons/cancle.svg" alt="close" />
         </Box>
 
         <Box sx={{ px: 3, pb: 2 }}>
@@ -203,26 +234,10 @@ function MobileView({ onClose }) {
       >
         {socials.map(({ label, Icon }) => (
           <SocialBtn key={label}>
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: "14px",
-                border: "1.5px solid rgba(255,255,255,0.22)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(255,255,255,0.06)",
-                boxShadow: "inset 0 0 8px rgba(255,255,255,0.03)",
-                transition: "border 0.2s, box-shadow 0.2s",
-                "&:hover": {
-                  border: "1.5px solid #00ff9c",
-                  boxShadow: "0 0 10px rgba(0,255,150,0.3)",
-                },
-              }}
+            <SocialIcons
             >
               <Icon sx={{ fontSize: 22, color: "inherit" }} />
-            </Box>
+            </SocialIcons>
             <Typography sx={{ fontSize: "10px", color: "inherit" }}>{label}</Typography>
           </SocialBtn>
         ))}
@@ -244,7 +259,7 @@ function DesktopView({ onClose }) {
           position: "absolute",
           top: 16,
           right: 16,
-          cursor:"pointer"
+          cursor: "pointer"
         }}
       >
         <Box component="img" src="/assets/icons/cancle.svg" alt="close" />
@@ -252,10 +267,10 @@ function DesktopView({ onClose }) {
 
       <Typography sx={{ color: "#888", fontSize: "13px", mb: 0.5 }}>Hello!</Typography>
       <Typography sx={{ fontSize: "28px", fontWeight: 600, mb: 3 }}>
-        My Name is <span style={{ color: "#00ff9c" }}>Akash Pardeshi</span>
+        My Name is <span style={{ color: "#52c41a" }}>Akash Pardeshi</span>
       </Typography>
 
-      <Typography sx={{ color: "#888", fontSize: "12px", mb: 1.5, letterSpacing: "1px" }}>
+      <Typography sx={{ fontSize: "12px", mb: 1.5, letterSpacing: "1px" }}>
         Experience
       </Typography>
       <Box
@@ -283,17 +298,17 @@ function DesktopView({ onClose }) {
       <Box sx={{ display: "flex", gap: 3, mb: 3, flexWrap: "wrap" }}>
         <Box sx={{ display: "flex", gap: 4, flex: 1 }}>
           <Box>{skillsLeft.map((s) => <SkillItem key={s}>{s}</SkillItem>)}</Box>
-          <Box>{skillsRight.map((s) => <SkillItem key={s}>{s}</SkillItem>)}</Box>
+          <Box sx={{ borderRight: "1px solid rgba(255,255,255,0.07)", pr: 7 }}>{skillsRight.map((s) => <SkillItem key={s}>{s}</SkillItem>)}</Box>
         </Box>
-        <CertCard sx={{ flex: 1, minWidth: "240px" }}>
+        <CertCard>
           <Box>
-            <img src= "assets/icons/UX-Certification.svg"/>
+            <img src="assets/icons/UX-Certification.svg" />
           </Box>
           <Box>
             <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>
               UI/UX Design with Generative AI
             </Typography>
-            <Typography sx={{ fontSize: "11px", color: "#777", mt: 0.3 }}>
+            <Typography sx={{ fontSize: "11px", mt: 0.3 }}>
               International Institute of Information Technology Bangalore (IIIT-B)
             </Typography>
           </Box>
@@ -305,7 +320,10 @@ function DesktopView({ onClose }) {
       <Box sx={{ display: "flex", gap: 3 }}>
         {socials.map(({ label, Icon }) => (
           <Box key={label} sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, cursor: "pointer", color: "#aaa", "&:hover": { color: "#00ff9c" } }}>
-            <Icon sx={{ fontSize: 28, color: "inherit" }} />
+            <SocialIcons>
+              <Icon sx={{ fontSize: 28, color: "inherit" }} />
+
+            </SocialIcons>
             <Typography sx={{ fontSize: "11px", color: "inherit" }}>{label}</Typography>
           </Box>
         ))}
