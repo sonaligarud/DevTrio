@@ -252,7 +252,7 @@ const ProjectDetailPage = () => {
 
         {/* Breadcrumb row */}
         <Box sx={{ display: "flex", alignItems: "stretch", mb: 2.5 }}>
-          <MainMenuChip onClick={() => navigate('/portfolio')}>
+          <MainMenuChip onClick={() => navigate('/')}>
             Main Menu
           </MainMenuChip>
           <CategoryChip>
@@ -399,7 +399,7 @@ const ProjectDetailPage = () => {
 
         {/* Breadcrumb */}
         <Box sx={{ display: "flex", alignItems: "stretch", mb: 2 }}>
-          <MainMenuChip onClick={() => navigate('/portfolio')} sx={{ fontSize: "11px", padding: "6px 24px 6px 12px" }}>
+          <MainMenuChip onClick={() => navigate('/')} sx={{ fontSize: "11px", padding: "6px 24px 6px 12px" }}>
             Main Menu
           </MainMenuChip>
           <CategoryChip sx={{ fontSize: "11px", padding: "6px 14px 6px 18px" }}>

@@ -3,6 +3,7 @@ import { Box, Typography, IconButton, InputBase } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
+import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
@@ -138,6 +139,7 @@ const MessageBubble = styled(Box)(({ role }) => ({
 }));
 
 export default function ChatbotUI({ onClose }) {
+    const navigate = useNavigate();
     // Let's allow closing by clicking the overlay backdrop
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -183,7 +185,7 @@ export default function ChatbotUI({ onClose }) {
             <Box sx={{ width: "100%", maxWidth: "850px", position: "relative" }}>
                 {/* Tabs */}
                 <Box sx={{ display: "flex", pl: 3 }}>
-                    <TabButton active>Main Menu</TabButton>
+                    <TabButton active onClick={() => { onClose?.(); navigate('/'); }}>Main Menu</TabButton>
                     <TabButton sx={{ ml: -2 }}>Web Mode</TabButton>
                 </Box>
 

@@ -16,24 +16,6 @@ const PageWrapper = styled(Box)({
   flexDirection: "column",
 });
 
-const MainMenuTab = styled(Box)({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "8px",
-  padding: "7px 28px 7px 16px",
-  position: "relative",
-  background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(10px)",
-  fontSize: "12px",
-  color: "#ccc",
-  cursor: "pointer",
-  // Parallelogram: left edge vertical, right top corner angled
-  clipPath: "polygon(0% 0%, calc(100% - 14px) 0%, 100% 100%, 0% 100%)",
-  // Use drop-shadow filter to simulate border since clip-path clips real borders
-  filter: "drop-shadow(0 -1px 0 rgba(255,255,255,0.2)) drop-shadow(1px 0 0 rgba(255,255,255,0.2)) drop-shadow(-1px 0 0 rgba(255,255,255,0.2))",
-  letterSpacing: "0.4px",
-});
-
 const CategoryCard = styled(Box)({
   background: "rgba(255,255,255,0.05)",
   border: "1px solid rgba(255,255,255,0.1)",
@@ -118,7 +100,7 @@ const PortfolioPage = () => {
               },
               clipPath: "polygon(0 0, 109% 0, 100% 2%, 88% 100%, 0 100%)"
             }}
-            onClick={() => navigate('/portfolio')}
+            onClick={() => navigate('/')}
           >
             Main Menu
           </Button>
@@ -219,7 +201,7 @@ const PortfolioPage = () => {
       }}>
         {/* Pill tabs */}
         <Box sx={{ display: "flex", gap: 1.5, mb: 2 }}>
-          <PillTab active={1} onClick={() => navigate('/portfolio')}>Main Menu</PillTab>
+          <PillTab active={1} onClick={() => navigate('/')}>Main Menu</PillTab>
           <PillTab active={1} onClick={() => navigate('/')}>AI Mode</PillTab>
         </Box>
 
