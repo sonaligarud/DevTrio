@@ -224,45 +224,34 @@ export default function ChatbotUI({ onClose }) {
 
                 {/* Main Card */}
                 <ChatCard>
-                    {/* Greeting or Messages */}
-                    {messages.length === 0 ? (
-                        <Box sx={{ p: 4, flexGrow: 1 }}>
-                            <Typography sx={{ color: "#aaa", fontSize: "14px", fontWeight: 300, mb: 0.5 }}>
-                                Hello!
-                            </Typography>
-                            <Typography sx={{ color: "#00ff9c", fontSize: "24px", fontWeight: 500 }}>
-                                Akash Pardeshi
-                            </Typography>
-                        </Box>
-                    ) : (
-                        <MessagesContainer sx={{ pt: 12 }}>
-                            {messages.map((msg) => (
-                                <MessageBubble key={msg.id} role={msg.role}>
-                                    {msg.role === "user" ? (
-                                        msg.content
-                                    ) : (
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                            {msg.content}
-                                        </ReactMarkdown>
-                                    )}
-                                </MessageBubble>
-                            ))}
-                            {isLoading && (
-                                <Box sx={{ alignSelf: "flex-start", p: 1 }}>
-                                    <CircularProgress size={20} sx={{ color: "#00ff9c" }} />
-                                </Box>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </MessagesContainer>
-                    )}
+                    {/* Messages */}
+                    <MessagesContainer sx={{ pt: 12, flexGrow: 1 }}>
+                        {messages.map((msg) => (
+                            <MessageBubble key={msg.id} role={msg.role}>
+                                {msg.role === "user" ? (
+                                    msg.content
+                                ) : (
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {msg.content}
+                                    </ReactMarkdown>
+                                )}
+                            </MessageBubble>
+                        ))}
+                        {isLoading && (
+                            <Box sx={{ alignSelf: "flex-start", p: 1 }}>
+                                <CircularProgress size={20} sx={{ color: "#00ff9c" }} />
+                            </Box>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </MessagesContainer>
 
                     {/* Suggestions and Input Area */}
                     <Box sx={{ p: 4, pt: 2, display: "flex", flexDirection: "column", gap: 3 }}>
-                        {messages.length === 0 && (
+                        {messages.length <= 1 && (
                             <Box sx={{ display: "flex", gap: 2 }}>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("Architecture details")}>Architecture details</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("What tech stack did you use?")}>What tech stack did you use?</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("Tell me about the design")}>Tell me about the design</SuggestionButton>
                             </Box>
                         )}
 
