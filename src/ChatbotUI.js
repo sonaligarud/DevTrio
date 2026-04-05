@@ -235,7 +235,7 @@ export default function ChatbotUI({ onClose }) {
                             </Typography>
                         </Box>
                     ) : (
-                        <MessagesContainer>
+                        <MessagesContainer sx={{ pt: 12 }}>
                             {messages.map((msg) => (
                                 <MessageBubble key={msg.id} role={msg.role}>
                                     {msg.role === "user" ? (
