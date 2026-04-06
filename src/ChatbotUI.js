@@ -8,6 +8,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const OverlayContainer = styled(Box)({
     position: "fixed",
@@ -136,6 +138,37 @@ const MessageBubble = styled(Box)(({ role }) => ({
     color: "#fff",
     fontSize: "14px",
     lineHeight: 1.5,
+    "& p": {
+        margin: "0 0 10px 0",
+        "&:last-child": {
+            margin: 0,
+        }
+    },
+    "& h1, & h2, & h3, & h4, & h5, & h6": {
+        marginTop: "15px",
+        marginBottom: "10px",
+        color: "#00ff9c",
+        fontWeight: 600,
+        "&:first-of-type": {
+            marginTop: 0,
+        }
+    },
+    "& ul, & ol": {
+        marginTop: "0",
+        marginBottom: "10px",
+        paddingLeft: "20px",
+    },
+    "& li": {
+        marginBottom: "6px",
+    },
+    "& a": {
+        color: "#00ff9c",
+        textDecoration: "underline",
+    },
+    "& strong": {
+        fontWeight: "bold",
+        color: "#fff",
+    }
 }));
 
 export default function ChatbotUI({ onClose }) {
@@ -198,14 +231,20 @@ export default function ChatbotUI({ onClose }) {
                                 Hello!
                             </Typography>
                             <Typography sx={{ color: "#00ff9c", fontSize: "24px", fontWeight: 500 }}>
-                                Alexander Williams
+                                Akash Pardeshi
                             </Typography>
                         </Box>
                     ) : (
-                        <MessagesContainer>
+                        <MessagesContainer sx={{ pt: 12 }}>
                             {messages.map((msg) => (
                                 <MessageBubble key={msg.id} role={msg.role}>
-                                    {msg.content}
+                                    {msg.role === "user" ? (
+                                        msg.content
+                                    ) : (
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {msg.content}
+                                        </ReactMarkdown>
+                                    )}
                                 </MessageBubble>
                             ))}
                             {isLoading && (
