@@ -23,32 +23,99 @@ from langchain.schema import Document
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
+import json
 
 logger = logging.getLogger("services")
 
 import re
 
 # ------------------------------------------------------------------
+# Intent Classification Prompts
+# ------------------------------------------------------------------
+INTENT_SYSTEM_PROMPT = """You are an AI intent classifier for a portfolio chatbot system.
+
+Your job is to classify a user's query based on intent and context.
+
+## 🎯 Context
+* The user may currently be viewing a specific project page.
+* The system supports both:
+  1. Project-specific queries
+  2. Global portfolio queries
+  3. General/off-topic conversation
+
+You are given:
+* `user_query`: the user's message
+* `current_project`: the project the user is currently viewing (can be null)
+
+## 🧠 Task
+Classify the query into ONE of the following categories:
+1. "project"
+   → The query is specifically about the current project
+2. "global"
+   → The query is about other projects or the entire portfolio
+3. "cross_project"
+   → The query compares or refers to multiple projects
+4. "other"
+   → Irrelevant, general, or chitchat
+
+## ⚠️ Rules
+* If the query mentions something not related to the current project → do NOT classify as "project"
+* If the query is ambiguous → prefer "global"
+* Do NOT explain your answer
+* Return ONLY a valid JSON
+
+## 📦 Output Format
+{{
+"intent": "project | global | cross_project | other"
+}}
+"""
+
+INTENT_HUMAN_PROMPT = "user_query: \"{user_query}\"\ncurrent_project: \"{current_project}\""
+
+# ------------------------------------------------------------------
 # System prompt template
 # Instructs the LLM how to answer using provided context
 # ------------------------------------------------------------------
-RAG_SYSTEM_PROMPT = """You are a portfolio assistant. Your ONLY job is to answer questions about the projects, skills, and work shown in this portfolio knowledge base.
+RAG_SYSTEM_PROMPT = """You are a portfolio assistant. Your sole purpose is to answer questions strictly about the projects, skills, and work documented in the portfolio knowledge base provided to you.
 
-STRICT RULES — you MUST follow these without exception:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 HARD RULES — MUST BE FOLLOWED WITHOUT EXCEPTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. ONLY use information from the context provided below. Do NOT use any of your own general knowledge.
-2. If the question is NOT related to the portfolio projects or skills in the context, respond with EXACTLY:
-   "I can only answer questions about this portfolio and its projects. I don't have information about that topic."
-3. If the question IS about the portfolio but the context doesn't contain enough detail to answer it, say:
-   "I don't have specific information about that in my knowledge base."
-4. Never invent facts, statistics, or details not present in the context.
-5. Never answer general knowledge questions (cricket, news, science, IPL, weather, etc.) — even if you know the answer.
+RULE 1 — CONTEXT IS YOUR ONLY SOURCE OF TRUTH
+  • You MAY ONLY use facts explicitly present in the [Context] block below.
+  • You MUST NOT use any knowledge from your training data, memory, or assumptions.
+  • If a fact is not in the [Context], treat it as unknown — regardless of how confident you feel.
 
-Context from the knowledge base (this is the ONLY source you may use):
+RULE 2 — DO NOT GUESS OR INFER
+  • Never extrapolate, estimate, or make up details not directly stated in the [Context].
+  • Do NOT say things like "likely", "probably", "I assume", or "it could be".
+  • If you are unsure, use the exact fallback phrase from Rule 3.
+
+RULE 3 — MANDATORY FALLBACK PHRASE
+  • If the answer is not found in the [Context], you MUST respond with EXACTLY this phrase:
+      "I don't have that information in this portfolio's knowledge base."
+  • Do NOT apologize, elaborate, or guess after saying this phrase.
+
+RULE 4 — SCOPE RESTRICTION
+  • If the user asks about general topics (news, sports, weather, science, coding theory, etc.)
+    that are NOT about THIS portfolio's projects or skills, respond with EXACTLY:
+      "I can only answer questions about this portfolio and its projects."
+  • Do NOT answer general-knowledge questions, even if you know the answer.
+
+RULE 5 — NO HALLUCINATION UNDER ANY CIRCUMSTANCES
+  • Never invent project names, statistics, technologies, dates, metrics, or names.
+  • If the user asks for something specific (e.g., "What was the conversion rate?") and the
+    [Context] doesn't state it, say the Rule 3 fallback — period.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Context] — THIS IS YOUR ONLY ALLOWED SOURCE:
 {context}
 
-Previous conversation history (use this to understand follow-up questions like "tell me about the first one", but DO NOT invent facts outside the context):
-{chat_history}"""
+[Chat History] — Use ONLY to resolve follow-up references (e.g., "the first one", "that project").
+DO NOT use history to invent new facts:
+{chat_history}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
 
 RAG_HUMAN_PROMPT = "{question}"
 
@@ -75,6 +142,11 @@ class RAGService:
         self.prompt_template = ChatPromptTemplate.from_messages([
             ("system", RAG_SYSTEM_PROMPT),
             ("human", RAG_HUMAN_PROMPT),
+        ])
+        
+        self.intent_template = ChatPromptTemplate.from_messages([
+            ("system", INTENT_SYSTEM_PROMPT),
+            ("human", INTENT_HUMAN_PROMPT),
         ])
 
         logger.info("RAGService initialized.")
@@ -110,6 +182,26 @@ class RAGService:
         logger.info(f"RAG chat | mode='{mode}' | project_id='{project_id}' | query='{query[:60]}'")
         
         chat_history = chat_history or []
+
+        # Step 0: Classify intent to auto-adjust routing and handle chitchat
+        intent = self._classify_intent(query, project_id or "global portfolio")
+        logger.info(f"Intent classified as: {intent}")
+        
+        # Short-circuit for general/chitchat questions ("hey how are you")
+        if intent == "other":
+            return {
+                "answer": "Hello! I am an AI assistant here to help you explore this portfolio. Feel free to ask me questions about the projects, skills, or experience shown here.",
+                "sources": [],
+                "mode": mode,
+                "project_id": project_id,
+            }
+
+        original_mode = mode
+        if mode == "web" and project_id:
+            # If user asks out-of-scope question while on project page, dynamically switch to global mode
+            if intent in ["global", "cross_project"]:
+                mode = "ai"
+                # We keep project_id to know the context contextually, but mode='ai' avoids strict filtering.
 
         # Step 1: Retrieve relevant documents
         # Expand query with recent history to ensure follow-up questions retrieve relevant docs
@@ -155,6 +247,33 @@ class RAGService:
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    def _classify_intent(self, query: str, project_id: str) -> str:
+        """
+        Uses the LLM to classify the query intent.
+        Returns one of: 'project', 'global', 'cross_project', 'other'.
+        """
+        try:
+            chain = self.intent_template | self.llm | StrOutputParser()
+            response = chain.invoke({
+                "user_query": query,
+                "current_project": project_id
+            })
+            
+            # Remove DeepSeek <think>...</think> blocks if present
+            response = re.sub(r"<think>.*?</think>\n*", "", response, flags=re.DOTALL).strip()
+            
+            # Extremely basic JSON extraction in case there's markdown wrapper
+            if "```json" in response:
+                response = response.split("```json")[-1].split("```")[0].strip()
+            elif "```" in response:
+                response = response.split("```")[-1].split("```")[0].strip()
+                
+            data = json.loads(response)
+            return data.get("intent", "global")
+        except Exception as e:
+            logger.error(f"Intent classification failed: {e}")
+            return "global"  # safe fallback
 
     def _retrieve_documents(
         self,

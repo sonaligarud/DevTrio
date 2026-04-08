@@ -121,6 +121,22 @@ SAMPLE_DOCUMENTS = [
         ),
         "image_url": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600",
     },
+    {
+        "project_id": "global_summary",
+        "title": "Portfolio Personal Summary",
+        "content": (
+            "This is the global portfolio overview and summary metadata. "
+            "I have completed a total of 5 projects so far in my professional portfolio: "
+            "1) ShopEasy E-Commerce Platform (React, Node.js) "
+            "2) MedConnect Patient Portal (Django, React) "
+            "3) FinFlow Budget Tracker (Flutter, Firebase) "
+            "4) LearnAI Online Education Platform (Next.js, FastAPI) "
+            "5) PropSearch Real Estate Marketplace (Vue.js, Laravel). "
+            "My primary tech stack includes React, Django, Python, Node.js, and PostgreSQL. "
+            "This portfolio demonstrates my full-stack web development and AI integration skills."
+        ),
+        "image_url": "",
+    },
 ]
 
 
