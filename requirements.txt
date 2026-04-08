@@ -34,5 +34,5 @@ pillow==10.4.0
 # Requires Python 3.9+. Install manually if needed:
 #   pip install langchain-google-genai google-generativeai
 # ============================================================
-# langchain-google-genai>=1.0.0
-# google-generativeai>=0.5.0
+langchain-google-genai>=1.0.0
+google-generativeai>=0.5.0

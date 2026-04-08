@@ -17,6 +17,7 @@ Modes:
 """
 
 import logging
+import time
 from typing import Optional, Dict, Any, List
 
 from langchain.schema import Document
@@ -24,10 +25,9 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 import json
+import re
 
 logger = logging.getLogger("services")
-
-import re
 
 # ------------------------------------------------------------------
 # Intent Classification Prompts
@@ -248,6 +248,33 @@ class RAGService:
     # Private helpers
     # ------------------------------------------------------------------
 
+    # ------------------------------------------------------------------
+    # Retry helper
+    # ------------------------------------------------------------------
+
+    def _invoke_with_retry(self, chain, inputs: dict, max_retries: int = 3) -> str:
+        """
+        Invoke a LangChain chain with automatic retry on 429 rate-limit errors.
+        Uses exponential backoff: waits 10s, 20s, 30s between attempts.
+        """
+        last_exc: Exception = RuntimeError("Unknown error in _invoke_with_retry")
+        for attempt in range(1, max_retries + 1):
+            try:
+                return chain.invoke(inputs)
+            except Exception as e:
+                last_exc = e
+                err_str = str(e)
+                if "429" in err_str and attempt < max_retries:
+                    wait = attempt * 10  # 10s, 20s, 30s
+                    logger.warning(
+                        f"Rate limit hit (attempt {attempt}/{max_retries}). "
+                        f"Retrying in {wait}s..."
+                    )
+                    time.sleep(wait)
+                else:
+                    raise  # re-raise on non-429 or final attempt
+        raise last_exc  # should never reach here, but satisfies type checker
+
     def _classify_intent(self, query: str, project_id: str) -> str:
         """
         Uses the LLM to classify the query intent.
@@ -255,7 +282,7 @@ class RAGService:
         """
         try:
             chain = self.intent_template | self.llm | StrOutputParser()
-            response = chain.invoke({
+            response = self._invoke_with_retry(chain, {
                 "user_query": query,
                 "current_project": project_id
             })
@@ -346,7 +373,7 @@ class RAGService:
         try:
             # Build LCEL chain: prompt → LLM → parse string output
             chain = self.prompt_template | self.llm | StrOutputParser()
-            answer = chain.invoke({
+            answer = self._invoke_with_retry(chain, {
                 "context": context, 
                 "question": question,
                 "chat_history": history_str
@@ -357,11 +384,17 @@ class RAGService:
             
             return answer
         except Exception as e:
+            err_str = str(e)
             logger.error(f"LLM generation failed: {e}")
-            # Return a graceful error message instead of crashing
+            # User-friendly message for rate limit errors
+            if "429" in err_str:
+                return (
+                    "I'm currently experiencing high demand. "
+                    "Please wait a moment and try again."
+                )
             return (
                 "I'm sorry, I encountered an error generating a response. "
-                f"Please check the server logs. Error: {str(e)}"
+                f"Please check the server logs. Error: {err_str}"
             )
 
     def _extract_sources(self, documents: List[Document]) -> List[Dict[str, Any]]:
