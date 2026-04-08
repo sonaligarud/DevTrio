@@ -161,7 +161,7 @@ class RAGService:
         mode: str = "ai",
         project_id: Optional[str] = None,
         chat_history: Optional[List[Dict[str, str]]] = None,
-        k: int = 5,
+        k: int = 3,  # Optimized: retrieve only top-3 to minimize token usage
     ) -> Dict[str, Any]:
         """
         Full RAG pipeline for a user query.
@@ -300,10 +300,14 @@ class RAGService:
 
         return docs
 
+    # Maximum characters to include per document — prevents bloating the LLM context window
+    MAX_CHARS_PER_DOC = 800
+
     def _build_context(self, documents: List[Document]) -> str:
         """
         Concatenate retrieved document contents into a single context string.
         Each document is prefixed with its project and title metadata.
+        Content is capped at MAX_CHARS_PER_DOC characters to minimize token usage.
         """
         if not documents:
             return "No relevant documents found in the knowledge base."
@@ -313,19 +317,29 @@ class RAGService:
             meta = doc.metadata
             project = meta.get("project_id", "Unknown")
             title = meta.get("title", "Untitled")
+            # Trim content to cap token usage per document
+            content = doc.page_content
+            if len(content) > self.MAX_CHARS_PER_DOC:
+                content = content[:self.MAX_CHARS_PER_DOC] + "... [truncated]"
             context_parts.append(
-                f"[Document {i}] Project: {project} | Title: {title}\n{doc.page_content}"
+                f"[Document {i}] Project: {project} | Title: {title}\n{content}"
             )
 
         return "\n\n---\n\n".join(context_parts)
+
+    # Maximum number of recent chat messages to include in the prompt
+    MAX_HISTORY_MESSAGES = 4
 
     def _generate_answer(self, question: str, context: str, chat_history: List[Dict[str, str]]) -> str:
         """
         Build the final prompt and call the LLM.
         Uses LangChain's LCEL (LangChain Expression Language) chain.
+        Chat history is capped at the last MAX_HISTORY_MESSAGES entries to limit token usage.
         """
+        # Keep only the most recent messages to avoid bloating the prompt
+        recent_history = chat_history[-self.MAX_HISTORY_MESSAGES:] if chat_history else []
         history_str = ""
-        for msg in chat_history:
+        for msg in recent_history:
             role = "User" if msg.get("role") == "user" else "Assistant"
             history_str += f"{role}: {msg.get('content')}\n"
 
