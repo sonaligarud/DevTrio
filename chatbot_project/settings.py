@@ -90,14 +90,34 @@ TEMPLATES = [
 ]
 
 # --------------------------------------------------
-# Database (SQLite for simplicity; swap for Postgres in prod)
+# Database — driven by environment variables
+# Set DB_ENGINE=django.db.backends.postgresql for production (PostgreSQL)
+# Falls back to SQLite automatically in local dev if DB_ENGINE is not set
 # --------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+_db_engine = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
+
+if _db_engine == "django.db.backends.postgresql":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME":     os.getenv("DB_NAME",     "chatbot_db"),
+            "USER":     os.getenv("DB_USER",     "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST":     os.getenv("DB_HOST",     "localhost"),
+            "PORT":     os.getenv("DB_PORT",     "5432"),
+            "OPTIONS": {
+                "connect_timeout": 10,
+            },
+        }
     }
-}
+else:
+    # Default: SQLite (local development / fallback)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # --------------------------------------------------
 # Password validation
