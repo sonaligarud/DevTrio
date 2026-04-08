@@ -26,143 +26,95 @@ import django
 django.setup()
 
 from utils.service_registry import get_rag_service
+from django.db import connection
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# ------------------------------------------------------------------
-# Sample documents — replace with your own project data
-# ------------------------------------------------------------------
-SAMPLE_DOCUMENTS = [
-    {
-        "project_id": "ecommerce_001",
-        "title": "ShopEasy E-Commerce Platform",
-        "content": (
-            "ShopEasy is a production-grade multi-vendor e-commerce platform built with React (frontend) and Node.js/Express (backend). "
-            "The platform supports unlimited vendor storefronts under a single marketplace, each with its own product catalog, dashboard, and analytics. "
-            "Key technical stack: React 18, Redux Toolkit for state management, Node.js with Express, PostgreSQL as primary database, Redis for caching, "
-            "Elasticsearch for product search, and AWS S3 for media storage. "
-            "Payment processing is handled via Stripe with support for multi-currency, recurring subscriptions, and split payouts to vendors. "
-            "An AI-powered recommendation engine uses collaborative filtering to personalize the homepage and product suggestions. "
-            "Scale: 50,000+ daily active users, $2M+ in monthly GMV, 99.9% uptime SLA. "
-            "Standout features: abandoned cart recovery emails (increased conversion by 18%), dynamic pricing rules, bulk CSV order import, "
-            "and a full mobile PWA for fast mobile checkout. "
-            "The biggest engineering challenge was building the real-time inventory sync across vendors — solved using WebSockets and an event-driven architecture with RabbitMQ. "
-            "Deployment: Dockerized, deployed on AWS ECS with auto-scaling, CloudFront CDN for static assets."
-        ),
-        "image_url": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600",
-    },
-    {
-        "project_id": "healthcare_002",
-        "title": "MedConnect Patient Portal",
-        "content": (
-            "MedConnect is a HIPAA-compliant patient management system built for mid-to-large healthcare providers. "
-            "Tech stack: Django (REST API backend), React (frontend), PostgreSQL, Celery for async task queues, and Twilio for SMS/voice notifications. "
-            "Core features include: online appointment scheduling with calendar sync (Google/Outlook), telemedicine video calls via WebRTC, "
-            "full electronic health record (EHR) management with HL7 FHIR integration, e-prescription workflows, secure patient-doctor messaging, "
-            "and automated insurance eligibility checks via real-time API calls. "
-            "Scale: 200+ clinics, 15,000+ registered patients, 3,000+ telemedicine sessions per month. "
-            "The most complex feature was the EHR integration — different hospital systems use different HL7 versions, so a custom FHIR translation middleware was built. "
-            "Security: All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Role-based access control separates patient, doctor, nurse, and admin permissions. "
-            "Deployment: HIPAA-compliant AWS infrastructure with audit logging, VPC isolation, and automated vulnerability scanning."
-        ),
-        "image_url": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600",
-    },
-    {
-        "project_id": "fintech_003",
-        "title": "FinFlow Budget Tracker",
-        "content": (
-            "FinFlow is a cross-platform personal finance app built with Flutter (iOS + Android) and Firebase (Firestore, Auth, Functions). "
-            "Users connect their bank accounts securely via Plaid API, which pulls real-time transaction data across 10,000+ supported institutions. "
-            "Core features: automatic expense categorization using ML classification, custom budget goal setting, bill payment reminders, "
-            "investment portfolio tracking (stocks, ETFs, crypto), credit score monitoring, and monthly financial health reports. "
-            "An AI insights engine analyzes spending patterns and surfaces personalized tips — e.g. 'You spent 40% more on dining this month compared to last'. "
-            "Scale: 80,000+ active users, 4.8-star rating on both App Store and Play Store, averaging 12 app sessions per user per week. "
-            "Technical challenges: Plaid's webhook system for real-time sync required careful event deduplication and idempotency handling. "
-            "Firebase Cloud Functions handle all background processing to keep the mobile app lightweight. "
-            "The crypto portfolio feature integrates with CoinGecko API for live pricing. "
-            "Monetization: Freemium model — basic features free, premium tier at $4.99/month with advanced analytics."
-        ),
-        "image_url": "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=600",
-    },
-    {
-        "project_id": "edtech_004",
-        "title": "LearnAI Online Education Platform",
-        "content": (
-            "LearnAI is an adaptive online learning platform focused on data science, machine learning, and AI education. "
-            "Tech stack: Next.js 14 (App Router) for frontend with SSR/SSG, Python FastAPI for backend APIs, PostgreSQL, Redis for session caching, "
-            "and JupyterHub for interactive notebook environments. "
-            "Course content is delivered through video lectures (hosted on Cloudflare Stream), interactive Jupyter notebooks that run in isolated Docker containers, "
-            "live coding challenges, AI-generated quizzes that adapt based on student performance, and peer code review via GitHub integration. "
-            "A mentorship marketplace connects students with industry mentors for 1:1 sessions, integrated with Calendly for scheduling and Stripe for payments. "
-            "Scale: 500+ courses, 10,000+ active students from 60+ countries, 50+ company partners for job placement. "
-            "The AI quiz engine uses spaced repetition (SM-2 algorithm) to resurface weak topics automatically. "
-            "Completion rate is 72%, significantly above the industry average of ~15% for online courses — attributed to the adaptive learning path. "
-            "Deployment: Vercel for Next.js frontend, FastAPI on Railway, JupyterHub on Kubernetes for scalable notebook execution."
-        ),
-        "image_url": "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600",
-    },
-    {
-        "project_id": "realestate_005",
-        "title": "PropSearch Real Estate Marketplace",
-        "content": (
-            "PropSearch is a full-stack real estate marketplace built with Vue.js 3 (Composition API) and Laravel 10 for the backend REST API. "
-            "The platform aggregates 2M+ property listings via MLS (Multiple Listing Service) data feeds, refreshed every 15 minutes via a custom ETL pipeline. "
-            "Standout features: immersive 3D virtual tours powered by Matterport SDK integration, AI-powered property valuation using a gradient boosting model "
-            "trained on 5 years of local sale data, neighborhood analytics (crime index, school ratings, walkability scores), "
-            "interactive mortgage calculator comparing 20+ lenders in real-time, and a saved search alert system via email/SMS. "
-            "Lead generation: 500K+ monthly users, 3,000+ registered real estate agents, with qualified lead forms that convert at 8.4%. "
-            "The AI valuation model achieves a median absolute error of 3.2% compared to final sale price, outperforming Zillow's Zestimate benchmark in target markets. "
-            "Tech details: PostgreSQL with PostGIS extension for geospatial property search (radius, polygon draw), Elasticsearch for full-text search, "
-            "Mapbox for interactive map UI, and Redis queues (Laravel Horizon) for background MLS sync jobs. "
-            "Mobile: responsive Vue PWA, with agent-facing native iOS/Android app built in React Native."
-        ),
-        "image_url": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600",
-    },
-    {
-        "project_id": "global_summary",
-        "title": "Portfolio Personal Summary",
-        "content": (
-            "This is the global portfolio overview and summary metadata. "
-            "I have completed a total of 5 projects so far in my professional portfolio: "
-            "1) ShopEasy E-Commerce Platform (React, Node.js) "
-            "2) MedConnect Patient Portal (Django, React) "
-            "3) FinFlow Budget Tracker (Flutter, Firebase) "
-            "4) LearnAI Online Education Platform (Next.js, FastAPI) "
-            "5) PropSearch Real Estate Marketplace (Vue.js, Laravel). "
-            "My primary tech stack includes React, Django, Python, Node.js, and PostgreSQL. "
-            "This portfolio demonstrates my full-stack web development and AI integration skills."
-        ),
-        "image_url": "",
-    },
-]
+def fetch_projects_from_db():
+    """
+    Fetches real projects from the PostgreSQL database using a raw SQL cursor.
+    Formats them into proper dictionaries for the vector store.
+    """
+    documents = []
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, title, description, tech_stack, image_url FROM projects")
+        rows = cursor.fetchall()
+        for row in rows:
+            proj_id, title, desc, tech, image_url = row
+            
+            # Combine into a rich content string for the LLM context
+            content = f"Project Title: {title}\n"
+            if desc:
+                content += f"Description: {desc}\n"
+            if tech:
+                content += f"Technologies Used: {tech}\n"
+            
+            documents.append({
+                "project_id": str(proj_id),
+                "title": title or "Untitled",
+                "content": content,
+                "image_url": image_url or "",
+            })
+            
+    # Also add a global summary document based on fetched dynamic data
+    if documents:
+        titles = [d["title"] for d in documents]
+        summary_content = (
+            "This is the global portfolio overview. "
+            "I have worked on various projects, including: " + ", ".join(titles) + ". "
+            "These projects demonstrate my development skills and capabilities."
+        )
+        documents.append({
+            "project_id": "global_summary",
+            "title": "Portfolio Personal Summary",
+            "content": summary_content,
+            "image_url": "",
+        })
+        
+    return documents
 
 
 def main():
-    logger.info("Starting data seeding...")
+    logger.info("Starting data seeding from PostgreSQL database...")
 
     try:
         rag_service = get_rag_service()
         vector_store = rag_service.vector_store
 
-        current_count = vector_store.get_collection_count()
-        logger.info(f"Current collection size: {current_count} documents")
+        # Clear existing collection so we don't have stale/duplicate hardcoded data
+        logger.info("Clearing existing ChromaDB collection...")
+        try:
+            vector_store.vector_store.delete_collection()
+            # We explicitly need to re-initialize it to continue adding documents
+            vector_store.vector_store = vector_store._init_vector_store()
+        except Exception as e:
+            logger.warning(f"Could not clear collection (might already be empty): {e}")
 
-        count = vector_store.add_documents(SAMPLE_DOCUMENTS)
+        # Fetch dynamically from PostgreSQL
+        db_documents = fetch_projects_from_db()
+        if not db_documents:
+            logger.warning("No projects found in the database. Database is empty.")
+            return
+
+        logger.info(f"Found {len(db_documents) - 1} projects in the PostgreSQL database. Ingesting to ChromaDB...")
+
+        count = vector_store.add_documents(db_documents)
         logger.info(f"✅ Successfully added {count} documents to ChromaDB.")
 
         new_count = vector_store.get_collection_count()
         logger.info(f"New collection size: {new_count} documents")
 
         # Quick test search
-        logger.info("\n--- Test Search: 'e-commerce payment' ---")
-        results = vector_store.search_global("e-commerce payment", k=2)
+        first_project_title = db_documents[0]["title"]
+        logger.info(f"\n--- Test Search: '{first_project_title}' ---")
+        results = vector_store.search_global(first_project_title, k=2)
         for r in results:
             logger.info(f"  Found: [{r.metadata['project_id']}] {r.metadata['title']}")
 
-        logger.info("\n✅ Data seeding complete!")
+        logger.info("\n✅ Database to ChromaDB Sync Complete!")
 
     except Exception as e:
         logger.error(f"❌ Seeding failed: {e}", exc_info=True)
