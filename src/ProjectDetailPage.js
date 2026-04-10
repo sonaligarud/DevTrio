@@ -4,7 +4,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 // ─── Styled ───────────────────────────────────────────────────────────────────
@@ -229,9 +229,61 @@ const ProjectDetailPage = () => {
   const { category: rawCategory } = useParams();
   const category = decodeURIComponent(rawCategory || '');
   const navigate = useNavigate();
-  const projects = projectData[category] || [];
+
+  const [projects, setProjects] = useState(projectData[category] || []);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const tabsRef = useRef(null);
+  const mobileTabsRef = useRef(null);
+
+  const scrollTabs = (direction) => {
+    if (tabsRef.current) {
+      tabsRef.current.scrollBy({ left: direction === 'right' ? 200 : -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollMobileTabs = (direction) => {
+    if (mobileTabsRef.current) {
+      mobileTabsRef.current.scrollBy({ left: direction === 'right' ? 150 : -150, behavior: 'smooth' });
+    }
+  };
+
+  const fallbackStats = [
+    { icon: "📊", label: "Traffic", value: "50,000 + 250,000", sub: "Million ACTIVE range in daily visitors." },
+    { icon: "🎫", label: "Returns", value: "4,000 Tickets", sub: "supporting request As during tasks." },
+    { icon: "📊", label: "Traffic", value: "50,000 + 250,000", sub: "Million ACTIVE range in daily visitors." },
+    { icon: "🎫", label: "Returns", value: "4,000 Tickets", sub: "supporting request As during tasks." },
+  ];
+
+  const fallbackSlides = [
+    "/assets/images/Comp_1_00033.png",
+    "/assets/images/Comp_1_00033.png",
+    "/assets/images/Comp_1_00033.png"
+  ];
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/api/projects/?category=${encodeURIComponent(category)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const transformed = data.map(dbProj => ({
+            id: dbProj.id,
+            label: dbProj.category || category,
+            name: dbProj.title,
+            description: dbProj.description,
+            stats: fallbackStats,
+            slides: dbProj.image_url ? [dbProj.image_url, ...fallbackSlides] : fallbackSlides
+          }));
+          setProjects(transformed);
+        } else {
+          setProjects(projectData[category] || []);
+        }
+        setCurrentProjectIndex(0);
+        setCurrentSlide(0);
+      })
+      .catch(err => console.error("Failed to fetch projects:", err));
+  }, [category]);
 
   const currentProject = projects[currentProjectIndex] || {};
   const slides = currentProject.slides || [];
@@ -278,7 +330,6 @@ const ProjectDetailPage = () => {
             p: "20px 24px 16px",
           }}
         >
-          {/* Project tabs row */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
             {/* Back arrow */}
             <Box
@@ -294,15 +345,45 @@ const ProjectDetailPage = () => {
               <ArrowBackIosNewIcon sx={{ fontSize: 13 }} />
             </Box>
 
-            {projects.map((proj, i) => (
-              <ProjectTab
-                key={proj.id}
-                active={i === currentProjectIndex ? 1 : 0}
-                onClick={() => handleProjectChange(i)}
-              >
-                Project -{i + 1}
-              </ProjectTab>
-            ))}
+            {/* Scroll Left Button */}
+            <Box
+              onClick={() => scrollTabs('left')}
+              sx={{
+                width: 30, height: 30, borderRadius: "6px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", color: "#fff", flexShrink: 0,
+                "&:hover": { background: "rgba(255,255,255,0.08)" },
+              }}
+            >
+              <ChevronLeftIcon sx={{ fontSize: 18 }} />
+            </Box>
+
+            <Box ref={tabsRef} sx={{ display: "flex", alignItems: "center", gap: 1.5, flex: 1, overflowX: "auto", scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}>
+              {projects.map((proj, i) => (
+                <ProjectTab
+                  key={proj.id}
+                  active={i === currentProjectIndex ? 1 : 0}
+                  onClick={() => handleProjectChange(i)}
+                >
+                  {proj.name}
+                </ProjectTab>
+              ))}
+            </Box>
+
+            {/* Scroll Right Button */}
+            <Box
+              onClick={() => scrollTabs('right')}
+              sx={{
+                width: 30, height: 30, borderRadius: "6px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", color: "#fff", flexShrink: 0,
+                "&:hover": { background: "rgba(255,255,255,0.08)" },
+              }}
+            >
+              <ChevronRightIcon sx={{ fontSize: 18 }} />
+            </Box>
           </Box>
 
           {/* Content row: left sidebar + image viewer */}
@@ -414,19 +495,36 @@ const ProjectDetailPage = () => {
           display: "flex", flexDirection: "column", p: 2, overflow: "hidden", position: "relative",
         }}>
           {/* Project tabs */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2, overflowX: "auto", pb: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2, pb: 0.5 }}>
             <Box onClick={() => navigate('/portfolio')} sx={{
               width: 28, height: 28, borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)",
               display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
             }}>
               <ArrowBackIosNewIcon sx={{ fontSize: 11, color: "#fff" }} />
             </Box>
-            {projects.map((proj, i) => (
-              <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}
-                sx={{ fontSize: "11px", padding: "5px 14px" }}>
-                Project -{i + 1}
-              </ProjectTab>
-            ))}
+
+            <Box onClick={() => scrollMobileTabs('left')} sx={{
+              width: 28, height: 28, borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+            }}>
+              <ChevronLeftIcon sx={{ fontSize: 16, color: "#fff" }} />
+            </Box>
+
+            <Box ref={mobileTabsRef} sx={{ display: "flex", gap: 1, flex: 1, overflowX: "auto", scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}>
+              {projects.map((proj, i) => (
+                <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}
+                  sx={{ fontSize: "11px", padding: "5px 14px", whiteSpace: "nowrap" }}>
+                  {proj.name}
+                </ProjectTab>
+              ))}
+            </Box>
+
+            <Box onClick={() => scrollMobileTabs('right')} sx={{
+              width: 28, height: 28, borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+            }}>
+              <ChevronRightIcon sx={{ fontSize: 16, color: "#fff" }} />
+            </Box>
           </Box>
 
           {/* Left info */}

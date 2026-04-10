@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Modal, useMediaQuery, useTheme, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -133,6 +133,31 @@ const WorkCategoryCard = styled(Box)({
 /* ── Work tab ── */
 function WorkTab({ onClose }) {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState(workCategories);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/categories/")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const fallbackIcons = {
+            "Print-Designs": "/assets/icons/print-designs.svg",
+            "Social Media": "/assets/icons/social-media.svg",
+            "UI/UX": "/assets/icons/UX.svg",
+            "Video": "/assets/icons/Video.svg",
+            "XR": "/assets/icons/XR.svg",
+            "Software": "/assets/icons/UX.svg",
+            "Print Media": "/assets/icons/print-designs.svg",
+          };
+          const mapped = data.map(cat => ({
+            label: cat,
+            icon: fallbackIcons[cat] || "/assets/icons/UX.svg"
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch(err => console.error("Failed to fetch categories:", err));
+  }, []);
 
   const handleCategoryClick = (label) => {
     onClose();
@@ -143,7 +168,7 @@ function WorkTab({ onClose }) {
     <Box>
       {/* Category cards row */}
       <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap" }}>
-        {workCategories.map((cat) => (
+        {categories.map((cat) => (
           <WorkCategoryCard key={cat.label} onClick={() => handleCategoryClick(cat.label)}>
             <Box
               component="img"
