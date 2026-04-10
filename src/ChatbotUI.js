@@ -171,6 +171,42 @@ const MessageBubble = styled(Box)(({ role }) => ({
     }
 }));
 
+const SourceImagesContainer = styled(Box)({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+    marginTop: "10px",
+});
+
+const SourceImageCard = styled(Box)({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "4px",
+    cursor: "pointer",
+    "& img": {
+        width: "120px",
+        height: "80px",
+        objectFit: "cover",
+        borderRadius: "8px",
+        border: "1px solid rgba(0, 255, 150, 0.3)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    },
+    "&:hover img": {
+        transform: "scale(1.05)",
+        boxShadow: "0 4px 16px rgba(0, 255, 150, 0.4)",
+    },
+    "& span": {
+        fontSize: "10px",
+        color: "#888",
+        textAlign: "center",
+        maxWidth: "120px",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+    }
+});
+
 export default function ChatbotUI({ onClose }) {
     const navigate = useNavigate();
     // Let's allow closing by clicking the overlay backdrop
@@ -227,15 +263,32 @@ export default function ChatbotUI({ onClose }) {
                     {/* Messages */}
                     <MessagesContainer sx={{ pt: 12, flexGrow: 1 }}>
                         {messages.map((msg) => (
-                            <MessageBubble key={msg.id} role={msg.role}>
-                                {msg.role === "user" ? (
-                                    msg.content
-                                ) : (
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                        {msg.content}
-                                    </ReactMarkdown>
+                            <Box key={msg.id} sx={{ alignSelf: msg.role === "user" ? "flex-end" : "flex-start", maxWidth: "80%" }}>
+                                <MessageBubble role={msg.role}>
+                                    {msg.role === "user" ? (
+                                        msg.content
+                                    ) : (
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {msg.content}
+                                        </ReactMarkdown>
+                                    )}
+                                </MessageBubble>
+                                {/* Show project images from sources if available */}
+                                {msg.role === "ai" && msg.sources && msg.sources.filter(s => s.image_url).length > 0 && (
+                                    <SourceImagesContainer>
+                                        {msg.sources.filter(s => s.image_url).map((source, idx) => (
+                                            <SourceImageCard key={idx} onClick={() => window.open(source.image_url, "_blank")}>
+                                                <img
+                                                    src={source.image_url}
+                                                    alt={source.title}
+                                                    onError={(e) => { e.target.style.display = "none"; e.target.parentElement.style.display = "none"; }}
+                                                />
+                                                <span>{source.title}</span>
+                                            </SourceImageCard>
+                                        ))}
+                                    </SourceImagesContainer>
                                 )}
-                            </MessageBubble>
+                            </Box>
                         ))}
                         {isLoading && (
                             <Box sx={{ alignSelf: "flex-start", p: 1 }}>
