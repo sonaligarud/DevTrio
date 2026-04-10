@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -56,16 +57,39 @@ const desktopCategories = [
   { label: "XR", icon: "/assets/icons/XR.svg" },
 ];
 
-const mobileCategories = [
-  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
-  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
-  { label: "XR", icon: "/assets/icons/XR.svg" },
-  { label: "Video", icon: "/assets/icons/Video.svg" },
-  { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
-];
 
 const PortfolioPage = () => {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState(desktopCategories);
+
+  useEffect(() => {
+    console.log("Fetching categories on PortfolioPage mount...");
+    fetch("http://localhost:8000/api/categories/")
+      .then(res => {
+        console.log("Categories response:", res.status);
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then(data => {
+        console.log("Categories fetched:", data);
+        if (data && data.length > 0) {
+          const fallbackIcons = {
+            "Print-Designs": "/assets/icons/print-designs.svg",
+            "Social Media": "/assets/icons/social-media.svg",
+            "UI/UX": "/assets/icons/UX.svg",
+            "Video": "/assets/icons/Video.svg",
+            "XR": "/assets/icons/XR.svg",
+            "Software": "/assets/icons/UX.svg",
+          };
+          const mapped = data.map(cat => ({
+            label: cat,
+            icon: fallbackIcons[cat] || "/assets/icons/UX.svg"
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch(err => console.error("Failed to fetch categories:", err));
+  }, []);
 
   return (
     <PageWrapper>
@@ -174,7 +198,7 @@ const PortfolioPage = () => {
               gridTemplateRows: "repeat(3, 115px)",
               gap: "14px",
             }}>
-              {desktopCategories.map((cat, i) => (
+              {categories.map((cat, i) => (
                 <CategoryCard
                   key={i}
                   onClick={() => navigate(`/portfolio/${encodeURIComponent(cat.label)}`)}
@@ -230,8 +254,8 @@ const PortfolioPage = () => {
           />
           {/* Welcome text */}
           <Box sx={{ mb: 2.5, zIndex: 1 }}>
-            <Typography sx={{ fontSize: "12px",textAlign:"left" }}>Welcome!</Typography>
-            <Typography sx={{ fontSize: "22px", fontWeight: 700, textAlign:"left" }}>
+            <Typography sx={{ fontSize: "12px", textAlign: "left" }}>Welcome!</Typography>
+            <Typography sx={{ fontSize: "22px", fontWeight: 700, textAlign: "left" }}>
               Here is my work
             </Typography>
           </Box>
@@ -245,7 +269,7 @@ const PortfolioPage = () => {
             flex: 1,
             zIndex: 1,
           }}>
-            {mobileCategories.map((cat, i) => (
+            {categories.map((cat, i) => (
               <CategoryCard
                 key={i}
                 onClick={() => navigate(`/portfolio/${encodeURIComponent(cat.label)}`)}

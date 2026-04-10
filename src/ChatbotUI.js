@@ -171,6 +171,42 @@ const MessageBubble = styled(Box)(({ role }) => ({
     }
 }));
 
+const SourceImagesContainer = styled(Box)({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+    marginTop: "10px",
+});
+
+const SourceImageCard = styled(Box)({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "4px",
+    cursor: "pointer",
+    "& img": {
+        width: "120px",
+        height: "80px",
+        objectFit: "cover",
+        borderRadius: "8px",
+        border: "1px solid rgba(0, 255, 150, 0.3)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    },
+    "&:hover img": {
+        transform: "scale(1.05)",
+        boxShadow: "0 4px 16px rgba(0, 255, 150, 0.4)",
+    },
+    "& span": {
+        fontSize: "10px",
+        color: "#888",
+        textAlign: "center",
+        maxWidth: "120px",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+    }
+});
+
 export default function ChatbotUI({ onClose }) {
     const navigate = useNavigate();
     // Let's allow closing by clicking the overlay backdrop
@@ -224,20 +260,11 @@ export default function ChatbotUI({ onClose }) {
 
                 {/* Main Card */}
                 <ChatCard>
-                    {/* Greeting or Messages */}
-                    {messages.length === 0 ? (
-                        <Box sx={{ p: 4, flexGrow: 1 }}>
-                            <Typography sx={{ color: "#aaa", fontSize: "14px", fontWeight: 300, mb: 0.5 }}>
-                                Hello!
-                            </Typography>
-                            <Typography sx={{ color: "#00ff9c", fontSize: "24px", fontWeight: 500 }}>
-                                Akash Pardeshi
-                            </Typography>
-                        </Box>
-                    ) : (
-                        <MessagesContainer sx={{ pt: 12 }}>
-                            {messages.map((msg) => (
-                                <MessageBubble key={msg.id} role={msg.role}>
+                    {/* Messages */}
+                    <MessagesContainer sx={{ pt: 12, flexGrow: 1 }}>
+                        {messages.map((msg) => (
+                            <Box key={msg.id} sx={{ alignSelf: msg.role === "user" ? "flex-end" : "flex-start", maxWidth: "80%" }}>
+                                <MessageBubble role={msg.role}>
                                     {msg.role === "user" ? (
                                         msg.content
                                     ) : (
@@ -246,23 +273,38 @@ export default function ChatbotUI({ onClose }) {
                                         </ReactMarkdown>
                                     )}
                                 </MessageBubble>
-                            ))}
-                            {isLoading && (
-                                <Box sx={{ alignSelf: "flex-start", p: 1 }}>
-                                    <CircularProgress size={20} sx={{ color: "#00ff9c" }} />
-                                </Box>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </MessagesContainer>
-                    )}
+                                {/* Show project images from sources if available */}
+                                {msg.role === "ai" && msg.sources && msg.sources.filter(s => s.image_url).length > 0 && (
+                                    <SourceImagesContainer>
+                                        {msg.sources.filter(s => s.image_url).map((source, idx) => (
+                                            <SourceImageCard key={idx} onClick={() => window.open(source.image_url, "_blank")}>
+                                                <img
+                                                    src={source.image_url}
+                                                    alt={source.title}
+                                                    onError={(e) => { e.target.style.display = "none"; e.target.parentElement.style.display = "none"; }}
+                                                />
+                                                <span>{source.title}</span>
+                                            </SourceImageCard>
+                                        ))}
+                                    </SourceImagesContainer>
+                                )}
+                            </Box>
+                        ))}
+                        {isLoading && (
+                            <Box sx={{ alignSelf: "flex-start", p: 1 }}>
+                                <CircularProgress size={20} sx={{ color: "#00ff9c" }} />
+                            </Box>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </MessagesContainer>
 
                     {/* Suggestions and Input Area */}
                     <Box sx={{ p: 4, pt: 2, display: "flex", flexDirection: "column", gap: 3 }}>
-                        {messages.length === 0 && (
+                        {messages.length <= 1 && (
                             <Box sx={{ display: "flex", gap: 2 }}>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
-                                <SuggestionButton onClick={() => sendMessage("AI Suggestion")}>AI Suggestion</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("Architecture details")}>Architecture details</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("What tech stack did you use?")}>What tech stack did you use?</SuggestionButton>
+                                <SuggestionButton onClick={() => sendMessage("Tell me about the design")}>Tell me about the design</SuggestionButton>
                             </Box>
                         )}
 

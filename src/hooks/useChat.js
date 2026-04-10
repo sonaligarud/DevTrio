@@ -20,7 +20,14 @@ const formatTime = () =>
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 export function useChat() {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([
+        {
+            id: 'init_nova_msg',
+            role: 'ai',
+            content: "Hi, I am Nova, Akash's AI assistant. I can walk you through project thinking and decision. Where should we start?",
+            timestamp: formatTime()
+        }
+    ]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [mode, setMode] = useState('ai'); // 'ai' | 'web'
