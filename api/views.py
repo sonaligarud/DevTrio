@@ -20,6 +20,7 @@ import tempfile
 from pathlib import Path
 
 from rest_framework.views import APIView
+from django.db import connection
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -291,3 +292,120 @@ class DocumentIngestView(APIView):
                 {"error": "Ingestion failed.", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+# ==================================================================
+# Categories API
+# ==================================================================
+
+class CategoryListView(APIView):
+    """
+    GET /api/categories
+    Returns all unique categories from the database.
+    """
+    def get(self, request):
+        query = "SELECT DISTINCT category FROM projects WHERE category IS NOT NULL ORDER BY category ASC"
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            
+            categories = [row[0] for row in rows]
+            return Response(categories, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error fetching categories: {e}", exc_info=True)
+            return Response({"error": "Failed to fetch categories."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ==================================================================
+# Categories API
+# ==================================================================
+
+class CategoryListView(APIView):
+    """
+    GET /api/categories
+    Returns all unique categories from the database.
+    """
+    def get(self, request):
+        query = "SELECT DISTINCT category FROM projects WHERE category IS NOT NULL ORDER BY category ASC"
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            
+            categories = [row[0] for row in rows]
+            return Response(categories, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error fetching categories: {e}", exc_info=True)
+            return Response({"error": "Failed to fetch categories."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ==================================================================
+# Projects API
+# ==================================================================
+
+def map_project_row(row):
+    return {
+        "id": row[0],
+        "title": row[1],
+        "description": row[2],
+        "tech_stack": row[3],
+        "image_url": row[4],
+        "created_at": row[5],
+        "category": row[6] if len(row) > 6 else None
+    }
+
+class ProjectListView(APIView):
+    """
+    GET /api/projects
+    Returns all projects from the database.
+    Optional query parameters for filtering: ?tech_stack=React
+    """
+    def get(self, request):
+        tech_stack = request.query_params.get("tech_stack", "")
+        title = request.query_params.get("title", "")
+        category = request.query_params.get("category", "")
+
+        query = "SELECT id, title, description, tech_stack, image_url, created_at, category FROM projects WHERE 1=1"
+        params = []
+
+        if category:
+            query += " AND category ILIKE %s"
+            params.append(f"%{category}%")
+
+        if tech_stack:
+            query += " AND tech_stack ILIKE %s"
+            params.append(f"%{tech_stack}%")
+        
+        if title:
+            query += " AND title ILIKE %s"
+            params.append(f"%{title}%")
+        
+        query += " ORDER BY id ASC"
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+            
+            projects = [map_project_row(row) for row in rows]
+            return Response(projects, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error fetching projects: {e}", exc_info=True)
+            return Response({"error": "Failed to fetch projects."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProjectDetailView(APIView):
+    """
+    GET /api/projects/:id
+    Returns single project details by ID.
+    """
+    def get(self, request, pk):
+        query = "SELECT id, title, description, tech_stack, image_url, created_at, category FROM projects WHERE id = %s"
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, [pk])
+                row = cursor.fetchone()
+            
+            if row:
+                return Response(map_project_row(row), status=status.HTTP_200_OK)
+            return Response({"error": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Error fetching project {pk}: {e}", exc_info=True)
+            return Response({"error": "Failed to fetch project."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

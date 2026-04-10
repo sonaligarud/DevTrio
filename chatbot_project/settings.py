@@ -97,17 +97,20 @@ TEMPLATES = [
 _db_engine = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
 
 if _db_engine == "django.db.backends.postgresql":
+    _db_options: dict = {"connect_timeout": 10}
+    _sslmode = os.getenv("DB_SSLMODE", "")
+    if _sslmode:
+        _db_options["sslmode"] = _sslmode
+
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME":     os.getenv("DB_NAME",     "chatbot_db"),
-            "USER":     os.getenv("DB_USER",     "postgres"),
+            "ENGINE":   "django.db.backends.postgresql",
+            "NAME":     os.getenv("DB_NAME",     "neondb"),
+            "USER":     os.getenv("DB_USER",     "neondb_owner"),
             "PASSWORD": os.getenv("DB_PASSWORD", ""),
             "HOST":     os.getenv("DB_HOST",     "localhost"),
             "PORT":     os.getenv("DB_PORT",     "5432"),
-            "OPTIONS": {
-                "connect_timeout": 10,
-            },
+            "OPTIONS":  _db_options,
         }
     }
 else:

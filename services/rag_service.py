@@ -76,11 +76,17 @@ INTENT_HUMAN_PROMPT = "user_query: \"{user_query}\"\ncurrent_project: \"{current
 # System prompt template
 # Instructs the LLM how to answer using provided context
 # ------------------------------------------------------------------
-RAG_SYSTEM_PROMPT = """You are a portfolio assistant. Your sole purpose is to answer questions strictly about the projects, skills, and work documented in the portfolio knowledge base provided to you.
+RAG_SYSTEM_PROMPT = """You are Nova, Akash's AI Assistant. Your sole purpose is to answer questions strictly about the projects, skills, and work documented in the portfolio knowledge base provided to you.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔒 HARD RULES — MUST BE FOLLOWED WITHOUT EXCEPTION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RULE 0 — IDENTITY
+  • Your name is Nova. You are Akash's AI Assistant.
+  • If anyone asks who you are, what your name is, or who built you, ALWAYS answer:
+      "I am Nova, Akash's AI Assistant. I can help you explore his portfolio and projects."
+  • Never claim to be any other AI model (ChatGPT, Gemini, etc.).
 
 RULE 1 — CONTEXT IS YOUR ONLY SOURCE OF TRUTH
   • You MAY ONLY use facts explicitly present in the [Context] block below.
@@ -107,6 +113,12 @@ RULE 5 — NO HALLUCINATION UNDER ANY CIRCUMSTANCES
   • Never invent project names, statistics, technologies, dates, metrics, or names.
   • If the user asks for something specific (e.g., "What was the conversion rate?") and the
     [Context] doesn't state it, say the Rule 3 fallback — period.
+
+RULE 6 — NEVER OUTPUT IMAGE URLS IN YOUR TEXT
+  • The [Context] may contain lines like "Image URL: https://..."
+  • You MUST use image information to confirm a project has an image, but NEVER paste or print the URL in your response.
+  • The user interface automatically displays project images — you do NOT need to mention the URL.
+  • Instead, you may say something like: "Here is the project image for [Title] 👇" or "The image for [Title] is shown below."
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [Context] — THIS IS YOUR ONLY ALLOWED SOURCE:
@@ -182,6 +194,16 @@ class RAGService:
         logger.info(f"RAG chat | mode='{mode}' | project_id='{project_id}' | query='{query[:60]}'")
         
         chat_history = chat_history or []
+
+        # Short-circuit for identity questions — always answer as Nova
+        identity_keywords = ["who are you", "what is your name", "your name", "who built you", "are you an ai", "what are you", "introduce yourself"]
+        if any(kw in query.lower() for kw in identity_keywords):
+            return {
+                "answer": "I am **Nova**, Akash's AI Assistant. I can walk you through his projects, tech stack, architecture decisions, and more. Where should we start? 🚀",
+                "sources": [],
+                "mode": mode,
+                "project_id": project_id,
+            }
 
         # Step 0: Classify intent to auto-adjust routing and handle chitchat
         intent = self._classify_intent(query, project_id or "global portfolio")
@@ -344,12 +366,14 @@ class RAGService:
             meta = doc.metadata
             project = meta.get("project_id", "Unknown")
             title = meta.get("title", "Untitled")
+            image_url = meta.get("image_url", "")
             # Trim content to cap token usage per document
             content = doc.page_content
             if len(content) > self.MAX_CHARS_PER_DOC:
                 content = content[:self.MAX_CHARS_PER_DOC] + "... [truncated]"
+            image_line = f"Image URL: {image_url}" if image_url else "Image URL: (not available)"
             context_parts.append(
-                f"[Document {i}] Project: {project} | Title: {title}\n{content}"
+                f"[Document {i}] Project: {project} | Title: {title}\n{image_line}\n{content}"
             )
 
         return "\n\n---\n\n".join(context_parts)
