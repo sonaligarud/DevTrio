@@ -1,23 +1,260 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { Box, Typography, InputBase, IconButton, CircularProgress } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import AboutMe from "./AboutMe";
-import { useNavigate } from "react-router-dom";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import MicIcon from "@mui/icons-material/Mic";
+import { AboutMeContent } from "./AboutMe";
+import { useChat } from "./hooks/useChat";
+import { useSpeech } from "./hooks/useSpeech";
+import { transcribeAudio } from "./api/chatApi";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
-const UI_SHOW_FRAME = 155;  // welcome UI fades in from frame 155
-const END_FRAME = 200;       // last archive frame
+const UI_SHOW_FRAME = 155;
+const END_FRAME = 200;
 
 const framePath = (i) => {
   const n = String(i).padStart(5, "0");
   return `/assets/images/archive/Final_${n}.jpg`;
 };
 
-export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenChatbot,introComplete }) {
+const socials = [
+  { label: "LinkedIn", icon: "/assets/icons/linkedIn.svg" },
+  { label: "Behance", icon: "/assets/icons/Behance.svg" },
+  { label: "Dribbble", icon: "/assets/icons/Dribble.svg" },
+  { label: "Mobile", icon: "/assets/icons/Mobile.svg" },
+  { label: "Mail", icon: "/assets/icons/Mail.svg" },
+];
+
+/* ── Inline Chatbot panel ── */
+function ChatbotInline() {
+  const { messages, isLoading, sendMessage, messagesEndRef } = useChat();
+  const [inputValue, setInputValue] = useState("");
+
+  const handleSend = () => {
+    if (inputValue.trim()) { sendMessage(inputValue); setInputValue(""); }
+  };
+
+  const { isListening, interimText, toggleListening, isProcessing } = useSpeech({
+    onTranscript: (text) => setInputValue((p) => p ? p + " " + text : text),
+    useBackend: true,
+    onBackendTranscript: async (blob) => {
+      try {
+        const data = await transcribeAudio(blob);
+        if (data.transcript) setInputValue((p) => p ? p + " " + data.transcript : data.transcript);
+      } catch (e) { console.error(e); }
+    },
+  });
+
+  return (
+    <Box sx={{
+      flex: 1, display: "flex", flexDirection: "column",
+      background: "rgba(10,14,10,0.85)",
+      borderRadius: "0 16px 16px 0",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderLeft: "none",
+      overflow: "hidden",
+      position: "relative",
+    }}>
+      {/* Orb top-right */}
+      <Box sx={{
+        position: "absolute", top: -30, right: -30,
+        width: 110, height: 110, borderRadius: "50%",
+        background: "rgba(0,0,0,0.6)",
+        border: "1px solid rgba(0,255,150,0.3)",
+        boxShadow: "0 0 20px rgba(0,255,150,0.2)",
+        overflow: "hidden", zIndex: 10,
+      }}>
+        <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline
+          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen" }} />
+      </Box>
+
+      {/* Messages / greeting */}
+      <Box sx={{ flex: 1, overflowY: "auto", p: "24px 24px 0",
+        "&::-webkit-scrollbar": { width: "4px" },
+        "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
+      }}>
+        {messages.length === 0 ? (
+          <Box sx={{ mt: 6 }}>
+            <Typography sx={{ color: "#aaa", fontSize: "13px", lineHeight: 1.7 }}>
+              Hi!<br />
+              I'm <span style={{ color: "#00ff9c", fontWeight: 600 }}>Nova</span>, Akash's AI Assistant.<br />
+              I can walk you through projects, thinking,<br />
+              and decisions.<br />
+              Where should we start?
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {messages.map((msg) => (
+              <Box key={msg.id} sx={{
+                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                background: msg.role === "user" ? "rgba(0,255,150,0.1)" : "rgba(255,255,255,0.05)",
+                border: msg.role === "user" ? "1px solid rgba(0,255,150,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "10px", px: 2, py: 1,
+                maxWidth: "85%", color: "#fff", fontSize: "13px", lineHeight: 1.5,
+              }}>{msg.content}</Box>
+            ))}
+            {isLoading && <CircularProgress size={18} sx={{ color: "#00ff9c", alignSelf: "flex-start" }} />}
+            <div ref={messagesEndRef} />
+          </Box>
+        )}
+      </Box>
+
+      {/* Suggestion chips */}
+      {messages.length === 0 && (
+        <Box sx={{ display: "flex", gap: 1, px: 3, pb: 1.5, flexWrap: "wrap" }}>
+          {["View Case Study", "How I Design", "Start Chat"].map((s) => (
+            <Box key={s} onClick={() => sendMessage(s)} sx={{
+              px: 2, py: 0.8, borderRadius: "20px",
+              background: "#00ff9c", color: "#000",
+              fontSize: "11px", fontWeight: 600, cursor: "pointer",
+              "&:hover": { boxShadow: "0 4px 12px rgba(0,255,150,0.4)" },
+            }}>{s}</Box>
+          ))}
+        </Box>
+      )}
+
+      {/* Input */}
+      <Box sx={{ p: "12px 16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <Box sx={{
+          display: "flex", alignItems: "center", gap: 1,
+          background: "rgba(0,0,0,0.4)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "10px", px: 2, py: 0.8,
+        }}>
+          <InputBase
+            placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
+            fullWidth value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            disabled={isLoading || isProcessing}
+            sx={{ color: "#aaa", fontSize: "13px", "& input::placeholder": { color: isListening ? "#00ff9c" : "#555", opacity: 1 } }}
+          />
+          <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? "#00ff9c" : "#666", p: "4px" }}>
+            <MicIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+          <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
+            sx={{ background: "#00ff9c", color: "#000", borderRadius: "8px", p: "4px",
+              "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" } }}>
+            {isLoading || isProcessing
+              ? <CircularProgress size={16} sx={{ color: "#000" }} />
+              : <ArrowUpwardIcon sx={{ fontSize: 16 }} />}
+          </IconButton>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+/* ── Welcome split screen ── */
+function WelcomeScreen({ opacity }) {
+  const containerRef = useRef(null);
+  const [leftPct, setLeftPct] = useState(58); // % width for left panel
+  const dragging = useRef(false);
+
+  const onMouseDown = (e) => { dragging.current = true; e.preventDefault(); };
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const pct = Math.min(75, Math.max(30, (x / rect.width) * 100));
+      setLeftPct(pct);
+    };
+    const onUp = () => { dragging.current = false; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove);
+    window.addEventListener("touchend", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+    };
+  }, []);
+
+  return (
+    <Box sx={{
+      position: "absolute", inset: 0, zIndex: 5,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      opacity, visibility: opacity > 0 ? "visible" : "hidden",
+      pointerEvents: opacity > 0.5 ? "auto" : "none",
+      px: { xs: 2, md: 6 }, py: { xs: 2, md: 4 },
+    }}>
+      {/* Social icons — left edge */}
+      <Box sx={{
+        display: { xs: "none", md: "flex" }, flexDirection: "column",
+        alignItems: "center", gap: 1.5, mr: 2,
+      }}>
+        {socials.map(({ label, icon }) => (
+          <Box key={label} sx={{
+            width: 36, height: 36, borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.15)",
+            background: "rgba(255,255,255,0.04)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            transition: "border 0.2s, box-shadow 0.2s",
+            "&:hover": { border: "1px solid rgba(0,255,150,0.5)", boxShadow: "0 0 8px rgba(0,255,150,0.2)" },
+          }}>
+            <Box component="img" src={icon} alt={label} sx={{ width: 18, height: 18, filter: "brightness(0) invert(0.6)" }} />
+          </Box>
+        ))}
+      </Box>
+
+      {/* Split container */}
+      <Box ref={containerRef} sx={{
+        flex: 1, display: "flex", height: { xs: "90vh", md: "75vh" },
+        maxWidth: "1100px", position: "relative",
+        borderRadius: "16px",
+        overflow: "visible",
+      }}>
+        {/* Left panel — AboutMe */}
+        <Box sx={{
+          width: `${leftPct}%`, flexShrink: 0,
+          background: "rgba(8,11,8,0.92)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRight: "none",
+          borderRadius: "16px 0 0 16px",
+          overflowY: "auto", p: "28px 28px 24px",
+          "&::-webkit-scrollbar": { width: "4px" },
+          "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.2)", borderRadius: "2px" },
+        }}>
+          <AboutMeContent onClose={() => {}} mobile={false} />
+        </Box>
+
+        {/* Draggable divider */}
+        <Box
+          onMouseDown={onMouseDown}
+          onTouchStart={onMouseDown}
+          sx={{
+            width: "18px", flexShrink: 0,
+            background: "rgba(15,20,15,0.9)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "col-resize", zIndex: 2, position: "relative",
+            "&:hover .drag-handle": { background: "rgba(0,255,150,0.6)" },
+          }}
+        >
+          <Box className="drag-handle" sx={{
+            width: 4, height: 40, borderRadius: 2,
+            background: "rgba(255,255,255,0.2)",
+            transition: "background 0.2s",
+          }} />
+        </Box>
+
+        {/* Right panel — Chatbot */}
+        <ChatbotInline />
+      </Box>
+    </Box>
+  );
+}
+
+export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpenChatbot, introComplete }) {
   const canvasRef = useRef(null);
-  const navigate = useNavigate();
 
   const posRef = useRef(skipIntro ? END_FRAME : 0);
   const targetPosRef = useRef(skipIntro ? END_FRAME : 0);
@@ -34,7 +271,6 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
 
   // frame-derived UI states
   const [currentFrame, setCurrentFrame] = useState(skipIntro ? END_FRAME : 0);
-  const [aboutOpen, setAboutOpen] = useState(false);
   // stopped: user scrolled to frame 10 and stopped — show options
   const [stopped, setStopped] = useState(false);
   const stoppedRef = useRef(false);
@@ -132,8 +368,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
       setCurrentFrame(idx);
       onFrameChange?.(idx);
 
-      // welcome UI: fade in 155→165, full until 200, fade out below 155
-      if (idx >= UI_SHOW_FRAME) {
+      // welcome UI: fade in 155→165, visible 165→170, fade out 170→180
+       if (idx >= UI_SHOW_FRAME) {
         setWelcomeOpacity(Math.min(1, (idx - UI_SHOW_FRAME) / 10));
       } else {
         setWelcomeOpacity(0);
@@ -235,8 +471,31 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
 
 
 
-  const showScrollDownHint = currentFrame < STOP_FRAME && !stopped;
   const showScrollUpHint = welcomeOpacity >= 1;
+  const showScrollEntry = currentFrame < STOP_FRAME && !stopped;
+
+  // mute state for the ON/OFF button
+  const [muted, setMuted] = useState(true);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+    audio.loop = true;
+    audio.volume = 0.35;
+    audioRef.current = audio;
+    return () => { audio.pause(); audio.src = ""; };
+  }, []);
+
+  const handleMuteToggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (muted) {
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+    setMuted((m) => !m);
+  };
 
   return (
     <>
@@ -246,108 +505,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
           style={{ display: "block", position: "absolute", inset: 0, width: "100vw", height: "100vh" }}
         />
 
-
-
-        {/* Options panel — shown when stopped near frame 10 */}
-        {stopped && (
-          <Box sx={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Box sx={{
-              background: "rgba(5,12,8,0.88)", backdropFilter: "blur(24px)",
-              border: "1px solid rgba(0,255,150,0.2)", borderRadius: "16px",
-              padding: "32px 40px", display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-              minWidth: { xs: "85vw", md: "420px" },
-              animation: "fadeInUp 0.4s ease forwards",
-            }}>
-              <Typography sx={{ color: "#aaa", fontSize: "13px", letterSpacing: "1px" }}>
-                Select as per your preference ?
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, width: "100%" }}>
-                <OptionButton label="Talk with my AI Assistant" onClick={onOpenChatbot} />
-                <OptionButton label="Scroll to Continue Story" highlight
-                  onClick={() => {
-                    setStoppedSync(false);
-                    targetPosRef.current = END_FRAME;
-                    loadAround(STOP_FRAME, 50);
-                  }}
-                />
-                <OptionButton label="Jump on Web Mode" onClick={() => navigate('/portfolio')} />
-              </Box>
-            </Box>
-          </Box>
-        )}
-
-        {/* Welcome UI — fades in with frames 155→200 */}
-        <Box sx={{
-          position: "absolute", inset: 0, zIndex: 5,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          opacity: welcomeOpacity,
-          visibility: welcomeOpacity > 0 ? "visible" : "hidden",
-          pointerEvents: welcomeOpacity > 0.5 ? "auto" : "none",
-          transition: "none",
-        }}>
-          {/* Desktop */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", alignItems: "center" }}>
-            <Box sx={{ position: "relative", width: "700px", display: "flex", alignItems: "center" }}>
-              <Box sx={{
-                flex: 1, height: "260px",
-                backgroundImage: "url('/assets/images/vector_2026-03-26/vector@3x.png')",
-                backgroundSize: "100% 100%", backgroundRepeat: "no-repeat",
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                gap: "16px", px: "40px",
-              }}>
-                <Typography sx={{ color: "#cfcfcf", fontSize: "18px", fontWeight: 400, mb: 1.5, letterSpacing: "0.5px" }}>
-                  Welcome to the Portfolio
-                </Typography>
-                <Button onClick={onOpenChatbot} sx={{
-                  width: "70%", padding: "11px 36px", borderRadius: "10px",
-                  border: "1px solid rgba(255,255,255,0.2)", color: "#bbb",
-                  textTransform: "none", fontSize: "13px",
-                  background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", whiteSpace: "nowrap",
-                  "&:hover": { border: "1px solid #00ff9c", color: "#00ff9c" },
-                }}>Talk with my AI Assistant</Button>
-                <Button onClick={() => navigate('/portfolio')} sx={{
-                  width: "70%", padding: "11px 36px", borderRadius: "10px",
-                  border: "1px solid rgba(255,255,255,0.2)", color: "#bbb",
-                  textTransform: "none", fontSize: "13px",
-                  background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", whiteSpace: "nowrap",
-                  "&:hover": { border: "1px solid #00ff9c", color: "#00ff9c" },
-                }}>Jump on Web Mode</Button>
-              </Box>
-              <Box sx={{ position: "absolute", right: "-80px", top: "10%", transform: "translateY(-50%)", width: "150px", height: "150px", borderRadius: "50%", overflow: "hidden", zIndex: 2 }}>
-                <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </Box>
-            </Box>
-            <Box sx={{ position: "absolute", bottom: 36, textAlign: "center" }}>
-              <Typography sx={{ color: "#00ff9c", letterSpacing: "5px", fontSize: "20px", fontWeight: 500 }}>AKASH PARDESHI</Typography>
-              <Typography sx={{ color: "#555", fontSize: "9px", letterSpacing: "7px", mt: 0.8 }}>UI DESIGNER &amp; UX RESEARCHER</Typography>
-            </Box>
-          </Box>
-
-          {/* Mobile */}
-          <Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", px: 3 }}>
-            <Box sx={{
-              width: "100%", maxWidth: "360px",
-              backgroundImage: "url('/assets/images/hud/Main_Landing_Page_Mobile.svg')",
-              backgroundSize: "100% 100%", backgroundRepeat: "no-repeat",
-              position: "relative", px: 3, pt: 3, pb: 4,
-              display: "flex", flexDirection: "column", gap: 2,
-            }}>
-              <Box sx={{ position: "absolute", top: "-40px", right: "-28px", width: "100px", height: "100px", borderRadius: "50%", overflow: "hidden", zIndex: 2 }}>
-                <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </Box>
-              <Box sx={{ mt: 1 }}>
-                <Typography sx={{ color: "#aaa", fontSize: "12px" }}>Welcome to the</Typography>
-                <Typography sx={{ color: "#fff", fontSize: "26px", fontWeight: 700, lineHeight: 1.2 }}>Portfolio</Typography>
-              </Box>
-              <Box sx={{ my: 1 }}>
-                <Typography sx={{ color: "#00ff9c", letterSpacing: "3px", fontSize: "16px", fontWeight: 600 }}>AKASH PARDESHI</Typography>
-                <Typography sx={{ color: "#555", fontSize: "8px", letterSpacing: "4px", mt: 0.5 }}>UI DESIGNER &amp; UX RESEARCHER</Typography>
-              </Box>
-              <Button onClick={onOpenChatbot} sx={{ width: "100%", padding: "12px 0", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.2)", color: "#bbb", textTransform: "none", fontSize: "13px", background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", "&:hover": { border: "1px solid #00ff9c", color: "#00ff9c" } }}>Talk with my AI Assistant</Button>
-              <Button onClick={() => navigate('/portfolio')} sx={{ width: "100%", padding: "12px 0", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.2)", color: "#bbb", textTransform: "none", fontSize: "13px", background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", "&:hover": { border: "1px solid #00ff9c", color: "#00ff9c" } }}>Jump on Web Mode</Button>
-            </Box>
-          </Box>
-        </Box>
+        {/* Welcome split screen — fades in with animation */}
+        <WelcomeScreen opacity={welcomeOpacity} />
 
         <style>{`
           @keyframes fadeInUp {
@@ -365,13 +524,81 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
         `}</style>
       </Box>
 
-      {/* Scroll DOWN hint */}
-      {showScrollDownHint && (
-        <Box sx={{ position: "fixed", bottom: 36, left: 36, zIndex: 99998, display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5, pointerEvents: "none" }}>
-          <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>scroll</Typography>
-          <KeyboardArrowDownIcon sx={{ color: "rgba(0,255,150,0.7)", fontSize: 22, animation: "bounceDown 1.4s ease-in-out infinite" }} />
+      {/* Scroll entry card — shown on frame 0 before scrolling */}
+      {showScrollEntry && (
+        <Box sx={{
+          position: "fixed", inset: 0, zIndex: 99997,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none",
+        }}>
+          <Box sx={{
+            display: "flex", alignItems: "center", gap: 2,
+            px: "40px", py: "22px",
+            borderRadius: "14px",
+            background: "rgba(40,50,45,0.55)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            minWidth: "280px",
+          }}>
+            {/* Mouse scroll icon */}
+            <Box sx={{ flexShrink: 0, opacity: 0.85 }}>
+              <svg width="22" height="36" viewBox="0 0 22 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="20" height="34" rx="10" stroke="white" strokeWidth="1.5"/>
+                <rect x="9.5" y="6" width="3" height="7" rx="1.5" fill="white">
+                  <animate attributeName="y" values="6;12;6" dur="1.4s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
+                </rect>
+              </svg>
+            </Box>
+            {/* Text */}
+            <Box>
+              <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "15px", fontWeight: 400, lineHeight: 1.5 }}>
+                Scroll to enter in the
+              </Typography>
+              <Typography sx={{ color: "#fff", fontSize: "14px", fontWeight: 700, lineHeight: 1.3 }}>
+                Design lab
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       )}
+
+      {/* ON/OFF mute button — bottom right */}
+      <Box sx={{
+        position: "fixed", bottom: 28, right: 28, zIndex: 99998,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
+      }}>
+        <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "9px", letterSpacing: "2px", textTransform: "uppercase" }}>
+          ON/OFF
+        </Typography>
+        <Box
+          onClick={() => handleMuteToggle()}
+          sx={{
+            width: 40, height: 40, borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.2)",
+            background: "rgba(30,35,30,0.7)",
+            backdropFilter: "blur(10px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            transition: "border 0.2s, box-shadow 0.2s",
+            "&:hover": { border: "1px solid rgba(0,255,150,0.5)", boxShadow: "0 0 10px rgba(0,255,150,0.2)" },
+          }}
+        >
+          {muted ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+          )}
+        </Box>
+      </Box>
 
       {/* Scroll UP hint — on final UI screen */}
       {showScrollUpHint && (
@@ -381,34 +608,6 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro,onOpenC
         </Box>
       )}
 
-      {/* About Me */}
-      <Box sx={{ position: "fixed", top: 24, right: 40, zIndex: 99999 }}>
-        <Button onClick={() => setAboutOpen(true)} sx={{
-          border: "1px solid #00ff9c", color: "#00ff9c", borderRadius: "6px",
-          padding: "5px 18px", textTransform: "none", fontSize: "13px",
-          "&:hover": { background: "#00ff9c", color: "#000" },
-        }}>
-          About Me
-        </Button>
-      </Box>
-      <AboutMe open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </>
-  );
-}
-
-function OptionButton({ label, onClick, highlight }) {
-  return (
-    <Button onClick={onClick} sx={{
-      flex: 1, padding: "11px 16px", borderRadius: "10px",
-      border: highlight ? "1px solid rgba(0,255,150,0.5)" : "1px solid rgba(255,255,255,0.15)",
-      color: highlight ? "#00ff9c" : "#bbb",
-      textTransform: "none", fontSize: "12px",
-      background: highlight ? "rgba(0,255,150,0.06)" : "rgba(255,255,255,0.03)",
-      backdropFilter: "blur(10px)", whiteSpace: "nowrap",
-      transition: "all 0.3s ease",
-      "&:hover": { border: "1px solid #00ff9c", color: "#00ff9c", boxShadow: "0 0 14px rgba(0,255,150,0.3)" },
-    }}>
-      {label}
-    </Button>
   );
 }
