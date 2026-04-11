@@ -15,7 +15,7 @@
 .loader-line {
   width: 100px;
   height: 2px;
-  background-color: #00ff88;
+  background-color: #00CD1F;
   border-radius: 2px;
   animation: expand 1.2s ease-in-out infinite alternate;
 }

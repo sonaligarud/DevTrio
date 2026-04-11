@@ -70,7 +70,8 @@ function ChatbotInline() {
       </Box>
 
       {/* Messages / greeting */}
-      <Box sx={{ flex: 1, overflowY: "auto", p: "24px 24px 0",
+      <Box sx={{
+        flex: 1, overflowY: "auto", p: "24px 24px 0",
         "&::-webkit-scrollbar": { width: "4px" },
         "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
       }}>
@@ -135,8 +136,10 @@ function ChatbotInline() {
             <MicIcon sx={{ fontSize: 18 }} />
           </IconButton>
           <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
-            sx={{ background: "#00ff9c", color: "#000", borderRadius: "8px", p: "4px",
-              "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" } }}>
+            sx={{
+              background: "#00ff9c", color: "#000", borderRadius: "8px", p: "4px",
+              "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" }
+            }}>
             {isLoading || isProcessing
               ? <CircularProgress size={16} sx={{ color: "#000" }} />
               : <ArrowUpwardIcon sx={{ fontSize: 16 }} />}
@@ -223,7 +226,7 @@ function WelcomeScreen({ opacity }) {
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.2)", borderRadius: "2px" },
         }}>
-          <AboutMeContent onClose={() => {}} mobile={false} />
+          <AboutMeContent onClose={() => { }} mobile={false} />
         </Box>
 
         {/* Draggable divider */}
@@ -369,7 +372,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       onFrameChange?.(idx);
 
       // welcome UI: fade in 155→165, visible 165→170, fade out 170→180
-       if (idx >= UI_SHOW_FRAME) {
+      if (idx >= UI_SHOW_FRAME) {
         setWelcomeOpacity(Math.min(1, (idx - UI_SHOW_FRAME) / 10));
       } else {
         setWelcomeOpacity(0);
@@ -397,7 +400,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       // clear reversing only when we've fully scrubbed back to start
       if (reversingRef.current && idx <= 1) {
         reversingRef.current = false;
-      }    }
+      }
+    }
   }, [drawFrame, loadAround, preloadBackward, onComplete, onFrameChange]);
 
   // ── Init ──────────────────────────────────────────────────────────────────
@@ -490,7 +494,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
     const audio = audioRef.current;
     if (!audio) return;
     if (muted) {
-      audio.play().catch(() => {});
+      audio.play().catch(() => { });
     } else {
       audio.pause();
     }
@@ -543,15 +547,12 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
             minWidth: "280px",
           }}>
             {/* Mouse scroll icon */}
-            <Box sx={{ flexShrink: 0, opacity: 0.85 }}>
-              <svg width="22" height="36" viewBox="0 0 22 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="1" y="1" width="20" height="34" rx="10" stroke="white" strokeWidth="1.5"/>
-                <rect x="9.5" y="6" width="3" height="7" rx="1.5" fill="white">
-                  <animate attributeName="y" values="6;12;6" dur="1.4s" repeatCount="indefinite"/>
-                  <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/>
-                </rect>
-              </svg>
-            </Box>
+            <Box
+              component="img"
+              src="/assets/gif/scroll.gif"
+              alt="scroll down"
+              sx={{ width: "20px" }}
+            />
             {/* Text */}
             <Box>
               <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "15px", fontWeight: 400, lineHeight: 1.5 }}>
@@ -588,17 +589,39 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
         >
           {muted ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-              <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
             </svg>
           ) : (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
             </svg>
           )}
         </Box>
       </Box>
+
+      {/* Scroll gif — bottom left, frame 1–5 (gif only) */}
+
+      {/* Scroll gif + text — bottom left, after frame 6 until welcome UI */}
+      {currentFrame > 6 && welcomeOpacity === 0 && (
+        <Box sx={{
+          position: "fixed", bottom: 28, left: 28, zIndex: 99998,
+          display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
+          pointerEvents: "none",
+        }}>
+           <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>
+            scroll down
+          </Typography>
+          <Box
+            component="img"
+            src="/assets/gif/scroll.gif"
+            alt="scroll"
+            sx={{ width: 20, opacity: 0.85 }}
+          />
+         
+        </Box>
+      )}
 
       {/* Scroll UP hint — on final UI screen */}
       {showScrollUpHint && (

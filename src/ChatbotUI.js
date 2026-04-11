@@ -8,8 +8,15 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+// Simple markdown renderer to avoid external dependency
+const ReactMarkdown = ({ children }) => {
+  const html = (children || "")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/\n/g, "<br/>");
+  return <span dangerouslySetInnerHTML={{ __html: html }} />;
+};
 
 const OverlayContainer = styled(Box)({
     position: "fixed",
@@ -241,9 +248,7 @@ export default function ChatbotUI({ onClose }) {
                                     {msg.role === "user" ? (
                                         msg.content
                                     ) : (
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                            {msg.content}
-                                        </ReactMarkdown>
+                                        <ReactMarkdown>{msg.content}</ReactMarkdown>
                                     )}
                                 </MessageBubble>
                             ))}

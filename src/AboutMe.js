@@ -3,6 +3,7 @@ import { Box, Typography, Modal, useMediaQuery, useTheme, Chip } from "@mui/mate
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import { PRIMARY, primaryAlpha } from "./theme";
 
 /* ── Styled components ── */
 const ModalBox = styled(Box)(({ mobile }) => ({
@@ -18,28 +19,58 @@ const ModalBox = styled(Box)(({ mobile }) => ({
   background: "rgba(8, 11, 8, 0.97)",
   backdropFilter: "blur(30px)",
   WebkitBackdropFilter: "blur(30px)",
-  border: mobile ? "none" : "1px solid rgba(0,255,150,0.12)",
+  border: mobile ? "none" : `1px solid ${primaryAlpha(0.12)}`,
   borderRadius: mobile ? 0 : "20px",
   padding: mobile ? "24px 20px 32px" : "32px 36px 32px",
   color: "#fff",
-  boxShadow: mobile ? "none" : "0 0 60px rgba(0,255,150,0.08)",
+  boxShadow: mobile ? "none" : `0 0 60px ${primaryAlpha(0.08)}`,
   "&::-webkit-scrollbar": { width: "4px" },
-  "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.25)", borderRadius: "4px" },
+  "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
 }));
 
 const Tab = styled(Box)(({ active }) => ({
-  padding: "6px 18px",
+  position: "relative",
+  padding: "6px 22px",
   borderRadius: "8px",
   fontSize: "13px",
   fontWeight: 500,
   cursor: "pointer",
-  color: active ? "#000" : "#888",
-  background: active ? "#00ff9c" : "transparent",
-  border: active ? "none" : "1px solid rgba(255,255,255,0.12)",
+  color: active ? PRIMARY : "rgba(255,255,255,0.75)",
+  background: active
+    ? `linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`
+    : "rgba(255,255,255,0.04)",
+  border: active ? "1px solid transparent" : "1px solid rgba(255,255,255,0.12)",
+  backdropFilter: "blur(50px)",
+  WebkitBackdropFilter: "blur(50px)",
   transition: "all 0.2s",
+  "&::after": active ? {
+    content: '""',
+    position: "absolute",
+    bottom: "-8px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 0,
+    height: 0,
+    borderLeft: "7px solid transparent",
+    borderRight: "7px solid transparent",
+    borderTop: `8px solid ${PRIMARY}`,
+  } : { content: '""' },
   "&:hover": {
-    color: active ? "#000" : "#fff",
-    borderColor: active ? "none" : "rgba(255,255,255,0.3)",
+    color: PRIMARY,
+    background: `linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`,
+    border: "1px solid transparent",
+  },
+  "&:hover::after": {
+    content: '""',
+    position: "absolute",
+    bottom: "-8px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 0,
+    height: 0,
+    borderLeft: "7px solid transparent",
+    borderRight: "7px solid transparent",
+    borderTop: `8px solid ${PRIMARY}`,
   },
 }));
 
@@ -51,7 +82,7 @@ const ExpCard = styled(Box)({
   minWidth: "130px",
   flexShrink: 0,
   transition: "border 0.2s",
-  "&:hover": { border: "1px solid rgba(0,255,150,0.35)" },
+  "&:hover": { border: `1px solid ${primaryAlpha(0.35)}` },
 });
 
 const CertCard = styled(Box)({
@@ -65,27 +96,28 @@ const CertCard = styled(Box)({
   WebkitBackdropFilter: "blur(38px)",
   boxShadow: "0 6px 13px 0 rgba(0,0,0,0.3), inset 0 1px 2px 0 rgba(0,0,0,0.25)",
   background: `linear-gradient(#0b0b0b, #0b0b0b) padding-box,
-    linear-gradient(100deg, #8f8f8f 1%, #636363 27%, #00cd1f 48%, #636363 69%, #8f8f8f 97%) border-box`,
+    linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`,
   border: "1px solid transparent",
 });
 
 const DownloadBtn = styled(Box)({
   display: "flex",
   alignItems: "center",
-  gap: "8px",
-  padding: "10px 20px",
-  borderRadius: "10px",
-  border: "1px solid rgba(0,255,150,0.35)",
-  background: "rgba(0,255,150,0.06)",
+  gap: "10px",
+  padding: "12px 24px",
+  borderRadius: "12px",
+  border: "1px solid rgba(255,255,255,0.15)",
+  background: "rgba(20,25,20,0.9)",
   cursor: "pointer",
-  color: "#00ff9c",
+  color: "#fff",
   fontSize: "13px",
   fontWeight: 500,
   whiteSpace: "nowrap",
   transition: "background 0.2s, box-shadow 0.2s",
   "&:hover": {
-    background: "rgba(0,255,150,0.12)",
-    boxShadow: "0 0 14px rgba(0,255,150,0.2)",
+    background: "rgba(30,35,30,0.95)",
+    borderColor: primaryAlpha(0.4),
+    boxShadow: `0 0 14px ${primaryAlpha(0.15)}`,
   },
 });
 
@@ -111,22 +143,23 @@ const workCategories = [
 ];
 
 const WorkCategoryCard = styled(Box)({
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.09)",
+  backgroundImage: "url('/assets/images/bg-images/frame-633656.svg')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
   borderRadius: "14px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   gap: "10px",
-  padding: "20px 16px",
+  padding: "32px 16px",
   cursor: "pointer",
   flex: 1,
   transition: "all 0.2s",
   "&:hover": {
-    border: "1px solid rgba(0,255,150,0.4)",
-    background: "rgba(0,255,150,0.04)",
-    boxShadow: "0 0 16px rgba(0,255,150,0.1)",
+    backgroundImage: "url('/assets/images/bg-images/frame-633657.svg')",
+    padding: "32px 16px",
   },
 });
 
@@ -141,8 +174,8 @@ function WorkTab({ onClose }) {
 
   return (
     <Box>
-      {/* Category cards row */}
-      <Box sx={{ display: "flex", gap: 1.5, mb: 3, flexWrap: "wrap" }}>
+      {/* Category cards — single row */}
+      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
         {workCategories.map((cat) => (
           <WorkCategoryCard key={cat.label} onClick={() => handleCategoryClick(cat.label)}>
             <Box
@@ -158,17 +191,12 @@ function WorkTab({ onClose }) {
         ))}
       </Box>
 
-      {/* Bio text */}
-      <Typography sx={{ fontSize: "12px", color: "#666", lineHeight: 1.8, mb: 3 }}>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-      </Typography>
-
-      {/* Divider */}
-      <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.07)", mb: 2.5 }} />
-
-      {/* Download Resume */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <DownloadBtn>
+      {/* Bio + Download Resume row */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
+        <Typography sx={{ fontSize: "12px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        </Typography>
+        <DownloadBtn sx={{ flexShrink: 0 }}>
           <FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />
           Download Resume
         </DownloadBtn>
@@ -195,7 +223,7 @@ function AboutMeTab({ mobile }) {
           pb: 1,
           mb: 3,
           "&::-webkit-scrollbar": { height: "3px" },
-          "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.25)", borderRadius: "4px" },
+          "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
         }}
       >
         {experiences.map((exp) => (
@@ -242,9 +270,9 @@ function AboutMeTab({ mobile }) {
                 borderRadius: "8px",
                 transition: "all 0.2s",
                 "&:hover": {
-                  background: "rgba(0,255,150,0.08)",
-                  borderColor: "rgba(0,255,150,0.35)",
-                  color: "#00ff9c",
+                  background: primaryAlpha(0.08),
+                  borderColor: primaryAlpha(0.35),
+                  color: PRIMARY,
                 },
               }}
             />
@@ -263,7 +291,7 @@ function AboutMeTab({ mobile }) {
 
 /* ── Main modal content ── */
 function AboutMeContent({ onClose, mobile }) {
-  const [activeTab, setActiveTab] = useState("about");
+  const [activeTab, setActiveTab] = useState("work");
 
   return (
     <>
@@ -275,7 +303,7 @@ function AboutMeContent({ onClose, mobile }) {
             Welcome to the Portfolio!
           </Typography>
           <Typography sx={{ fontSize: mobile ? "26px" : "32px", fontWeight: 700, lineHeight: 1.1 }}>
-            Akash <span style={{ color: "#00ff9c" }}>P</span>
+            <span style={{ color: PRIMARY }}>Akash P</span>
           </Typography>
         </Box>
 
