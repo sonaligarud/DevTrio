@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import AudioButton from "./AudioButton";
 
 const PageWrapper = styled(Box)({
   height: "100vh",
@@ -69,6 +70,7 @@ const PortfolioPage = () => {
 
   return (
     <PageWrapper>
+      <AudioButton />
 
       {/* ══════════════ DESKTOP ══════════════ */}
       <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", height: "100%", p: 4, pr: 6, position: "relative", zIndex: 1 }}>

@@ -7,6 +7,7 @@ import { AboutMeContent } from "./AboutMe";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
+import AudioButton from "./AudioButton";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -478,29 +479,6 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
   const showScrollUpHint = welcomeOpacity >= 1;
   const showScrollEntry = currentFrame < STOP_FRAME && !stopped;
 
-  // mute state for the ON/OFF button
-  const [muted, setMuted] = useState(true);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-    audio.loop = true;
-    audio.volume = 0.35;
-    audioRef.current = audio;
-    return () => { audio.pause(); audio.src = ""; };
-  }, []);
-
-  const handleMuteToggle = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (muted) {
-      audio.play().catch(() => { });
-    } else {
-      audio.pause();
-    }
-    setMuted((m) => !m);
-  };
-
   return (
     <>
       <Box sx={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000" }}>
@@ -567,39 +545,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       )}
 
       {/* ON/OFF mute button — bottom right */}
-      <Box sx={{
-        position: "fixed", bottom: 28, right: 28, zIndex: 99998,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
-      }}>
-        <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "9px", letterSpacing: "2px", textTransform: "uppercase" }}>
-          ON/OFF
-        </Typography>
-        <Box
-          onClick={() => handleMuteToggle()}
-          sx={{
-            width: 40, height: 40, borderRadius: "10px",
-            border: "1px solid rgba(255,255,255,0.2)",
-            background: "rgba(30,35,30,0.7)",
-            backdropFilter: "blur(10px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-            transition: "border 0.2s, box-shadow 0.2s",
-            "&:hover": { border: "1px solid rgba(0,255,150,0.5)", boxShadow: "0 0 10px rgba(0,255,150,0.2)" },
-          }}
-        >
-          {muted ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
-            </svg>
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-            </svg>
-          )}
-        </Box>
-      </Box>
+      <AudioButton />
 
       {/* Scroll gif — bottom left, frame 1–5 (gif only) */}
 

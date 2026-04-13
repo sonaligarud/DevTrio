@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
+import AudioButton from "./AudioButton";
 
 // ─── Category tabs config ─────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -137,10 +138,11 @@ const ActiveTabLine = styled(Box)({
 });
 
 const SliderDot = styled(Box)(({ active }) => ({
-  width: "15px",
-  height: "15px",
+  width: "12px",
+  height: "12px",
   borderRadius: "50%",
-  background: active ? "#00cd1f" : "rgba(255,255,255,0.25)",
+  background: active ? "#00cd1f" : "",
+  border: active ? "" : "solid 1px #ddd",
   cursor: "pointer",
   transition: "all 0.2s ease",
   boxShadow: active ? "0 0 8px #00cd1f" : "none",
@@ -400,6 +402,7 @@ const ProjectDetailPage = () => {
   return (
     <>
     <PageWrapper>
+      <AudioButton />
       {/* ══════════════ DESKTOP ══════════════ */}
       <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", height: "100%", p: "24px 28px 24px" }}>
 
@@ -497,7 +500,7 @@ const ProjectDetailPage = () => {
                   <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
                 ))}
                 <Box sx={{
-                  position: "absolute", right: 12, bottom: 12,
+                  position: "absolute", right: 50, bottom: 100,
                   borderRadius: "6px",
                   display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
                 }} onClick={() => setExpanded(true)}>
@@ -603,7 +606,7 @@ const ProjectDetailPage = () => {
 
           {/* Image viewer */}
           <Box sx={{ flex: 1, position: "relative", display: "flex", alignItems: "center", minHeight: 0, mb: 1.5 }}>
-            <NavArrowBtn onClick={prevSlide} sx={{ position: "absolute", left: -10, zIndex: 2}}>
+            <NavArrowBtn onClick={prevSlide} sx={{ position: "absolute", left: 10, zIndex: 2}}>
               <Box component="img" src="/assets/icons/left.svg" alt="prev"/>
             </NavArrowBtn>
             <Box sx={{
@@ -613,7 +616,7 @@ const ProjectDetailPage = () => {
               <Box component="img" src={slides[currentSlide]} alt={`slide-${currentSlide}`}
                 sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
             </Box>
-            <NavArrowBtn onClick={nextSlide} sx={{ position: "absolute", right: -10, zIndex: 2}}>
+            <NavArrowBtn onClick={nextSlide} sx={{ position: "absolute", right: 10, zIndex: 2}}>
               <Box component="img" src="/assets/icons/left.svg" alt="next"/>
             </NavArrowBtn>
           </Box>
@@ -688,7 +691,7 @@ const ProjectDetailPage = () => {
 
               {/* Minimize icon — bottom right of slider */}
               <Box onClick={() => setExpanded(false)} sx={{
-                position: "absolute", bottom: 12, right: 12,
+                position: "absolute", bottom: 50, right: 50,
                 width: 34, height: 34, borderRadius: "6px",
                 background: "rgba(0,0,0,0.6)",
                 display: "flex", alignItems: "center", justifyContent: "center",
