@@ -3,90 +3,37 @@ import { styled } from "@mui/material/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 import AudioButton from "./AudioButton";
 
-// ─── Category tabs config ─────────────────────────────────────────────────────
 const CATEGORIES = [
-  { label: "UI/UX",         route: "UI/UX" },
-  { label: "Social Media",  route: "Social Media" },
-  { label: "Videos",        route: "Video" },
-  { label: "Print Media",   route: "Print-Designs" },
+  { label: "UI/UX",        route: "UI/UX" },
+  { label: "Social Media", route: "Social Media" },
+  { label: "Videos",       route: "Video" },
+  { label: "Print Media",  route: "Print-Designs" },
 ];
 
 // ─── Styled ───────────────────────────────────────────────────────────────────
 
 const PageWrapper = styled(Box)({
-  height: "100vh",
-  width: "100%",
+  height: "100vh", width: "100%",
   backgroundImage: "url('/assets/images/bg-images/Background.jpg')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
+  backgroundSize: "cover", backgroundPosition: "center",
   backgroundColor: "#05070a",
-  position: "relative",
-  overflow: "hidden",
-  color: "#fff",
-  display: "flex",
-  flexDirection: "column",
+  position: "relative", overflow: "hidden",
+  color: "#fff", display: "flex", flexDirection: "column",
 });
 
-const MainMenuChip = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  padding: "7px 28px 7px 14px",
-  background: "rgba(30,34,40,0.95)",
-  border: "1px solid rgba(255,255,255,0.18)",
-  borderRadius: "8px 0 0 8px",
-  fontSize: "13px",
-  color: "#fff",
-  cursor: "pointer",
-  clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%)",
-  "&:hover": { background: "rgba(50,55,62,0.95)" },
-});
-
-
-const ProjectTab = styled(Box)(({ active }) => ({
-  padding: "6px 20px",
-  borderRadius: "6px",
-  fontSize: "12px",
-  fontWeight: active ? 600 : 400,
-  color: active ? "#00cd1f" : "#888",
-  background: active ? "rgba(184,255,110,0.08)" : "transparent",
-  border: active ? "1px solid #00cd1f" : "1px solid rgba(255,255,255,0.1)",
-  cursor: "pointer",
-  whiteSpace: "nowrap",
-  transition: "all 0.2s ease",
-  "&:hover": { border: "1px solid rgba(184,255,110,0.3)", color: "#ccc" },
-}));
-
-const NavArrowBtn = styled(IconButton)({
-  width: "28px",
-  height: "52px",
-  background: "rgba(5,10,5,0.75)",
-  border: "1px solid rgba(0,205,31,0.35)",
-  color: "#00cd1f",
-  borderRadius: "6px",
-  flexShrink: 0,
-  "&:hover": {
-    background: "rgba(0,205,31,0.08)",
-    borderColor: "rgba(0,205,31,0.65)",
-    boxShadow: "0 0 8px rgba(0,205,31,0.2)",
-  },
-});
-
-// Tab shape matching the screenshot: trapezoid — angled left/right sides, flat top
-// Active: green text + green bottom accent line. Inactive: dim gray.
 const CategoryTab = styled(Box)(({ active }) => ({
   position: "relative",
-  padding: "10px 34px 11px",
+  padding: "9px 32px 10px",
   fontSize: "13px",
   fontWeight: active ? 600 : 400,
-  color: active ? "#b8ff6e" : "#555",
+  color: active ? "#00CD1F" : "#555",
   cursor: "pointer",
   whiteSpace: "nowrap",
   letterSpacing: "0.3px",
@@ -96,65 +43,54 @@ const CategoryTab = styled(Box)(({ active }) => ({
   zIndex: active ? 3 : 1,
   userSelect: "none",
   isolation: "isolate",
-  // Border layer (slightly larger, same clip shape)
   "&::before": {
-    content: '""',
-    position: "absolute",
-    inset: "-1px",
+    content: '""', position: "absolute", inset: "-1px",
     clipPath: "polygon(14px 0%, calc(100% - 14px) 0%, 100% 100%, 0% 100%)",
-    background: active
-      ? "rgba(184,255,110,0.25)"
-      : "rgba(255,255,255,0.07)",
+    background: active ? "rgba(0,205,31,0.18)" : "rgba(255,255,255,0.06)",
     zIndex: -1,
   },
-  // Fill layer
   "&::after": {
-    content: '""',
-    position: "absolute",
-    inset: 0,
+    content: '""', position: "absolute", inset: 0,
     clipPath: "polygon(14px 0%, calc(100% - 14px) 0%, 100% 100%, 0% 100%)",
-    background: active
-      ? "rgba(12,18,10,0.97)"
-      : "rgba(8,10,8,0.55)",
+    background: active ? "rgba(8,14,8,0.97)" : "rgba(8,10,8,0.55)",
     zIndex: -1,
   },
   "& span": { position: "relative", zIndex: 1 },
-  "&:hover": { color: active ? "#b8ff6e" : "#888" },
-  "&:hover::after": {
-    background: active ? "rgba(12,18,10,0.97)" : "rgba(14,17,14,0.8)",
-  },
+  "&:hover": { color: active ? "#00CD1F" : "#888" },
 }));
 
-// Green bottom accent line shown under the active tab
 const ActiveTabLine = styled(Box)({
   height: "2px",
-  background: "linear-gradient(90deg, transparent 14px, #00cd1f calc(14px), #00cd1f calc(100% - 14px), transparent calc(100% - 14px))",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
-  zIndex: 4,
-  pointerEvents: "none",
+  background: "linear-gradient(90deg, transparent 14px, #00CD1F calc(14px), #00CD1F calc(100% - 14px), transparent calc(100% - 14px))",
+  position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 4, pointerEvents: "none",
 });
 
-const SliderDot = styled(Box)(({ active }) => ({
-  width: "12px",
-  height: "12px",
-  borderRadius: "50%",
-  background: active ? "#00cd1f" : "",
-  border: active ? "" : "solid 1px #ddd",
-  cursor: "pointer",
-  transition: "all 0.2s ease",
-  boxShadow: active ? "0 0 8px #00cd1f" : "none",
+const ProjectTab = styled(Box)(({ active }) => ({
+  padding: "6px 18px",
+  borderRadius: "6px",
+  fontSize: "12px",
+  fontWeight: active ? 600 : 400,
+  color: active ? "#00CD1F" : "#666",
+  background: active ? "rgba(0,205,31,0.08)" : "transparent",
+  border: active ? "1px solid #00CD1F" : "1px solid rgba(255,255,255,0.1)",
+  cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s ease",
+  "&:hover": { border: "1px solid rgba(0,205,31,0.4)", color: "#ccc" },
 }));
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+const SliderDot = styled(Box)(({ active }) => ({
+  width: "10px", height: "10px", borderRadius: "50%",
+  background: active ? "#00CD1F" : "transparent",
+  border: active ? "none" : "1px solid rgba(255,255,255,0.4)",
+  cursor: "pointer", transition: "all 0.2s ease",
+  boxShadow: active ? "0 0 6px #00CD1F" : "none",
+}));
+
+// ─── Project Data ─────────────────────────────────────────────────────────────
 
 const projectData = {
   "UI/UX": [
     {
-      id: 1, label: "UI/UX", name: "Swift",
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+      id: 1, name: "Swift",
       slides: [
         "/assets/images/projects/swift/1.jpg",
         "/assets/images/projects/swift/2.jpg",
@@ -167,55 +103,34 @@ const projectData = {
         "/assets/images/projects/swift/9.jpg",
       ],
     },
-    {
-      id: 2, label: "UI/UX", name: "Project Name Here",
-      description: "Dashboard redesign for analytics platform with improved data visualization.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png", "/assets/images/group.png"],
-    },
-    {
-      id: 3, label: "UI/UX", name: "Project Name Here",
-      description: "E-commerce mobile application design with seamless checkout flow.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
-    },
-    {
-      id: 4, label: "UI/UX", name: "Project Name Here",
-      description: "Onboarding flow redesign for SaaS product improving user activation.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
-    },
+    { id: 2, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png", "/assets/images/group.png"] },
+    { id: 3, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
+    { id: 4, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
   "Social Media": [
-    {
-      id: 1, label: "Social Media", name: "Project Name Here",
-      description: "Instagram campaign for product launch.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
-    },
+    { id: 1, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
   "Print-Designs": [
     {
-      id: 1, label: "Print", name: "Project Name Here",
-      description: "Complete brand identity package.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
+      id: 1, name: "Brand Identity",
+      slides: [
+        { image: "/assets/images/group.png", brand: "BrandCo", title: "The Art of\nBrand Identity.", description: "BrandCo empowers businesses with cohesive visual identities — from logo systems to full brand guidelines." },
+        { image: "/assets/images/group.png", brand: "PrintStudio", title: "Print That\nSpeaks Volumes.", description: "Crafting print materials that communicate brand values clearly." },
+      ],
     },
+    { id: 2, name: "Packaging Design", slides: [{ image: "/assets/images/group.png", brand: "PackagePro", title: "Packaging That\nProtects & Sells.", description: "Structural and graphic packaging solutions." }] },
   ],
   "Video": [
-    {
-      id: 1, label: "Video", name: "Project Name Here",
-      description: "Animated explainer video for product demo.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
-    },
+    { id: 1, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
   "XR": [
-    {
-      id: 1, label: "XR", name: "Project Name Here",
-      description: "Immersive virtual reality environment design.",
-      slides: ["/assets/images/group.png", "/assets/images/group.png"],
-    },
+    { id: 1, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
 };
 
-// ─── Inline Chatbot Panel ─────────────────────────────────────────────────────
+// ─── Chatbot Panel ────────────────────────────────────────────────────────────
 
-function ChatbotPanel({ onNavigate }) {
+function ChatbotPanel() {
   const { messages, isLoading, sendMessage, messagesEndRef } = useChat();
   const [inputValue, setInputValue] = useState("");
 
@@ -235,56 +150,34 @@ function ChatbotPanel({ onNavigate }) {
   });
 
   return (
-    <Box sx={{
-      display: "flex", flexDirection: "column", height: "100%",
-      background: "rgba(10,14,10,0.85)",
-      borderRadius: "0 16px 16px 0",
-      border: "1px solid rgba(255,255,255,0.08)",
-      borderLeft: "none",
-      overflow: "hidden",
-      position: "relative",
-    }}>
-      {/* Orb top-right */}
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", position: "relative" }}>
+      {/* Messages */}
       <Box sx={{
-        position: "absolute", top: -30, right: -30,
-        width: 110, height: 110, borderRadius: "50%",
-        background: "rgba(0,0,0,0.6)",
-        border: "1px solid rgba(0,255,150,0.3)",
-        boxShadow: "0 0 20px rgba(0,255,150,0.2)",
-        overflow: "hidden", zIndex: 10,
-      }}>
-        <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline
-          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen" }} />
-      </Box>
-
-      {/* Messages / greeting */}
-      <Box sx={{
-        flex: 1, overflowY: "auto", p: "24px 24px 0",
-        "&::-webkit-scrollbar": { width: "4px" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
+        flex: 1, overflowY: "auto", px: 2.5, pt: 3, pb: 1,
+        "&::-webkit-scrollbar": { width: "3px" },
+        "&::-webkit-scrollbar-thumb": { background: "rgba(0,205,31,0.2)", borderRadius: "2px" },
       }}>
         {messages.length === 0 ? (
-          <Box sx={{ mt: 6 }}>
-            <Typography sx={{ color: "#aaa", fontSize: "13px", lineHeight: 1.7 }}>
+          <Box sx={{ mt: 2 }}>
+            <Typography sx={{ color: "#aaa", fontSize: "13px", lineHeight: 1.8 }}>
               Hi!<br />
-              I'm <span style={{ color: "#00ff9c", fontWeight: 600 }}>Nova</span>, Akash's AI Assistant.<br />
-              I can walk you through projects, thinking,<br />
-              and decisions.<br />
+              I'm <span style={{ color: "#00CD1F", fontWeight: 600 }}>Nova</span>, Akash's AI Assistant.<br />
+              I can walk you through projects, thinking, and decisions.<br />
               Where should we start?
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, pt: 6 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
             {messages.map((msg) => (
               <Box key={msg.id} sx={{
                 alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                background: msg.role === "user" ? "rgba(0,255,150,0.1)" : "rgba(255,255,255,0.05)",
-                border: msg.role === "user" ? "1px solid rgba(0,255,150,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                background: msg.role === "user" ? "rgba(0,205,31,0.1)" : "rgba(255,255,255,0.05)",
+                border: msg.role === "user" ? "1px solid rgba(0,205,31,0.25)" : "1px solid rgba(255,255,255,0.08)",
                 borderRadius: "10px", px: 2, py: 1,
                 maxWidth: "85%", color: "#fff", fontSize: "13px", lineHeight: 1.5,
               }}>{msg.content}</Box>
             ))}
-            {isLoading && <CircularProgress size={18} sx={{ color: "#00ff9c", alignSelf: "flex-start" }} />}
+            {isLoading && <CircularProgress size={18} sx={{ color: "#00CD1F", alignSelf: "flex-start" }} />}
             <div ref={messagesEndRef} />
           </Box>
         )}
@@ -292,25 +185,26 @@ function ChatbotPanel({ onNavigate }) {
 
       {/* Suggestion chips */}
       {messages.length === 0 && (
-        <Box sx={{ display: "flex", gap: 1, px: 3, pb: 1.5, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 1, px: 2.5, pb: 1.5, flexWrap: "wrap" }}>
           {["View Case Study", "About Akash"].map((s) => (
             <Box key={s} onClick={() => sendMessage(s)} sx={{
-              px: 2, py: 0.8, borderRadius: "20px",
-              background: "#00ff9c", color: "#000",
-              fontSize: "11px", fontWeight: 600, cursor: "pointer",
-              "&:hover": { boxShadow: "0 4px 12px rgba(0,255,150,0.4)" },
+              px: 2, py: 0.7, borderRadius: "20px",
+              background: "rgba(0,205,31,0.12)",
+              border: "1px solid rgba(0,205,31,0.35)",
+              color: "#00CD1F", fontSize: "11px", fontWeight: 600, cursor: "pointer",
+              "&:hover": { background: "rgba(0,205,31,0.2)" },
             }}>{s}</Box>
           ))}
         </Box>
       )}
 
-      {/* Input */}
-      <Box sx={{ p: "12px 16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      {/* Input bar */}
+      <Box sx={{ px: 2, pb: 2, pt: 1, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <Box sx={{
           display: "flex", alignItems: "center", gap: 1,
-          background: "rgba(0,0,0,0.4)",
+          background: "rgba(0,0,0,0.35)",
           border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "10px", px: 2, py: 0.8,
+          borderRadius: "10px", px: 1.5, py: 0.7,
         }}>
           <InputBase
             placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
@@ -318,19 +212,20 @@ function ChatbotPanel({ onNavigate }) {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={isLoading || isProcessing}
-            sx={{ color: "#aaa", fontSize: "13px", "& input::placeholder": { color: isListening ? "#00ff9c" : "#555", opacity: 1 } }}
+            sx={{ color: "#ccc", fontSize: "13px", "& input::placeholder": { color: isListening ? "#00CD1F" : "#555", opacity: 1 } }}
           />
-          <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? "#00ff9c" : "#666", p: "4px" }}>
-            <MicIcon sx={{ fontSize: 18 }} />
+          <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? "#00CD1F" : "#555", p: "4px" }}>
+            <MicIcon sx={{ fontSize: 17 }} />
           </IconButton>
           <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
             sx={{
-              background: "#00ff9c", color: "#000", borderRadius: "8px", p: "4px",
-              "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" }
+              background: "#00CD1F", color: "#000", borderRadius: "7px", p: "4px",
+              "&:hover": { background: "#00b81a" },
+              "&.Mui-disabled": { background: "rgba(0,205,31,0.2)" },
             }}>
             {isLoading || isProcessing
-              ? <CircularProgress size={16} sx={{ color: "#000" }} />
-              : <ArrowUpwardIcon sx={{ fontSize: 16 }} />}
+              ? <CircularProgress size={15} sx={{ color: "#000" }} />
+              : <ArrowUpwardIcon sx={{ fontSize: 15 }} />}
           </IconButton>
         </Box>
       </Box>
@@ -338,30 +233,7 @@ function ChatbotPanel({ onNavigate }) {
   );
 }
 
-// ─── Minimized Orb Button ─────────────────────────────────────────────────────
-
-function OrbButton({ onClick }) {
-  return (
-    <Box
-      onClick={onClick}
-      sx={{
-        position: "fixed", top: 20, right: 20, zIndex: 200,
-        width: 80, height: 80, borderRadius: "50%",
-        background: "rgba(0,0,0,0.6)",
-        border: "1px solid rgba(0,255,150,0.4)",
-        boxShadow: "0 0 24px rgba(0,255,150,0.25)",
-        overflow: "hidden", cursor: "pointer",
-        transition: "box-shadow 0.2s",
-        "&:hover": { boxShadow: "0 0 36px rgba(0,255,150,0.45)" },
-      }}
-    >
-      <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline
-        style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
-    </Box>
-  );
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 const ProjectDetailPage = () => {
   const { category: rawCategory } = useParams();
@@ -370,350 +242,329 @@ const ProjectDetailPage = () => {
   const projects = projectData[category] || [];
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [chatOpen, setChatOpen] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
   const currentProject = projects[currentProjectIndex] || {};
   const slides = currentProject.slides || [];
   const totalSlides = slides.length;
 
+  // Normalize slide
+  const rawSlide = slides[currentSlide];
+  const slideData = typeof rawSlide === "string" ? { image: rawSlide } : (rawSlide || {});
+  const isSplitSlide = !!(slideData.title || slideData.brand);
+
   const prevSlide = () => setCurrentSlide((s) => (s - 1 + totalSlides) % totalSlides);
   const nextSlide = () => setCurrentSlide((s) => (s + 1) % totalSlides);
+  const handleProjectChange = (i) => { setCurrentProjectIndex(i); setCurrentSlide(0); };
 
-  const handleProjectChange = (i) => {
-    setCurrentProjectIndex(i);
-    setCurrentSlide(0);
-  };
-
-  // scroll on image area to navigate slides
   const imageAreaRef = useRef(null);
   useEffect(() => {
     const el = imageAreaRef.current;
     if (!el) return;
-    const onWheel = (e) => {
-      e.preventDefault();
-      if (e.deltaY > 0) nextSlide();
-      else prevSlide();
-    };
+    const onWheel = (e) => { e.preventDefault(); e.deltaY > 0 ? nextSlide() : prevSlide(); };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   });
 
+  // ── Draggable divider ──────────────────────────────────────────────────────
+  const bodyRowRef = useRef(null);
+  const [chatWidthPct, setChatWidthPct] = useState(28); // % of body row width
+  const dragging = useRef(false);
+
+  const onDividerMouseDown = (e) => { dragging.current = true; e.preventDefault(); };
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragging.current || !bodyRowRef.current) return;
+      const rect = bodyRowRef.current.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      // chatbot is on the right — pct from right edge
+      const pct = Math.min(55, Math.max(18, ((rect.width - x) / rect.width) * 100));
+      setChatWidthPct(pct);
+    };
+    const onUp = () => { dragging.current = false; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+    };
+  }, []);
+
   return (
     <>
-    <PageWrapper>
-      <AudioButton />
-      {/* ══════════════ DESKTOP ══════════════ */}
-      <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", height: "100%", p: "24px 28px 24px" }}>
+      <PageWrapper>
+        <AudioButton />
 
-        {/* Top row: Main Menu chip + Category tabs */}
-        <Box sx={{ display: "flex", alignItems: "flex-end", gap: 0, mb: 0 }}>
-          {/* Main Menu back chip */}
-          <MainMenuChip onClick={() => navigate("/")} sx={{ mb: "1px", mr: 1.5, alignSelf: "center" }}>
-            Main Menu
-          </MainMenuChip>
+        {/* ══════════ DESKTOP ══════════ */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", height: "100%", p: "20px 20px 16px 20px" }}>
 
-          {/* Category tabs */}
-          <Box sx={{ display: "flex", alignItems: "flex-end", gap: 0, overflow: "visible" }}>
+          {/* Top bar: category tabs row */}
+          <Box sx={{ display: "flex", alignItems: "flex-end", mb: 0, pl: "2px" }}>
             {CATEGORIES.map((cat) => {
               const isActive = category === cat.route;
               return (
-                <CategoryTab
-                  key={cat.route}
-                  active={isActive ? 1 : 0}
-                  onClick={() => {
-                    if (!isActive) navigate(`/portfolio/${encodeURIComponent(cat.route)}`);
-                  }}
-                >
+                <CategoryTab key={cat.route} active={isActive ? 1 : 0}
+                  onClick={() => { if (!isActive) navigate(`/portfolio/${encodeURIComponent(cat.route)}`); }}>
                   <span>{cat.label}</span>
                   {isActive && <ActiveTabLine />}
                 </CategoryTab>
               );
             })}
           </Box>
-        </Box>
 
-        {/* Main card */}
-        <Box sx={{
-          flex: 1,
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: "0 16px 16px 16px",
-          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(28px)",
-          position: "relative", display: "flex", flexDirection: "column",
-          overflow: "hidden", p: "20px 24px 16px",
-          zIndex: 1,
-        }}>
-          {/* Project tabs row */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
-            <Box onClick={() => navigate("/portfolio")} sx={{
-              width: 30, height: 30, borderRadius: "6px",
-              border: "1px solid rgba(255,255,255,0.2)",
+          {/* Body row: left arrow + main panel + right arrow + chatbot panel */}
+          <Box ref={bodyRowRef} sx={{ flex: 1, display: "flex", alignItems: "stretch", gap: "10px", minHeight: 0 }}>
+
+            {/* Left nav arrow */}
+            <Box onClick={prevSlide} sx={{
+              width: 28, flexShrink: 0, alignSelf: "center",
+              height: 52, borderRadius: "6px",
+              background: "rgba(5,10,5,0.75)",
+              border: "1px solid rgba(0,205,31,0.35)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", color: "#fff", flexShrink: 0,
-              "&:hover": { background: "rgba(255,255,255,0.08)" },
+              cursor: "pointer", color: "#00CD1F",
+              "&:hover": { background: "rgba(0,205,31,0.08)", borderColor: "rgba(0,205,31,0.65)" },
             }}>
-              <ArrowBackIosNewIcon sx={{ fontSize: 13 }} />
+              <Box component="img" src="/assets/icons/left.svg" alt="prev" sx={{ width: 14 }} />
             </Box>
-            {projects.map((proj, i) => (
-              <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}>
-                Project -{i + 1}
-              </ProjectTab>
-            ))}
-          </Box>
 
-          {/* Content: image left + chatbot right */}
-          <Box sx={{ flex: 1, display: "flex", gap: 0, minHeight: 0 }}>
+            {/* Main panel — portfolio-page.svg frame */}
+            <Box sx={{ flex: 1, position: "relative", minWidth: 0, minHeight: 0 }}>
+              {/* SVG HUD frame */}
+              <Box component="img" src="/assets/images/hud/portfolio-page.svg" alt=""
+                sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none", zIndex: 2 }} />
 
-            {/* Left arrow — outside image panel */}
-            <NavArrowBtn onClick={prevSlide} sx={{ borderRadius: "6px 0 0 6px", borderRight: "none" }}>
-              <Box component="img" src="/assets/icons/left.svg" alt="prev"/>
-            </NavArrowBtn>
+              {/* Inner content */}
+              <Box sx={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", p: "14px 16px 40px 16px", zIndex: 1 }}>
 
-            {/* Left: image viewer */}
-            <Box
-              ref={imageAreaRef}
-              sx={{
-                flex: 1, display: "flex", flexDirection: "column", minHeight: 0,
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderLeft: "none", borderRight: "none",
-                background: "rgba(0,0,0,0.3)",
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              {/* Image */}
-              <Box sx={{
-                flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-                p: 3, minHeight: 0,
-              }}>
-                <Box
-                  component="img"
-                  src={slides[currentSlide]}
-                  alt={`slide-${currentSlide}`}
-                  sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" }}
-                />
-              </Box>
+                {/* Project tabs row */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
+                  <Box onClick={() => navigate("/portfolio")} sx={{
+                    width: 28, height: 28, borderRadius: "6px",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", color: "#fff", flexShrink: 0,
+                    "&:hover": { background: "rgba(255,255,255,0.08)" },
+                  }}>
+                    <ArrowBackIosNewIcon sx={{ fontSize: 12 }} />
+                  </Box>
+                  {projects.map((proj, i) => (
+                    <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}>
+                      Project -{i + 1}
+                    </ProjectTab>
+                  ))}
+                </Box>
 
-              {/* Expand + dots row */}
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.8, pb: 1.5, position: "relative" }}>
-                {Array.from({ length: totalSlides }).map((_, i) => (
-                  <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
-                ))}
-                <Box sx={{
-                  position: "absolute", right: 50, bottom: 100,
-                  borderRadius: "6px",
-                  display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
-                }} onClick={() => setExpanded(true)}>
-                  <Box component="img" src="/assets/images/extend.svg" alt="expand" />
+                {/* Slide image area */}
+                <Box ref={imageAreaRef} sx={{ flex: 1, minHeight: 0, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {isSplitSlide ? (
+                    <Box sx={{ display: "flex", alignItems: "center", width: "100%", height: "100%", gap: 5, px: 2 }}>
+                      <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minWidth: 0 }}>
+                        <Box component="img" src={slideData.image} alt="slide"
+                          sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" }} />
+                      </Box>
+                      <Box sx={{ flex: "0 0 40%", display: "flex", flexDirection: "column", gap: 1.5 }}>
+                        {slideData.brand && (
+                          <Typography sx={{ fontSize: "14px", color: "#00CD1F", fontWeight: 500 }}>{slideData.brand}</Typography>
+                        )}
+                        <Typography sx={{ fontSize: "26px", fontWeight: 700, lineHeight: 1.25, color: "#fff", whiteSpace: "pre-line" }}>
+                          {slideData.title}
+                        </Typography>
+                        {slideData.description && (
+                          <Typography sx={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, mt: 0.5 }}>
+                            <Box component="span" sx={{ color: "#00CD1F", fontWeight: 600 }}>{slideData.brand}</Box>{" "}
+                            {slideData.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box component="img" src={slideData.image} alt={`slide-${currentSlide}`}
+                      sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" }} />
+                  )}
+
+                  {/* Expand button */}
+                  <Box onClick={() => setExpanded(true)} sx={{
+                    position: "absolute", bottom: 8, right: 8,
+                    width: 32, height: 32, borderRadius: "6px",
+                    background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.12)",
+                    display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+                    "&:hover": { borderColor: "rgba(0,205,31,0.4)" },
+                  }}>
+                    <Box component="img" src="/assets/images/extend.svg" alt="expand" sx={{ width: 16 }} />
+                  </Box>
+                </Box>
+
+                {/* Dots */}
+                <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8, pt: 1.5 }}>
+                  {Array.from({ length: totalSlides }).map((_, i) => (
+                    <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
+                  ))}
                 </Box>
               </Box>
             </Box>
 
-            {/* Right arrow — outside image panel */}
-            <NavArrowBtn onClick={nextSlide} sx={{
-              borderRadius: chatOpen ? "0" : "0 6px 6px 0",
-              borderLeft: "none",
-              borderRight: chatOpen ? "none" : "1px solid rgba(0,205,31,0.35)",
+            {/* Right nav arrow */}
+            <Box onClick={nextSlide} sx={{
+              width: 28, flexShrink: 0, alignSelf: "center",
+              height: 52, borderRadius: "6px",
+              background: "rgba(5,10,5,0.75)",
+              border: "1px solid rgba(0,205,31,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", color: "#00CD1F",
+              "&:hover": { background: "rgba(0,205,31,0.08)", borderColor: "rgba(0,205,31,0.65)" },
             }}>
-              <Box component="img" src="/assets/icons/left.svg" alt="next"/>
-            </NavArrowBtn>
-
-            {/* Right: chatbot panel (collapsible) */}
-            <Box sx={{
-              width: chatOpen ? "320px" : 0,
-              flexShrink: 0,
-              overflow: "hidden",
-              transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
-            }}>
-              {chatOpen && <ChatbotPanel />}
+              <Box component="img" src="/assets/icons/right.svg" alt="next" sx={{ width: 14 }} />
             </Box>
 
-            {/* Toggle tab on the right edge */}
+            {/* Draggable divider */}
             <Box
-              onClick={() => setChatOpen((o) => !o)}
+              onMouseDown={onDividerMouseDown}
+              onTouchStart={onDividerMouseDown}
               sx={{
-                width: 20, flexShrink: 0, alignSelf: "stretch",
-                background: "rgba(0,255,150,0.06)",
-                border: "1px solid rgba(0,255,150,0.15)",
-                borderLeft: "none",
-                borderRadius: "0 8px 8px 0",
+                width: "14px", flexShrink: 0, alignSelf: "stretch",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer",
-                transition: "background 0.2s",
-                "&:hover": { background: "rgba(0,255,150,0.12)" },
+                cursor: "col-resize", zIndex: 3,
+                "&:hover .divider-handle": { background: "rgba(0,205,31,0.7)" },
               }}
             >
-              <Box sx={{
-                width: 3, height: 32, borderRadius: 2,
-                background: "rgba(0,255,150,0.4)",
+              <Box className="divider-handle" sx={{
+                width: 3, height: 48, borderRadius: 2,
+                background: "rgba(255,255,255,0.15)",
+                transition: "background 0.2s",
               }} />
             </Box>
-          </Box>
-        </Box>
-      </Box>
 
-      {/* ══════════════ MOBILE ══════════════ */}
-      <Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", height: "100%", px: 2, pt: 2.5, pb: 2 }}>
+            {/* Chatbot panel — portfolio-chantbot.svg frame */}
+            <Box sx={{ width: `${chatWidthPct}%`, flexShrink: 0, position: "relative" }}>
+              {/* SVG HUD frame */}
+              <Box component="img" src="/assets/images/hud/portfolio-chantbot.svg" alt=""
+                sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none", zIndex: 2 }} />
 
-        {/* Category tabs (scrollable) */}
-        <Box sx={{ display: "flex", alignItems: "flex-end", gap: 0, overflowX: "auto", pb: 0, mb: 0,
-          "&::-webkit-scrollbar": { display: "none" } }}>
-          <Box onClick={() => navigate("/")} sx={{
-            px: 2, py: 1, mr: 1, borderRadius: "8px",
-            border: "1px solid rgba(255,255,255,0.15)",
-            fontSize: "11px", color: "#aaa", cursor: "pointer", whiteSpace: "nowrap",
-            alignSelf: "center",
-            "&:hover": { color: "#fff" },
-          }}>← Menu</Box>
-          {CATEGORIES.map((cat) => {
-            const isActive = category === cat.route;
-            return (
-              <CategoryTab
-                key={cat.route}
-                active={isActive ? 1 : 0}
-                onClick={() => { if (!isActive) navigate(`/portfolio/${encodeURIComponent(cat.route)}`); }}
-                sx={{ fontSize: "11px", padding: "7px 16px" }}
-              >
-                <span>{cat.label}</span>
-                {isActive && <ActiveTabLine />}
-              </CategoryTab>
-            );
-          })}
-        </Box>
+              {/* Orb — top-right circular cutout of the chatbot SVG */}
+              <Box sx={{
+                position: "absolute", top: -6, right: -6, zIndex: 5,
+                width: 110, height: 110, borderRadius: "50%",
+                background: "rgba(0,0,0,0.7)",
+                border: "1px solid rgba(0,205,31,0.3)",
+                boxShadow: "0 0 24px rgba(0,205,31,0.25)",
+                overflow: "hidden",
+              }}>
+                <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline
+                  style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
+              </Box>
 
-        {/* Card */}
-        <Box sx={{
-          flex: 1, border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0 16px 16px 16px",
-          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)",
-          display: "flex", flexDirection: "column", p: 2, overflow: "hidden", position: "relative",
-          zIndex: 1,
-        }}>
-          {/* Project tabs */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2, overflowX: "auto", pb: 0.5 }}>
-            <Box onClick={() => navigate("/portfolio")} sx={{
-              width: 28, height: 28, borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)",
-              display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
-            }}>
-              <ArrowBackIosNewIcon sx={{ fontSize: 11, color: "#fff" }} />
+              {/* Chat content */}
+              <Box sx={{ position: "absolute", inset: 0, pt: "120px", pb: "8px", zIndex: 1 }}>
+                <ChatbotPanel />
+              </Box>
             </Box>
-            {projects.map((proj, i) => (
-              <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}
-                sx={{ fontSize: "11px", padding: "5px 14px" }}>
-                Project -{i + 1}
-              </ProjectTab>
-            ))}
-          </Box>
 
-          {/* Image viewer */}
-          <Box sx={{ flex: 1, position: "relative", display: "flex", alignItems: "center", minHeight: 0, mb: 1.5 }}>
-            <NavArrowBtn onClick={prevSlide} sx={{ position: "absolute", left: 10, zIndex: 2}}>
-              <Box component="img" src="/assets/icons/left.svg" alt="prev"/>
-            </NavArrowBtn>
-            <Box sx={{
-              flex: 1, background: "rgba(0,0,0,0.3)", borderRadius: "10px", overflow: "hidden",
-              height: "100%", mx: "18px", display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Box component="img" src={slides[currentSlide]} alt={`slide-${currentSlide}`}
-                sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
-            </Box>
-            <NavArrowBtn onClick={nextSlide} sx={{ position: "absolute", right: 10, zIndex: 2}}>
-              <Box component="img" src="/assets/icons/left.svg" alt="next"/>
-            </NavArrowBtn>
-          </Box>
-
-          {/* Dots */}
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8, mb: 1.5 }}>
-            {Array.from({ length: totalSlides }).map((_, i) => (
-              <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
-            ))}
           </Box>
         </Box>
 
-        {/* Mobile: floating orb to open chatbot */}
-        {!chatOpen && <OrbButton onClick={() => setChatOpen(true)} />}
+        {/* ══════════ MOBILE ══════════ */}
+        <Box sx={{ display: { xs: "flex", md: "none" }, flexDirection: "column", height: "100%", px: 2, pt: 2.5, pb: 2 }}>
+          {/* Category tabs */}
+          <Box sx={{ display: "flex", alignItems: "flex-end", gap: 0, overflowX: "auto", "&::-webkit-scrollbar": { display: "none" } }}>
+            <Box onClick={() => navigate("/")} sx={{
+              px: 2, py: 1, mr: 1, borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.15)",
+              fontSize: "11px", color: "#aaa", cursor: "pointer", whiteSpace: "nowrap", alignSelf: "center",
+            }}>← Menu</Box>
+            {CATEGORIES.map((cat) => {
+              const isActive = category === cat.route;
+              return (
+                <CategoryTab key={cat.route} active={isActive ? 1 : 0}
+                  onClick={() => { if (!isActive) navigate(`/portfolio/${encodeURIComponent(cat.route)}`); }}
+                  sx={{ fontSize: "11px", padding: "7px 16px" }}>
+                  <span>{cat.label}</span>
+                  {isActive && <ActiveTabLine />}
+                </CategoryTab>
+              );
+            })}
+          </Box>
 
-        {/* Mobile chatbot overlay */}
-        {chatOpen && (
+          {/* Card */}
           <Box sx={{
-            position: "fixed", inset: 0, zIndex: 300,
-            background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)",
-            display: "flex", flexDirection: "column",
-            p: 2, pt: 4,
-          }} onClick={(e) => { if (e.target === e.currentTarget) setChatOpen(false); }}>
-            <Box sx={{ flex: 1, borderRadius: "16px", overflow: "hidden", maxHeight: "80vh", mt: "auto" }}>
-              <ChatbotPanel />
+            flex: 1, border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0 16px 16px 16px",
+            background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)",
+            display: "flex", flexDirection: "column", p: 2, overflow: "hidden", position: "relative", zIndex: 1,
+          }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2, overflowX: "auto", pb: 0.5 }}>
+              <Box onClick={() => navigate("/portfolio")} sx={{
+                width: 28, height: 28, borderRadius: "6px", border: "1px solid rgba(255,255,255,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+              }}>
+                <ArrowBackIosNewIcon sx={{ fontSize: 11, color: "#fff" }} />
+              </Box>
+              {projects.map((proj, i) => (
+                <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}
+                  sx={{ fontSize: "11px", padding: "5px 14px" }}>
+                  Project -{i + 1}
+                </ProjectTab>
+              ))}
+            </Box>
+
+            <Box sx={{ flex: 1, position: "relative", display: "flex", alignItems: "center", minHeight: 0, mb: 1.5 }}>
+              <Box onClick={prevSlide} sx={{ position: "absolute", left: 0, zIndex: 2, width: 28, height: 44, borderRadius: "6px", background: "rgba(5,10,5,0.75)", border: "1px solid rgba(0,205,31,0.35)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <Box component="img" src="/assets/icons/left.svg" alt="prev" sx={{ width: 12 }} />
+              </Box>
+              <Box sx={{ flex: 1, background: "rgba(0,0,0,0.3)", borderRadius: "10px", overflow: "hidden", height: "100%", mx: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Box component="img" src={slideData.image} alt={`slide-${currentSlide}`} sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
+              </Box>
+              <Box onClick={nextSlide} sx={{ position: "absolute", right: 0, zIndex: 2, width: 28, height: 44, borderRadius: "6px", background: "rgba(5,10,5,0.75)", border: "1px solid rgba(0,205,31,0.35)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <Box component="img" src="/assets/icons/right.svg" alt="next" sx={{ width: 12 }} />
+              </Box>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8, mb: 1 }}>
+              {Array.from({ length: totalSlides }).map((_, i) => (
+                <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
+              ))}
             </Box>
           </Box>
-        )}
-      </Box>
-    </PageWrapper>
+        </Box>
+      </PageWrapper>
 
-      {/* ══════════════ FULLSCREEN OVERLAY ══════════════ */}
+      {/* ══════════ FULLSCREEN OVERLAY ══════════ */}
       {expanded && (
         <Box sx={{
           position: "fixed", inset: 0, zIndex: 9999,
           backgroundImage: "url('/assets/images/bg-images/bg.jpg')",
           backgroundSize: "cover", backgroundPosition: "center",
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          gap: 1.5,
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1.5,
         }}>
-          {/* Row: left arrow + slider box + right arrow */}
-          <Box sx={{ display: "flex", alignItems: "center", width: "100%", maxWidth: 1500, gap: 1.5 }}>
-
-            {/* Left arrow */}
-            <Box onClick={prevSlide} sx={{
-              width: 28, height: 52, flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(5,10,5,0.75)",
-              borderRadius: "6px", cursor: "pointer",
-            }}>
-              <Box component="img" src="/assets/icons/right.svg" alt="prev"/>
+          <Box sx={{ display: "flex", alignItems: "center", width: "100%", maxWidth: 1400, gap: 1.5, px: 2 }}>
+            <Box onClick={prevSlide} sx={{ width: 28, height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,10,5,0.75)", borderRadius: "6px", cursor: "pointer" }}>
+              <Box component="img" src="/assets/icons/left.svg" alt="prev" />
             </Box>
-
-            {/* Slider box with extend-screen.svg background */}
             <Box sx={{
-              flex: 1,
-              aspectRatio: "16/9",
+              flex: 1, aspectRatio: "16/9",
               backgroundImage: "url('/assets/images/bg-images/extend-screen.svg')",
               backgroundSize: "cover", backgroundPosition: "center",
-              borderRadius: "12px",
-              overflow: "hidden",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              position: "relative",
+              borderRadius: "12px", overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center", position: "relative",
             }}>
-              <Box
-                component="img"
-                src={slides[currentSlide]}
-                alt={`slide-${currentSlide}`}
-                sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
-              />
-
-              {/* Minimize icon — bottom right of slider */}
+              <Box component="img" src={slideData.image} alt={`slide-${currentSlide}`} sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               <Box onClick={() => setExpanded(false)} sx={{
-                position: "absolute", bottom: 50, right: 50,
-                width: 34, height: 34, borderRadius: "6px",
-                background: "rgba(0,0,0,0.6)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer",
+                position: "absolute", bottom: 12, right: 12,
+                width: 34, height: 34, borderRadius: "6px", background: "rgba(0,0,0,0.6)",
+                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
               }}>
                 <Box component="img" src="/assets/images/extend.svg" alt="minimize" sx={{ transform: "rotate(180deg)" }} />
               </Box>
             </Box>
-
-            {/* Right arrow */}
-            <Box onClick={nextSlide} sx={{
-              width: 28, height: 52, flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(5,10,5,0.75)",
-              borderRadius: "6px", cursor: "pointer",
-            }}>
-              <Box component="img" src="/assets/icons/left.svg" alt="next" />
+            <Box onClick={nextSlide} sx={{ width: 28, height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,10,5,0.75)", borderRadius: "6px", cursor: "pointer" }}>
+              <Box component="img" src="/assets/icons/right.svg" alt="next" />
             </Box>
           </Box>
-
-          {/* Dots */}
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 0.8 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8 }}>
             {Array.from({ length: totalSlides }).map((_, i) => (
               <SliderDot key={i} active={i === currentSlide ? 1 : 0} onClick={() => setCurrentSlide(i)} />
             ))}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, Modal, useMediaQuery, useTheme, Chip } from "@mui/material";
+import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -207,6 +207,10 @@ function WorkTab({ onClose }) {
 
 /* ── About Me tab content ── */
 function AboutMeTab({ mobile }) {
+  // Split skills into two rows of 4
+  const row1 = skills.slice(0, 4);
+  const row2 = skills.slice(4);
+
   return (
     <>
       {/* Experience label */}
@@ -215,30 +219,28 @@ function AboutMeTab({ mobile }) {
       </Typography>
 
       {/* Experience cards – horizontal scroll */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1.5,
-          overflowX: "auto",
-          pb: 1,
-          mb: 3,
-          "&::-webkit-scrollbar": { height: "3px" },
-          "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
-        }}
-      >
+      <Box sx={{
+        display: "flex", gap: 1.5, overflowX: "auto", pb: 1, mb: 2.5,
+        "&::-webkit-scrollbar": { height: "3px" },
+        "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
+      }}>
         {experiences.map((exp) => (
           <ExpCard key={exp.company}>
-            <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#fff", whiteSpace: "nowrap" }}>
+            <Typography sx={{ fontSize: "13px", fontWeight: 700, color: "#fff", whiteSpace: "nowrap" }}>
               {exp.company}
             </Typography>
-            <Typography sx={{ fontSize: "11px", color: "#888", mt: 0.4 }}>{exp.role}</Typography>
-            <Typography sx={{ fontSize: "10px", color: "#555", mt: 0.3 }}>{exp.period}</Typography>
+            <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#fff", mt: 0.2, whiteSpace: "nowrap" }}>
+              {exp.role}
+            </Typography>
+            <Typography sx={{ fontSize: "11px", color: "#555", mt: 0.3, whiteSpace: "nowrap" }}>
+              {exp.period}
+            </Typography>
           </ExpCard>
         ))}
       </Box>
 
       {/* Cert card */}
-      <CertCard sx={{ mb: 3 }}>
+      <CertCard sx={{ mb: 2.5 }}>
         <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0 }} />
         <Box>
           <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>
@@ -251,36 +253,27 @@ function AboutMeTab({ mobile }) {
       </CertCard>
 
       {/* Divider */}
-      <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.07)", mb: 2.5 }} />
+      <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.07)", mb: 2 }} />
 
-      {/* Skills left, Download Resume right */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
-        {/* Skills chips — left */}
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-          {skills.map((s) => (
-            <Chip
-              key={s}
-              label={s}
-              size="small"
-              sx={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: "#ccc",
-                fontSize: "11px",
-                borderRadius: "8px",
-                transition: "all 0.2s",
-                "&:hover": {
-                  background: primaryAlpha(0.08),
-                  borderColor: primaryAlpha(0.35),
-                  color: PRIMARY,
-                },
-              }}
-            />
+      {/* Skills rows + Download Resume */}
+      <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 2 }}>
+        {/* Skills — two rows with green arrow prefix */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.9 }}>
+          {[row1, row2].map((row, ri) => (
+            <Box key={ri} sx={{ display: "flex", gap: 2.5, flexWrap: "wrap" }}>
+              {row.map((s) => (
+                <Box key={s} sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
+                  {/* Green diagonal arrow */}
+                  <Box sx={{ color: PRIMARY, fontSize: "14px", lineHeight: 1, fontWeight: 700, mt: "-1px" }}>↗</Box>
+                  <Typography sx={{ fontSize: "12px", color: "#ccc", whiteSpace: "nowrap" }}>{s}</Typography>
+                </Box>
+              ))}
+            </Box>
           ))}
         </Box>
 
-        {/* Download Resume — right */}
-        <DownloadBtn>
+        {/* Download Resume */}
+        <DownloadBtn sx={{ flexShrink: 0 }}>
           <FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />
           Download Resume
         </DownloadBtn>
