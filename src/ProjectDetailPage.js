@@ -111,14 +111,8 @@ const projectData = {
     { id: 1, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
   "Print-Designs": [
-    {
-      id: 1, name: "Brand Identity",
-      slides: [
-        { image: "/assets/images/group.png", brand: "BrandCo", title: "The Art of\nBrand Identity.", description: "BrandCo empowers businesses with cohesive visual identities — from logo systems to full brand guidelines." },
-        { image: "/assets/images/group.png", brand: "PrintStudio", title: "Print That\nSpeaks Volumes.", description: "Crafting print materials that communicate brand values clearly." },
-      ],
-    },
-    { id: 2, name: "Packaging Design", slides: [{ image: "/assets/images/group.png", brand: "PackagePro", title: "Packaging That\nProtects & Sells.", description: "Structural and graphic packaging solutions." }] },
+    { id: 1, name: "Brand Identity", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
+    { id: 2, name: "Packaging Design", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
   ],
   "Video": [
     { id: 1, name: "Project Name Here", slides: ["/assets/images/group.png", "/assets/images/group.png"] },
@@ -325,12 +319,11 @@ const ProjectDetailPage = () => {
               width: 28, flexShrink: 0, alignSelf: "center",
               height: 52, borderRadius: "6px",
               background: "rgba(5,10,5,0.75)",
-              border: "1px solid rgba(0,205,31,0.35)",
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", color: "#00CD1F",
               "&:hover": { background: "rgba(0,205,31,0.08)", borderColor: "rgba(0,205,31,0.65)" },
             }}>
-              <Box component="img" src="/assets/icons/left.svg" alt="prev" sx={{ width: 14 }} />
+              <Box component="img" src="/assets/icons/right.svg" alt="prev"/>
             </Box>
 
             {/* Main panel — portfolio-page.svg frame */}
@@ -355,7 +348,7 @@ const ProjectDetailPage = () => {
                   </Box>
                   {projects.map((proj, i) => (
                     <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}>
-                      Project -{i + 1}
+                      {proj.name || `Project -${i + 1}`}
                     </ProjectTab>
                   ))}
                 </Box>
@@ -396,7 +389,7 @@ const ProjectDetailPage = () => {
                     display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
                     "&:hover": { borderColor: "rgba(0,205,31,0.4)" },
                   }}>
-                    <Box component="img" src="/assets/images/extend.svg" alt="expand" sx={{ width: 16 }} />
+                    <Box component="img" src="/assets/images/extend.svg" alt="expand"/>
                   </Box>
                 </Box>
 
@@ -414,12 +407,11 @@ const ProjectDetailPage = () => {
               width: 28, flexShrink: 0, alignSelf: "center",
               height: 52, borderRadius: "6px",
               background: "rgba(5,10,5,0.75)",
-              border: "1px solid rgba(0,205,31,0.35)",
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", color: "#00CD1F",
               "&:hover": { background: "rgba(0,205,31,0.08)", borderColor: "rgba(0,205,31,0.65)" },
             }}>
-              <Box component="img" src="/assets/icons/right.svg" alt="next" sx={{ width: 14 }} />
+              <Box component="img" src="/assets/icons/left.svg" alt="next"/>
             </Box>
 
             {/* Draggable divider */}
@@ -506,20 +498,20 @@ const ProjectDetailPage = () => {
               {projects.map((proj, i) => (
                 <ProjectTab key={proj.id} active={i === currentProjectIndex ? 1 : 0} onClick={() => handleProjectChange(i)}
                   sx={{ fontSize: "11px", padding: "5px 14px" }}>
-                  Project -{i + 1}
+                  {proj.name || `Project -${i + 1}`}
                 </ProjectTab>
               ))}
             </Box>
 
             <Box sx={{ flex: 1, position: "relative", display: "flex", alignItems: "center", minHeight: 0, mb: 1.5 }}>
               <Box onClick={prevSlide} sx={{ position: "absolute", left: 0, zIndex: 2, width: 28, height: 44, borderRadius: "6px", background: "rgba(5,10,5,0.75)", border: "1px solid rgba(0,205,31,0.35)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <Box component="img" src="/assets/icons/left.svg" alt="prev" sx={{ width: 12 }} />
+                <Box component="img" src="/assets/icons/right.svg" alt="prev"/>
               </Box>
               <Box sx={{ flex: 1, background: "rgba(0,0,0,0.3)", borderRadius: "10px", overflow: "hidden", height: "100%", mx: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Box component="img" src={slideData.image} alt={`slide-${currentSlide}`} sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
               </Box>
               <Box onClick={nextSlide} sx={{ position: "absolute", right: 0, zIndex: 2, width: 28, height: 44, borderRadius: "6px", background: "rgba(5,10,5,0.75)", border: "1px solid rgba(0,205,31,0.35)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <Box component="img" src="/assets/icons/right.svg" alt="next" sx={{ width: 12 }} />
+                <Box component="img" src="/assets/icons/right.svg" alt="next" />
               </Box>
             </Box>
 
@@ -542,7 +534,7 @@ const ProjectDetailPage = () => {
         }}>
           <Box sx={{ display: "flex", alignItems: "center", width: "100%", maxWidth: 1400, gap: 1.5, px: 2 }}>
             <Box onClick={prevSlide} sx={{ width: 28, height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,10,5,0.75)", borderRadius: "6px", cursor: "pointer" }}>
-              <Box component="img" src="/assets/icons/left.svg" alt="prev" />
+              <Box component="img" src="/assets/icons/right.svg" alt="prev" />
             </Box>
             <Box sx={{
               flex: 1, aspectRatio: "16/9",
@@ -553,7 +545,7 @@ const ProjectDetailPage = () => {
             }}>
               <Box component="img" src={slideData.image} alt={`slide-${currentSlide}`} sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
               <Box onClick={() => setExpanded(false)} sx={{
-                position: "absolute", bottom: 12, right: 12,
+                position: "absolute", bottom: 50,right: 20,
                 width: 34, height: 34, borderRadius: "6px", background: "rgba(0,0,0,0.6)",
                 display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
               }}>
@@ -561,7 +553,7 @@ const ProjectDetailPage = () => {
               </Box>
             </Box>
             <Box onClick={nextSlide} sx={{ width: 28, height: 52, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,10,5,0.75)", borderRadius: "6px", cursor: "pointer" }}>
-              <Box component="img" src="/assets/icons/right.svg" alt="next" />
+              <Box component="img" src="/assets/icons/left.svg" alt="next" />
             </Box>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "center", gap: 0.8 }}>
