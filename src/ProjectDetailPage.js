@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Box, Tabs, Tab, IconButton, Typography, InputBase, CircularProgress, Button, Tooltip } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
@@ -277,13 +275,9 @@ export default function ProjectDetailPage() {
                     </Tooltip>
                     <Tooltip title="Fullscreen" placement="left">
                       <IconButton onClick={openLightbox} sx={{
-                        width: 32, height: 32, borderRadius: "8px",
-                        background: "rgba(0,0,0,0.55)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        color: "#aaa",
-                        "&:hover": { border: "1px solid rgba(0,255,150,0.4)", color: "#00ff9f" },
+                        width: 32, height: 32, borderRadius: "8px"
                       }}>
-                        <FullscreenIcon sx={{ fontSize: 15 }} />
+                        <Box component="img" src="/assets/images/extend.svg" alt="maximize"/>
                       </IconButton>
                     </Tooltip>
                   </Box>
@@ -370,49 +364,53 @@ export default function ProjectDetailPage() {
         <Box sx={{
           position: "fixed", inset: 0, zIndex: 9999,
           background: "rgba(0,0,0,0.92)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
         }}
           onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}
         >
-          {/* Close */}
-          <IconButton onClick={() => setLightboxOpen(false)} sx={{
-            position: "absolute", top: 16, right: 16, zIndex: 2,
-            color: "#fff", background: "rgba(255,255,255,0.08)",
-            "&:hover": { background: "rgba(255,255,255,0.15)" },
-          }}>
-            <CloseIcon />
-          </IconButton>
+          {/* Image wrapper — arrows and minimize icon are relative to this */}
+          <Box sx={{ position: "relative", maxWidth: "80vw", maxHeight: "80vh" }}>
 
-          {/* Left arrow */}
-          <IconButton onClick={lbPrev} sx={{
-            position: "absolute", left: 16, zIndex: 2, p: 0, background: "none", border: "none",
-          }}>
-            <img src="/assets/icons/left.svg" alt="prev" style={{ width: 40, height: 40 }} />
-          </IconButton>
+            {/* Left arrow — on left edge of image, vertically centered */}
+            <IconButton onClick={lbPrev} sx={{
+              position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
+              zIndex: 2, p: 0, background: "none", border: "none",
+            }}>
+              <img src="/assets/icons/right.svg" alt="prev"/>
+            </IconButton>
 
-          {/* Image */}
-          <Box sx={{
-            maxWidth: "80vw", maxHeight: "80vh",
-            borderRadius: "12px", overflow: "hidden",
-            boxShadow: "0 0 60px rgba(0,0,0,0.8)",
-          }}>
-            <img
-              src={slides[lightboxIndex]}
-              alt={`slide ${lightboxIndex + 1}`}
-              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-            />
+            {/* Image */}
+            <Box sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
+              <img
+                src={slides[lightboxIndex]}
+                alt={`slide ${lightboxIndex + 1}`}
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+              />
+            </Box>
+
+            {/* Right arrow — on right edge of image, vertically centered */}
+            <IconButton onClick={lbNext} sx={{
+              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+              zIndex: 2, p: 0, background: "none", border: "none",
+            }}>
+              <img src="/assets/icons/left.svg" alt="next"/>
+            </IconButton>
+
+            {/* Minimize icon — bottom-right corner of image */}
+            <IconButton onClick={() => setLightboxOpen(false)} sx={{
+              position: "absolute", bottom: 10, right: 10, zIndex: 2,
+              width: 32, height: 32, borderRadius: "8px",
+            }}>
+              <Box component="img" src="/assets/images/extend.svg" alt="minimize"/>
+            </IconButton>
           </Box>
 
-          {/* Right arrow */}
-          <IconButton onClick={lbNext} sx={{
-            position: "absolute", right: 16, zIndex: 2, p: 0, background: "none", border: "none",
-          }}>
-            <img src="/assets/icons/right.svg" alt="next" style={{ width: 40, height: 40 }} />
-          </IconButton>
-
-          {/* Dots */}
-          <Box sx={{ display: "flex", gap: 1, mt: 3 }}>
+          {/* Dots — below image */}
+          <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
             {slides.map((_, i) => (
               <Box key={i} onClick={() => setLightboxIndex(i)} sx={{
                 width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
