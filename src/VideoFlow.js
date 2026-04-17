@@ -8,11 +8,6 @@ import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 import AudioButton from "./AudioButton";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import BrushIcon from "@mui/icons-material/Brush"; // Behance alternative
-import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"; // Dribbble alternative
-import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import ChatbotPanel from "./ChatbotPanel";
 
 const STOP_FRAME = 10;
@@ -26,11 +21,11 @@ const framePath = (i) => {
 };
 
 const socialIcons = [
-  { label: "LinkedIn", icon: <LinkedInIcon /> },
-  { label: "Behance", icon: <BrushIcon /> },
-  { label: "Dribbble", icon: <SportsBasketballIcon /> },
-  { label: "Mobile", icon: <PhoneIphoneIcon /> },
-  { label: "Mail", icon: <MailOutlineIcon /> },
+  { label: "LinkedIn", icon: "/assets/icons/Property-lindedin.svg" },
+  { label: "Behance", icon: "/assets/icons/Property-behance.svg" },
+  { label: "Dribbble", icon: "/assets/icons/Property-dribble.svg" },
+  { label: "Mobile", icon: "/assets/icons/Property-mobile.svg" },
+  { label: "Mail", icon: "/assets/icons/Property-email.svg" },
 ];
 
 /* ── Inline Chatbot panel ── */
@@ -182,17 +177,19 @@ function WelcomeScreen({ opacity }) {
         mr: 1.5,
         zIndex: 10,
         flexShrink: 0,
+        position:"absolute",
+        left:"7%"
       }}>
         {socialIcons.map(({ label, icon }) => (
           <Box key={label} sx={{
             display: "flex", alignItems: "center", justifyContent: "center",
-            width: 34, height: 34, borderRadius: "50%",
-            color: "rgba(255,255,255,0.5)",
+            borderRadius: "50%",
             cursor: "pointer",
-            transition: "color 0.2s",
-            "&:hover": { color: "#00ff9c" },
+            opacity: 0.6,
+            transition: "opacity 0.2s",
+            "&:hover": { opacity: 1 },
           }}>
-            {icon}
+            <Box component="img" src={icon} alt={label} sx={{ width: 40, height: 40 }} />
           </Box>
         ))}
       </Box>
@@ -218,7 +215,6 @@ function WelcomeScreen({ opacity }) {
           backgroundRepeat: "no-repeat",
           borderRadius: "16px 0 0 16px",
           overflowY: "auto",
-          backgroundColor:"#000",
           p: "50px",
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.2)", borderRadius: "2px" },

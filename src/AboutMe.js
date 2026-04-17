@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"; // kept for fallback
 import { PRIMARY, primaryAlpha } from "./theme";
 
 /* ── Styled components ── */
@@ -130,10 +130,6 @@ const experiences = [
   { company: "Affinity Express", role: "Sr. Designer", period: "2012 – 2015" },
 ];
 
-const skills = [
-  "Product Design", "Motion Design", "Interaction Design", "Team Leadership",
-  "Design Systems", "Creative Direction", "Brand Identity", "UX Design",
-];
 
 const workCategories = [
   { label: "UI/UX", icon: "/assets/icons/UX.svg" },
@@ -165,16 +161,17 @@ function WorkTab({ onClose }) {
               display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center",
               gap: "10px", py: "28px", cursor: "pointer",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.09)",
+              backgroundImage: "url(/assets/images/bg-images/without-hover.svg)",
+              backgroundSize: "100% 100%",
+              backgroundRepeat: "no-repeat",
               borderRadius: "14px",
-              transition: "all 0.2s",
+              transition: "background-image 0.2s",
               "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s" },
               "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "12px", fontWeight: 500, transition: "color 0.2s" },
               "&:hover": {
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid #00ff9c",
-                clipPath: "polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)",
+                backgroundImage: "url(/assets/images/bg-images/with-hover.svg)",
+                backgroundSize: "100% 100%",
+                backgroundRepeat: "no-repeat",
                 "& .cat-icon": { filter: "brightness(0) invert(1)" },
                 "& .cat-label": { color: "#fff" },
               },
@@ -188,12 +185,13 @@ function WorkTab({ onClose }) {
       </Box>
 
       {/* Bio + Download Resume */}
-      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 3 }}>
-        <Typography sx={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", lineHeight: 1.8, flex: 1 }}>
+           {/* Skills rows + Download Resume */}
+  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3,margin:"0px 100px"}}>
+        <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         </Typography>
-        <DownloadBtn sx={{ flexShrink: 0 }}>
-          <FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />
+        <DownloadBtn sx={{ flexShrink: 0}}>
+          <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
           Download Resume
         </DownloadBtn>
       </Box>
@@ -255,7 +253,7 @@ function AboutMeTab({ mobile }) {
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         </Typography>
         <DownloadBtn sx={{ flexShrink: 0}}>
-          <FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />
+          <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
           Download Resume
         </DownloadBtn>
       </Box>
