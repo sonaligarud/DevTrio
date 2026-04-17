@@ -142,26 +142,6 @@ const workCategories = [
   { label: "Print Media", icon: "/assets/icons/print-designs.svg" },
 ];
 
-const WorkCategoryCard = styled(Box)({
-  backgroundImage: "url('/assets/images/bg-images/frame-633656.svg')",
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-  borderRadius: "14px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "10px",
-  padding: "32px 16px",
-  cursor: "pointer",
-  flex: 1,
-  transition: "all 0.2s",
-  "&:hover": {
-    backgroundImage: "url('/assets/images/bg-images/frame-633657.svg')",
-    padding: "32px 16px",
-  },
-});
 
 /* ── Work tab ── */
 function WorkTab({ onClose }) {
@@ -174,26 +154,42 @@ function WorkTab({ onClose }) {
 
   return (
     <Box>
-      {/* Category cards — single row */}
-      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+      {/* Category cards — single row, 4 equal cols */}
+      <Box sx={{ display: "flex", gap: "12px", mb: "24px" }}>
         {workCategories.map((cat) => (
-          <WorkCategoryCard key={cat.label} onClick={() => handleCategoryClick(cat.label)}>
-            <Box
-              component="img"
-              src={cat.icon}
-              alt={cat.label}
-              sx={{ width: 36, height: 36, objectFit: "contain" }}
-            />
-            <Typography sx={{ fontSize: "12px", color: "#bbb", letterSpacing: "0.5px", fontWeight: 500 }}>
-              {cat.label}
-            </Typography>
-          </WorkCategoryCard>
+          <Box
+            key={cat.label}
+            onClick={() => handleCategoryClick(cat.label)}
+            sx={{
+              flex: 1,
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              gap: "10px", py: "28px", cursor: "pointer",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.09)",
+              borderRadius: "14px",
+              transition: "all 0.2s",
+              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s" },
+              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "12px", fontWeight: 500, transition: "color 0.2s" },
+              "&:hover": {
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid #00ff9c",
+                clipPath: "polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)",
+                "& .cat-icon": { filter: "brightness(0) invert(1)" },
+                "& .cat-label": { color: "#fff" },
+              },
+            }}
+          >
+            <Box component="img" src={cat.icon} alt={cat.label} className="cat-icon"
+              sx={{ width: 36, height: 36, objectFit: "contain" }} />
+            <Typography className="cat-label">{cat.label}</Typography>
+          </Box>
         ))}
       </Box>
 
-      {/* Bio + Download Resume row */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
-        <Typography sx={{ fontSize: "12px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
+      {/* Bio + Download Resume */}
+      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 3 }}>
+        <Typography sx={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", lineHeight: 1.8, flex: 1 }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         </Typography>
         <DownloadBtn sx={{ flexShrink: 0 }}>
@@ -207,14 +203,11 @@ function WorkTab({ onClose }) {
 
 /* ── About Me tab content ── */
 function AboutMeTab({ mobile }) {
-  // Split skills into two rows of 4
-  const row1 = skills.slice(0, 4);
-  const row2 = skills.slice(4);
 
   return (
-    <>
+    <Box sx={{padding:'40px 90px'}}>
       {/* Experience label */}
-      <Typography sx={{ color: "#666", fontSize: "11px", letterSpacing: "1.2px", textTransform: "uppercase", mb: 1.5 }}>
+      <Typography sx={{ fontSize: "12px", letterSpacing: "1.2px", mb: 1.5,textAlign:'left' }}>
         Experience
       </Typography>
 
@@ -222,6 +215,7 @@ function AboutMeTab({ mobile }) {
       <Box sx={{
         display: "flex", gap: 1.5, overflowX: "auto", pb: 1, mb: 2.5,
         "&::-webkit-scrollbar": { height: "3px" },
+        textAlign:"left",
         "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
       }}>
         {experiences.map((exp) => (
@@ -232,7 +226,7 @@ function AboutMeTab({ mobile }) {
             <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#fff", mt: 0.2, whiteSpace: "nowrap" }}>
               {exp.role}
             </Typography>
-            <Typography sx={{ fontSize: "11px", color: "#555", mt: 0.3, whiteSpace: "nowrap" }}>
+            <Typography sx={{ fontSize: "11px", mt: 0.3, whiteSpace: "nowrap" }}>
               {exp.period}
             </Typography>
           </ExpCard>
@@ -240,13 +234,13 @@ function AboutMeTab({ mobile }) {
       </Box>
 
       {/* Cert card */}
-      <CertCard sx={{ mb: 2.5 }}>
+      <CertCard sx={{ mb: 2.5}}>
         <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0 }} />
-        <Box>
-          <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>
+        <Box sx={{textAlign:"left"}}>
+          <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#fff"}}>
             UI/UX Design with Generative AI
           </Typography>
-          <Typography sx={{ fontSize: "11px", color: "#777", mt: 0.3 }}>
+          <Typography sx={{ fontSize: "11px", mt: 0.3 }}>
             International Institute of Information Technology Bangalore (IIIT-B)
           </Typography>
         </Box>
@@ -256,29 +250,16 @@ function AboutMeTab({ mobile }) {
       <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.07)", mb: 2 }} />
 
       {/* Skills rows + Download Resume */}
-      <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 2 }}>
-        {/* Skills — two rows with green arrow prefix */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.9 }}>
-          {[row1, row2].map((row, ri) => (
-            <Box key={ri} sx={{ display: "flex", gap: 2.5, flexWrap: "wrap" }}>
-              {row.map((s) => (
-                <Box key={s} sx={{ display: "flex", alignItems: "center", gap: 0.6 }}>
-                  {/* Green diagonal arrow */}
-                  <Box sx={{ color: PRIMARY, fontSize: "14px", lineHeight: 1, fontWeight: 700, mt: "-1px" }}>↗</Box>
-                  <Typography sx={{ fontSize: "12px", color: "#ccc", whiteSpace: "nowrap" }}>{s}</Typography>
-                </Box>
-              ))}
-            </Box>
-          ))}
-        </Box>
-
-        {/* Download Resume */}
-        <DownloadBtn sx={{ flexShrink: 0 }}>
+  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3}}>
+        <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+        </Typography>
+        <DownloadBtn sx={{ flexShrink: 0}}>
           <FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />
           Download Resume
         </DownloadBtn>
       </Box>
-    </>
+    </Box>
   );
 }
 
@@ -288,20 +269,22 @@ function AboutMeContent({ onClose, mobile }) {
 
   return (
     <>
-      {/* Header: name + tabs + close */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
-        {/* Left: greeting + name */}
-        <Box>
-          <Typography sx={{ color: "#888", fontSize: "12px", letterSpacing: "0.5px", mb: 0.5 }}>
+      {/* Header: greeting + name on left, tabs on right */}
+      <Box sx={{
+        display: "flex", justifyContent: "space-between",
+        alignItems: "flex-start", mb: "24px",
+        margin:"0px 90px"
+      }}>
+        <Box sx={{textAlign:"left"}}> 
+          <Typography sx={{ fontSize: "14px",mb: "4px" }}>
             Welcome to the Portfolio!
           </Typography>
-          <Typography sx={{ fontSize: mobile ? "26px" : "32px", fontWeight: 700, lineHeight: 1.1 }}>
-            <span style={{ color: PRIMARY }}>Akash P</span>
+          <Typography sx={{ fontSize: mobile ? "24px" : "28px", fontWeight: 700, lineHeight: 1.1, color: PRIMARY }}>
+            Akash P
           </Typography>
         </Box>
 
-        {/* Right: tabs + close */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 0.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: "4px" }}>
           <Tab active={activeTab === "work" ? 1 : 0} onClick={() => setActiveTab("work")}>
             Work
           </Tab>

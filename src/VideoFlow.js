@@ -8,6 +8,12 @@ import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 import AudioButton from "./AudioButton";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import BrushIcon from "@mui/icons-material/Brush"; // Behance alternative
+import SportsBasketballIcon from "@mui/icons-material/SportsBasketball"; // Dribbble alternative
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import ChatbotPanel from "./ChatbotPanel";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -19,12 +25,12 @@ const framePath = (i) => {
   return `/assets/images/archive/Final_${n}.jpg`;
 };
 
-const socials = [
-  { label: "LinkedIn", icon: "/assets/icons/linkedIn.svg" },
-  { label: "Behance", icon: "/assets/icons/Behance.svg" },
-  { label: "Dribbble", icon: "/assets/icons/Dribble.svg" },
-  { label: "Mobile", icon: "/assets/icons/Mobile.svg" },
-  { label: "Mail", icon: "/assets/icons/Mail.svg" },
+const socialIcons = [
+  { label: "LinkedIn", icon: <LinkedInIcon /> },
+  { label: "Behance", icon: <BrushIcon /> },
+  { label: "Dribbble", icon: <SportsBasketballIcon /> },
+  { label: "Mobile", icon: <PhoneIphoneIcon /> },
+  { label: "Mail", icon: <MailOutlineIcon /> },
 ];
 
 /* ── Inline Chatbot panel ── */
@@ -154,31 +160,6 @@ function ChatbotInline() {
 /* ── Welcome split screen ── */
 function WelcomeScreen({ opacity }) {
   const containerRef = useRef(null);
-  const [leftPct, setLeftPct] = useState(58); // % width for left panel
-  const dragging = useRef(false);
-
-  const onMouseDown = (e) => { dragging.current = true; e.preventDefault(); };
-
-  useEffect(() => {
-    const onMove = (e) => {
-      if (!dragging.current || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-      const pct = Math.min(75, Math.max(30, (x / rect.width) * 100));
-      setLeftPct(pct);
-    };
-    const onUp = () => { dragging.current = false; };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    window.addEventListener("touchmove", onMove);
-    window.addEventListener("touchend", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-      window.removeEventListener("touchmove", onMove);
-      window.removeEventListener("touchend", onUp);
-    };
-  }, []);
 
   return (
     <Box sx={{
@@ -188,70 +169,67 @@ function WelcomeScreen({ opacity }) {
       pointerEvents: opacity > 0.5 ? "auto" : "none",
       px: { xs: 2, md: 6 }, py: { xs: 2, md: 4 },
     }}>
-      {/* Social icons — left edge */}
+      {/* Social icons — left edge pill */}
       <Box sx={{
-        display: { xs: "none", md: "flex" }, flexDirection: "column",
-        alignItems: "center", gap: 1.5, mr: 2,
+        display: { xs: "none", md: "flex" },
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 1.5,
+        background: "rgba(18,22,18,0.92)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: "29px",
+        p: "14px 10px",
+        mr: 1.5,
+        zIndex: 10,
+        flexShrink: 0,
       }}>
-        {socials.map(({ label, icon }) => (
+        {socialIcons.map(({ label, icon }) => (
           <Box key={label} sx={{
-            width: 36, height: 36, borderRadius: "10px",
-            border: "1px solid rgba(255,255,255,0.15)",
-            background: "rgba(255,255,255,0.04)",
             display: "flex", alignItems: "center", justifyContent: "center",
+            width: 34, height: 34, borderRadius: "50%",
+            color: "rgba(255,255,255,0.5)",
             cursor: "pointer",
-            transition: "border 0.2s, box-shadow 0.2s",
-            "&:hover": { border: "1px solid rgba(0,255,150,0.5)", boxShadow: "0 0 8px rgba(0,255,150,0.2)" },
+            transition: "color 0.2s",
+            "&:hover": { color: "#00ff9c" },
           }}>
-            <Box component="img" src={icon} alt={label} sx={{ width: 18, height: 18, filter: "brightness(0) invert(0.6)" }} />
+            {icon}
           </Box>
         ))}
       </Box>
 
-      {/* Split container */}
-      <Box ref={containerRef} sx={{
-        flex: 1, display: "flex", height: { xs: "90vh", md: "75vh" },
-        maxWidth: "1100px", position: "relative",
-        borderRadius: "16px",
-        overflow: "visible",
-      }}>
-        {/* Left panel — AboutMe */}
+      {/* Split container — Grid 9/3 */}
+      <Box
+        ref={containerRef}
+        sx={{
+          flex: 1,
+          display: "flex",
+          height: { xs: "90vh", md: "62vh" },
+          borderRadius: "16px",
+          overflow: "visible",
+          position: "relative"
+        }}
+      >
+        {/* Left panel col-9 */}
         <Box sx={{
-          width: `${leftPct}%`, flexShrink: 0,
-          background: "rgba(8,11,8,0.92)",
-          backdropFilter: "blur(30px)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRight: "none",
+          flex: "0 0 75%",
+          backgroundImage: "url(/assets/images/hud/homepage-left-side.svg)",
+          backgroundSize: "100% 100%",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           borderRadius: "16px 0 0 16px",
-          overflowY: "auto", p: "28px 28px 24px",
+          overflowY: "auto",
+          backgroundColor:"#000",
+          p: "50px",
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.2)", borderRadius: "2px" },
         }}>
           <AboutMeContent onClose={() => { }} mobile={false} />
         </Box>
 
-        {/* Draggable divider */}
-        <Box
-          onMouseDown={onMouseDown}
-          onTouchStart={onMouseDown}
-          sx={{
-            width: "18px", flexShrink: 0,
-            background: "rgba(15,20,15,0.9)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "col-resize", zIndex: 2, position: "relative",
-            "&:hover .drag-handle": { background: "rgba(0,255,150,0.6)" },
-          }}
-        >
-          <Box className="drag-handle" sx={{
-            width: 4, height: 40, borderRadius: 2,
-            background: "rgba(255,255,255,0.2)",
-            transition: "background 0.2s",
-          }} />
+        {/* Right panel col-3 */}
+        <Box sx={{ flex: "0 0 25%", minWidth: 0 }}>
+          <ChatbotPanel />
         </Box>
-
-        {/* Right panel — Chatbot */}
-        <ChatbotInline />
       </Box>
     </Box>
   );
