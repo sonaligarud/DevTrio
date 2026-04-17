@@ -117,25 +117,20 @@ export default function ProjectDetailPage() {
         </Box>
 
         {/* CONTENT ROW */}
-        <Box ref={containerRef} sx={{ display: "flex", height: "78vh", position: "relative" }}>
+        <Box ref={containerRef} sx={{ display: "flex", height: "78vh", position: "relative", overflow: "visible" }}>
 
           {/* LEFT PANEL */}
           <Box sx={{ width: `${leftPct}%`, flexShrink: 0, display: "flex", flexDirection: "column" }}>
             <Box sx={{
               flex: 1,
               backgroundImage: "url('/assets/images/hud/portfolio-page.svg')",
-              backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat",
+              backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat",
               borderRadius: "16px", display: "flex", flexDirection: "column", overflow: "hidden",
             }}>
               {/* SUB TABS */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, pt: 2, pb: 1 }}>
-                <IconButton onClick={() => navigate(-1)} size="small" sx={{
-                  color: PRIMARY, border: "1px solid rgba(0,255,150,0.4)",
-                  borderRadius: "8px", p: "4px", width: 28, height: 28,
-                  "&:hover": { background: "rgba(0,255,150,0.1)" },
-                }}>
-                  <img src="/assets/icons/left.svg" alt="back" style={{ width: 14, height: 14 }} />
-                </IconButton>
+               
+                  <img src="/assets/icons/right.svg" alt="back"/>
                 {subTabs.map((tab, i) => (
                   <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                     px: 2, py: 0.6, borderRadius: "8px", cursor: "pointer",
@@ -151,10 +146,10 @@ export default function ProjectDetailPage() {
               {/* SLIDER */}
               <Box sx={{ position: "relative", flex: 1, display: "flex", alignItems: "center", px: 1 }}>
                 <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
-                  <img src="/assets/icons/left.svg" alt="prev" style={{ width: 28, height: 28 }} />
+                  <img src="/assets/icons/right.svg" alt="prev"/>
                 </IconButton>
                 <Box sx={{ flex: 1, display: "flex", alignItems: "center", gap: 4, px: "52px" }}>
-                  <Box sx={{ flex: "0 0 48%", position: "relative" }}>
+                  <Box sx={{ flex: "0 0 100%", position: "relative" }}>
                     <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
                       style={{ width: "100%", display: "block", borderRadius: "12px" }} />
                     <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: 1, zIndex: 3 }}>
@@ -164,7 +159,7 @@ export default function ProjectDetailPage() {
                           background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)", color: "#aaa",
                           "&:hover": { border: "1px solid rgba(0,255,150,0.4)", color: PRIMARY },
                         }}>
-                          <ShareIcon sx={{ fontSize: 15 }} />
+                          <ShareIcon/>
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Fullscreen" placement="left">
@@ -173,25 +168,14 @@ export default function ProjectDetailPage() {
                           background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)",
                           "&:hover": { border: "1px solid rgba(0,255,150,0.4)" },
                         }}>
-                          <Box component="img" src="/assets/images/extend.svg" alt="fullscreen" sx={{ width: 15, height: 15 }} />
+                          <Box component="img" src="/assets/images/extend.svg" alt="fullscreen"/>
                         </IconButton>
                       </Tooltip>
                     </Box>
                   </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography sx={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", mb: 0.5 }}>SwiftConnect</Typography>
-                    <Typography sx={{ fontSize: "22px", fontWeight: 700, lineHeight: 1.2, mb: 1.5 }}>
-                      The Future of<br />Proactive Support.
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", lineHeight: 1.8, color: "rgba(255,255,255,0.55)" }}>
-                      <span style={{ color: PRIMARY, fontWeight: 600 }}>SwiftConnect</span> empowers your team with AI driven
-                      insights to eliminate response delays, stabilise service quality, and turn peak-season surges into
-                      seamless customer experiences.
-                    </Typography>
-                  </Box>
                 </Box>
                 <IconButton onClick={next} sx={{ position: "absolute", right: 8, zIndex: 2, p: 0 }}>
-                  <img src="/assets/icons/right.svg" alt="next" style={{ width: 28, height: 28 }} />
+                  <img src="/assets/icons/left.svg" alt="next"/>
                 </IconButton>
               </Box>
             </Box>
@@ -223,7 +207,7 @@ export default function ProjectDetailPage() {
           <ChatbotPanel
             orb={orb}
             chips={["View Case Study", "About Akash"]}
-            wrapperSx={{ flex: 1, minWidth: 0, borderRadius: "0 16px 16px 0" }}
+            wrapperSx={{ flex: 1, minWidth: 0, height: "100%" }}
           />
         </Box>
       </Box>
@@ -233,7 +217,6 @@ export default function ProjectDetailPage() {
         <Box sx={{
           position: "fixed", inset: 0, zIndex: 9999,
           background: "rgba(0,0,0,0.92)",
-          backgroundImage: "url('/assets/images/bg-images/extend-screen.svg')",
           backgroundSize: "cover", backgroundPosition: "center",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
@@ -246,7 +229,7 @@ export default function ProjectDetailPage() {
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
             <IconButton onClick={lbNext} sx={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="next" style={{ width: 36, height: 36 }} />
+              <img src="/assets/icons/right.svg" alt="next"/>
             </IconButton>
             <IconButton onClick={() => setLightboxOpen(false)} sx={{
               position: "absolute", bottom: 10, right: 10, zIndex: 2,

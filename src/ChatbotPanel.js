@@ -6,19 +6,20 @@ import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 
-const PRIMARY = "#8f8f8f";
+const PRIMARY = "#00ff9c";
+const CHIP_BG = "rgba(30,35,30,0.9)";
 
 /**
- * Shared chatbot panel used on homepage and project detail page.
+ * Shared chatbot panel — homepage right col & project detail right panel.
  * Props:
- *   orb        — path to orb video (default: Welcome-state.mp4)
- *   hudBg      — path to HUD frame SVG overlay
- *   chips      — array of suggestion chip labels
- *   wrapperSx  — extra sx for the outer wrapper Box
+ *   orb       — orb video src
+ *   hudBg     — HUD frame SVG (default: portfolio-chantbot.svg matches design)
+ *   chips     — suggestion chip labels
+ *   wrapperSx — extra sx on outer wrapper
  */
 export default function ChatbotPanel({
   orb = "/assets/orb/Idle State.mp4",
-  hudBg = "/assets/images/hud/homepage-rightside.svg",
+  hudBg = "/assets/images/hud/portfolio-chantbot.svg",
   chips = ["View Case Study", "How I Design", "Start Chat"],
   wrapperSx = {},
 }) {
@@ -41,43 +42,56 @@ export default function ChatbotPanel({
   });
 
   return (
-    <Box sx={{
-      height: "100%",
-      display: "flex", flexDirection: "column",
-      backgroundImage: `url(${hudBg})`,
-      backgroundSize: "100% 100%",
-      backgroundRepeat: "no-repeat",
-      borderRadius: "0 16px 16px 0",
-      overflow: "hidden",
-      position: "relative",
-      ...wrapperSx,
-    }}>
-      {/* Orb top-right */}
+    /* Outer wrapper — position:relative so orb can overflow */
+    <Box sx={{ position: "relative", display: "flex", flexDirection: "column", ...wrapperSx }}>
+
+      {/* Orb — top-right, overflows the frame */}
       <Box sx={{
-        position: "absolute", top: -30, right: -30,
-        width: 110, height: 110, borderRadius: "50%",
-        background: "rgba(0,0,0,0.6)",
-        border: "1px solid rgba(0,255,150,0.3)",
-        boxShadow: "0 0 20px rgba(0,255,150,0.2)",
-        overflow: "hidden", zIndex: 10,
+        position: "absolute",
+        top: -38, right: -38,
+        width: 100, height: 100,
+        borderRadius: "50%",
+        background: "rgba(0,0,0,0.55)",
+        border: "1.5px solid rgba(0,255,150,0.35)",
+        boxShadow: "0 0 28px rgba(0,255,150,0.25), inset 0 0 18px rgba(0,255,150,0.08)",
+        overflow: "hidden",
+        zIndex: 20,
+        flexShrink: 0,
       }}>
         <video key={orb} src={orb} autoPlay loop muted playsInline
-          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen" }} />
+          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
       </Box>
 
-      {/* Content */}
-      <Box sx={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Messages */}
+      {/* HUD frame + content */}
+      <Box sx={{
+        flex: 1,
+        display: "flex", flexDirection: "column",
+        backgroundImage: `url(${hudBg})`,
+        backgroundSize: "100% 100%",
+        backgroundRepeat: "no-repeat",
+        overflow: "hidden",
+        position: "relative",
+        zIndex: 1,
+      }}>
+        {/* Messages area */}
         <Box sx={{
-          flex: 1, overflowY: "auto", p: "24px 24px 0",
-          "&::-webkit-scrollbar": { width: "4px" },
+          flex: 1, overflowY: "auto",
+          pt: "56px", px: "20px", pb: "8px",
+          "&::-webkit-scrollbar": { width: "3px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
         }}>
           {messages.length === 0 ? (
-            <Box sx={{ mt: 6 }}>
-              <Typography sx={{ fontSize: "13px", lineHeight: 1.7 }}>
+            /* Greeting bubble */
+            <Box sx={{
+              background: "rgba(20,26,20,0.85)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "10px",
+              p: "14px 16px",
+              mb: 1.5,
+            }}>
+              <Typography sx={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.85)" }}>
                 Hi!<br />
-                I'm <span style={{ color: PRIMARY, fontWeight: 600 }}>Nova</span>, Akash's AI Assistant.<br />
+                I'm <span style={{ color: PRIMARY, fontWeight: 700 }}>Nova</span>, Akash's AI Assistant.<br />
                 I can walk you through projects, thinking,<br />
                 and decisions.<br />
                 Where should we start?
@@ -88,13 +102,13 @@ export default function ChatbotPanel({
               {messages.map((msg) => (
                 <Box key={msg.id} sx={{
                   alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                  background: msg.role === "user" ? "rgba(0,255,150,0.1)" : "rgba(255,255,255,0.05)",
-                  border: msg.role === "user" ? "1px solid rgba(0,255,150,0.25)" : "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "10px", px: 2, py: 1,
-                  maxWidth: "85%", color: "#fff", fontSize: "13px", lineHeight: 1.5,
+                  background: msg.role === "user" ? "rgba(0,255,150,0.08)" : "rgba(20,26,20,0.85)",
+                  border: msg.role === "user" ? "1px solid rgba(0,255,150,0.2)" : "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "10px", px: "14px", py: "10px",
+                  maxWidth: "88%", color: "#fff", fontSize: "13px", lineHeight: 1.6,
                 }}>{msg.content}</Box>
               ))}
-              {isLoading && <CircularProgress size={18} sx={{ color: PRIMARY, alignSelf: "flex-start" }} />}
+              {isLoading && <CircularProgress size={16} sx={{ color: PRIMARY, alignSelf: "flex-start", mt: 0.5 }} />}
               <div ref={messagesEndRef} />
             </Box>
           )}
@@ -102,25 +116,31 @@ export default function ChatbotPanel({
 
         {/* Suggestion chips */}
         {messages.length === 0 && (
-          <Box sx={{ display: "flex", gap: 1, px: 3, pb: 1.5, flexWrap: "wrap" }}>
+          <Box sx={{ display: "flex", gap: "8px", px: "20px", pb: "10px", flexWrap: "wrap" }}>
             {chips.map((s) => (
               <Box key={s} onClick={() => sendMessage(s)} sx={{
-                px: 2, py: 0.8, borderRadius: "20px",
-                background: PRIMARY, color: "#000",
-                fontSize: "11px", fontWeight: 600, cursor: "pointer",
-                "&:hover": { boxShadow: "0 4px 12px rgba(0,255,150,0.4)" },
+                px: "14px", py: "7px",
+                borderRadius: "20px",
+                background: CHIP_BG,
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.8)",
+                fontSize: "11px", fontWeight: 500,
+                cursor: "pointer",
+                transition: "border-color 0.2s, color 0.2s",
+                "&:hover": { borderColor: PRIMARY, color: PRIMARY },
               }}>{s}</Box>
             ))}
           </Box>
         )}
 
-        {/* Input */}
-        <Box sx={{ p: "12px 16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        {/* Input bar */}
+        <Box sx={{ px: "16px", pb: "16px", pt: "6px" }}>
           <Box sx={{
-            display: "flex", alignItems: "center", gap: 1,
-            background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", gap: "8px",
+            background: "rgba(8,12,8,0.7)",
             border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "10px", px: 2, py: 0.8,
+            borderRadius: "10px",
+            px: "14px", py: "8px",
           }}>
             <InputBase
               placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
@@ -128,18 +148,23 @@ export default function ChatbotPanel({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               disabled={isLoading || isProcessing}
-              sx={{ color: "#aaa", fontSize: "13px", "& input::placeholder": { color: isListening ? PRIMARY : "#555", opacity: 1 } }}
+              sx={{
+                color: "#ccc", fontSize: "13px",
+                "& input::placeholder": { color: isListening ? PRIMARY : "rgba(255,255,255,0.3)", opacity: 1 },
+              }}
             />
-            <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? PRIMARY : "#666", p: "4px" }}>
+            <IconButton onClick={toggleListening} size="small"
+              sx={{ color: isListening ? PRIMARY : "rgba(255,255,255,0.35)", p: "4px", flexShrink: 0 }}>
               <MicIcon sx={{ fontSize: 18 }} />
             </IconButton>
             <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
               sx={{
-                background: PRIMARY, color: "#000", borderRadius: "8px", p: "4px",
-                "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" },
+                background: PRIMARY, color: "#000", borderRadius: "8px", p: "5px", flexShrink: 0,
+                "&:hover": { background: "#00e68a" },
+                "&.Mui-disabled": { background: "rgba(0,255,150,0.15)", color: "rgba(0,0,0,0.4)" },
               }}>
               {isLoading || isProcessing
-                ? <CircularProgress size={16} sx={{ color: "#000" }} />
+                ? <CircularProgress size={15} sx={{ color: "#000" }} />
                 : <ArrowUpwardIcon sx={{ fontSize: 16 }} />}
             </IconButton>
           </Box>

@@ -223,8 +223,11 @@ function WelcomeScreen({ opacity }) {
         </Box>
 
         {/* Right panel col-3 */}
-        <Box sx={{ flex: "0 0 25%", minWidth: 0 }}>
-          <ChatbotPanel />
+        <Box sx={{ flex: "0 0 25%", minWidth: 0, position: "relative", overflow: "visible" }}>
+          <ChatbotPanel
+            chips={["View Case Study", "How I Design", "Start Chat"]}
+            wrapperSx={{ height: "100%" }}
+          />
         </Box>
       </Box>
     </Box>
