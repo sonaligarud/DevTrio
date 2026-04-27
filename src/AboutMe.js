@@ -140,18 +140,18 @@ const workCategories = [
 
 
 /* ── Work tab ── */
-function WorkTab({ onClose }) {
+function WorkTab({ onClose, inline }) {
   const navigate = useNavigate();
 
   const handleCategoryClick = (label) => {
-    onClose();
+    if (onClose) onClose();
     navigate(`/portfolio/${encodeURIComponent(label)}`);
   };
 
   return (
-    <Box>
+    <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
       {/* Category cards — single row, 4 equal cols */}
-      <Box sx={{ display: "flex", gap: "12px", mb: "24px" }}>
+      <Box sx={{ display: "flex", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
           <Box
             key={cat.label}
@@ -159,8 +159,10 @@ function WorkTab({ onClose }) {
             sx={{
               flex: 1,
               display: "flex", flexDirection: "column",
+              padding:"45px",
               alignItems: "center", justifyContent: "center",
-              gap: "10px", py: "28px", cursor: "pointer",
+              gap: "10px",
+              cursor: "pointer",
               backgroundImage: "url(/assets/images/bg-images/without-hover.svg)",
               backgroundSize: "100% 100%",
               backgroundRepeat: "no-repeat",
@@ -172,6 +174,7 @@ function WorkTab({ onClose }) {
                 backgroundImage: "url(/assets/images/bg-images/with-hover.svg)",
                 backgroundSize: "100% 100%",
                 backgroundRepeat: "no-repeat",
+                padding:"65px",
                 "& .cat-icon": { filter: "brightness(0) invert(1)" },
                 "& .cat-label": { color: "#fff" },
               },
@@ -184,26 +187,23 @@ function WorkTab({ onClose }) {
         ))}
       </Box>
 
-      {/* Bio + Download Resume */}
-           {/* Skills rows + Download Resume */}
-  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3,margin:"0px 100px"}}>
-        <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-        </Typography>
-        <DownloadBtn sx={{ flexShrink: 0}}>
-          <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
-          Download Resume
-        </DownloadBtn>
+     
+           {/* Bio + Download Resume */}
+      <Box >
+        <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", maxWidth: "400px",marginTop:"20px" }}>
+        Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
+      </Typography>
       </Box>
     </Box>
   );
 }
 
 /* ── About Me tab content ── */
-function AboutMeTab({ mobile }) {
+function AboutMeTab({ mobile, inline }) {
+  const pad = inline ? "20px 0px" : "40px 90px";
 
   return (
-    <Box sx={{padding:'40px 90px'}}>
+    <Box sx={{ padding: pad }}>
       {/* Experience label */}
       <Typography sx={{ fontSize: "12px", letterSpacing: "1.2px", mb: 1.5,textAlign:'left' }}>
         Experience
@@ -262,22 +262,23 @@ function AboutMeTab({ mobile }) {
 }
 
 /* ── Main modal content ── */
-function AboutMeContent({ onClose, mobile }) {
+function AboutMeContent({ onClose, mobile, inline }) {
   const [activeTab, setActiveTab] = useState("work");
 
   return (
-    <>
+    <Box sx={inline ? { display: "flex", flexDirection: "column", height: "100%" } : {}}>
       {/* Header: greeting + name on left, tabs on right */}
       <Box sx={{
         display: "flex", justifyContent: "space-between",
-        alignItems: "flex-start", mb: "24px",
-        margin:"0px 90px"
+        alignItems: "flex-start",
+        mb: inline ? "20px" : "24px",
+        ...(inline ? {} : { margin: "0px 90px", mb: "24px" }),
       }}>
-        <Box sx={{textAlign:"left"}}> 
-          <Typography sx={{ fontSize: "14px",mb: "4px" }}>
+        <Box sx={{ textAlign: "left" }}>
+          <Typography sx={{ fontSize: "14px", mb: "4px" }}>
             Welcome to the Portfolio!
           </Typography>
-          <Typography sx={{ fontSize: mobile ? "24px" : "28px", fontWeight: 700, lineHeight: 1.1, color: PRIMARY }}>
+          <Typography sx={{ fontSize: mobile ? "22px" : "26px", fontWeight: 700, lineHeight: 1.1, color: PRIMARY }}>
             Akash P
           </Typography>
         </Box>
@@ -293,8 +294,10 @@ function AboutMeContent({ onClose, mobile }) {
       </Box>
 
       {/* Tab content */}
-      {activeTab === "work" ? <WorkTab onClose={onClose} /> : <AboutMeTab mobile={mobile} />}
-    </>
+      {activeTab === "work"
+        ? <WorkTab onClose={onClose} inline={inline} />
+        : <AboutMeTab mobile={mobile} inline={inline} />}
+    </Box>
   );
 }
 

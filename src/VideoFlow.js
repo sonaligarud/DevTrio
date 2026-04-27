@@ -1,23 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Typography, InputBase, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import MicIcon from "@mui/icons-material/Mic";
 import { AboutMeContent } from "./AboutMe";
-import { useChat } from "./hooks/useChat";
-import { useSpeech } from "./hooks/useSpeech";
-import { transcribeAudio } from "./api/chatApi";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
-const UI_SHOW_FRAME = 155;
-const END_FRAME = 200;
+const UI_SHOW_FRAME = 201;
+const END_FRAME = 202;
 
 const framePath = (i) => {
   const n = String(i).padStart(5, "0");
-  return `/assets/images/archive/Final_${n}.jpg`;
+  return `/assets/images/Updated-Sequence/Comp 1_${n}.jpg`;
 };
 
 const socialIcons = [
@@ -28,133 +23,9 @@ const socialIcons = [
   { label: "Mail", icon: "/assets/icons/Property-email.svg" },
 ];
 
-/* ── Inline Chatbot panel ── */
-function ChatbotInline() {
-  const { messages, isLoading, sendMessage, messagesEndRef } = useChat();
-  const [inputValue, setInputValue] = useState("");
-
-  const handleSend = () => {
-    if (inputValue.trim()) { sendMessage(inputValue); setInputValue(""); }
-  };
-
-  const { isListening, interimText, toggleListening, isProcessing } = useSpeech({
-    onTranscript: (text) => setInputValue((p) => p ? p + " " + text : text),
-    useBackend: true,
-    onBackendTranscript: async (blob) => {
-      try {
-        const data = await transcribeAudio(blob);
-        if (data.transcript) setInputValue((p) => p ? p + " " + data.transcript : data.transcript);
-      } catch (e) { console.error(e); }
-    },
-  });
-
-  return (
-    <Box sx={{
-      flex: 1, display: "flex", flexDirection: "column",
-      background: "rgba(10,14,10,0.85)",
-      borderRadius: "0 16px 16px 0",
-      border: "1px solid rgba(255,255,255,0.08)",
-      borderLeft: "none",
-      overflow: "hidden",
-      position: "relative",
-    }}>
-      {/* Orb top-right */}
-      <Box sx={{
-        position: "absolute", top: -30, right: -30,
-        width: 110, height: 110, borderRadius: "50%",
-        background: "rgba(0,0,0,0.6)",
-        border: "1px solid rgba(0,255,150,0.3)",
-        boxShadow: "0 0 20px rgba(0,255,150,0.2)",
-        overflow: "hidden", zIndex: 10,
-      }}>
-        <video src="/assets/orb/Welcome-state.mp4" autoPlay loop muted playsInline
-          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen" }} />
-      </Box>
-
-      {/* Messages / greeting */}
-      <Box sx={{
-        flex: 1, overflowY: "auto", p: "24px 24px 0",
-        "&::-webkit-scrollbar": { width: "4px" },
-        "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
-      }}>
-        {messages.length === 0 ? (
-          <Box sx={{ mt: 6 }}>
-            <Typography sx={{ color: "#aaa", fontSize: "13px", lineHeight: 1.7 }}>
-              Hi!<br />
-              I'm <span style={{ color: "#00ff9c", fontWeight: 600 }}>Nova</span>, Akash's AI Assistant.<br />
-              I can walk you through projects, thinking,<br />
-              and decisions.<br />
-              Where should we start?
-            </Typography>
-          </Box>
-        ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {messages.map((msg) => (
-              <Box key={msg.id} sx={{
-                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                background: msg.role === "user" ? "rgba(0,255,150,0.1)" : "rgba(255,255,255,0.05)",
-                border: msg.role === "user" ? "1px solid rgba(0,255,150,0.25)" : "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "10px", px: 2, py: 1,
-                maxWidth: "85%", color: "#fff", fontSize: "13px", lineHeight: 1.5,
-              }}>{msg.content}</Box>
-            ))}
-            {isLoading && <CircularProgress size={18} sx={{ color: "#00ff9c", alignSelf: "flex-start" }} />}
-            <div ref={messagesEndRef} />
-          </Box>
-        )}
-      </Box>
-
-      {/* Suggestion chips */}
-      {messages.length === 0 && (
-        <Box sx={{ display: "flex", gap: 1, px: 3, pb: 1.5, flexWrap: "wrap" }}>
-          {["View Case Study", "How I Design", "Start Chat"].map((s) => (
-            <Box key={s} onClick={() => sendMessage(s)} sx={{
-              px: 2, py: 0.8, borderRadius: "20px",
-              background: "#00ff9c", color: "#000",
-              fontSize: "11px", fontWeight: 600, cursor: "pointer",
-              "&:hover": { boxShadow: "0 4px 12px rgba(0,255,150,0.4)" },
-            }}>{s}</Box>
-          ))}
-        </Box>
-      )}
-
-      {/* Input */}
-      <Box sx={{ p: "12px 16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-        <Box sx={{
-          display: "flex", alignItems: "center", gap: 1,
-          background: "rgba(0,0,0,0.4)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "10px", px: 2, py: 0.8,
-        }}>
-          <InputBase
-            placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
-            fullWidth value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            disabled={isLoading || isProcessing}
-            sx={{ color: "#aaa", fontSize: "13px", "& input::placeholder": { color: isListening ? "#00ff9c" : "#555", opacity: 1 } }}
-          />
-          <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? "#00ff9c" : "#666", p: "4px" }}>
-            <MicIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-          <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
-            sx={{
-              background: "#00ff9c", color: "#000", borderRadius: "8px", p: "4px",
-              "&:hover": { background: "#00e68a" }, "&.Mui-disabled": { background: "rgba(0,255,150,0.2)" }
-            }}>
-            {isLoading || isProcessing
-              ? <CircularProgress size={16} sx={{ color: "#000" }} />
-              : <ArrowUpwardIcon sx={{ fontSize: 16 }} />}
-          </IconButton>
-        </Box>
-      </Box>
-    </Box>
-  );
-}
 
 /* ── Welcome split screen ── */
 function WelcomeScreen({ opacity }) {
-  const containerRef = useRef(null);
 
   return (
     <Box sx={{
@@ -162,73 +33,72 @@ function WelcomeScreen({ opacity }) {
       display: "flex", alignItems: "center", justifyContent: "center",
       opacity, visibility: opacity > 0 ? "visible" : "hidden",
       pointerEvents: opacity > 0.5 ? "auto" : "none",
-      px: { xs: 2, md: 6 }, py: { xs: 2, md: 4 },
+      px: "4vw", py: "4vh",
     }}>
-      {/* Social icons — left edge pill */}
+      {/* Root row: [social pill] [left panel col-9] [right panel col-3] */}
       <Box sx={{
-        display: { xs: "none", md: "flex" },
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 1.5,
-        background: "rgba(18,22,18,0.92)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: "29px",
-        p: "14px 10px",
-        mr: 1.5,
-        zIndex: 10,
-        flexShrink: 0,
-        position:"absolute",
-        left:"7%"
+        display: "flex",
+        alignItems: "stretch",
+        gap: "12px",
+        width: "90%",
+        height: "min(72vh, 520px)",
       }}>
-        {socialIcons.map(({ label, icon }) => (
-          <Box key={label} sx={{
-            display: "flex", alignItems: "center", justifyContent: "center",
-            borderRadius: "50%",
-            cursor: "pointer",
-            opacity: 0.6,
-            transition: "opacity 0.2s",
-            "&:hover": { opacity: 1 },
-          }}>
-            <Box component="img" src={icon} alt={label} sx={{ width: 40, height: 40 }} />
-          </Box>
-        ))}
-      </Box>
 
-      {/* Split container — Grid 9/3 */}
-      <Box
-        ref={containerRef}
-        sx={{
-          flex: 1,
-          display: "flex",
-          height: { xs: "90vh", md: "62vh" },
-          borderRadius: "16px",
-          overflow: "visible",
-          position: "relative"
-        }}
-      >
-        {/* Left panel col-9 */}
+        {/* Social icons pill */}
         <Box sx={{
-          flex: "0 0 75%",
-          backgroundImage: "url(/assets/images/hud/homepage-left-side.svg)",
-          backgroundSize: "100% 100%",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          borderRadius: "16px 0 0 16px",
-          overflowY: "auto",
-          p: "50px",
-          "&::-webkit-scrollbar": { width: "4px" },
-          "&::-webkit-scrollbar-thumb": { background: "rgba(0,255,150,0.2)", borderRadius: "2px" },
+          display: { xs: "none", md: "flex" },
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "16px",
+          background: "rgba(14,18,14,0.95)",
+          border: "1px solid rgba(255,255,255,0.09)",
+          borderRadius: "28px",
+          px: "10px",
+          py: "18px",
+          flexShrink: 0,
+          alignSelf: "center",
         }}>
-          <AboutMeContent onClose={() => { }} mobile={false} />
+          {socialIcons.map(({ label, icon }) => (
+            <Box key={label} component="img" src={icon} alt={label}
+              sx={{
+                width: 28, height: 28,
+                opacity: 0.55, cursor: "pointer",
+                transition: "opacity 0.2s",
+                "&:hover": { opacity: 1 },
+              }}
+            />
+          ))}
         </Box>
 
-        {/* Right panel col-3 */}
-        <Box sx={{ flex: "0 0 25%", minWidth: 0, position: "relative", overflow: "visible" }}>
+        {/* Left panel — col 9 */}
+        <Box sx={{
+          flex: "8 8 0%",
+          display: "flex",
+          flexDirection: "column",
+          background: "rgba(10,14,10,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: "16px",
+          overflow: "hidden",
+          p: "28px 28px 24px 28px",
+        }}>
+          <AboutMeContent onClose={() => {}} mobile={false} inline={true} />
+        </Box>
+
+        {/* Right panel — col 3 */}
+        <Box sx={{
+          flex: "4 4 0%",
+          position: "relative",
+          overflow: "visible",
+        }}>
           <ChatbotPanel
             chips={["View Case Study", "How I Design", "Start Chat"]}
             wrapperSx={{ height: "100%" }}
           />
         </Box>
+
       </Box>
     </Box>
   );
@@ -349,9 +219,9 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       setCurrentFrame(idx);
       onFrameChange?.(idx);
 
-      // welcome UI: fade in 155→165, visible 165→170, fade out 170→180
+      // welcome UI: show only on frames 201 and 202
       if (idx >= UI_SHOW_FRAME) {
-        setWelcomeOpacity(Math.min(1, (idx - UI_SHOW_FRAME) / 10));
+        setWelcomeOpacity(1);
       } else {
         setWelcomeOpacity(0);
       }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Box, IconButton, Typography, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import { useNavigate } from "react-router-dom";
 import ChatbotPanel from "./ChatbotPanel";
@@ -203,9 +203,8 @@ export default function ProjectDetailPage() {
             <Box className="drag-handle" sx={{ width: 4, height: 40, borderRadius: 2, background: "rgba(255,255,255,0.2)", transition: "background 0.2s" }} />
           </Box>
 
-          {/* RIGHT PANEL — shared ChatbotPanel */}
+          {/* RIGHT PANEL — ChatbotPanel */}
           <ChatbotPanel
-            orb={orb}
             chips={["View Case Study", "About Akash"]}
             wrapperSx={{ flex: 1, minWidth: 0, height: "100%" }}
           />
