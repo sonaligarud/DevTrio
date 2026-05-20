@@ -86,7 +86,7 @@ class LLMFactory:
             return ChatOpenAI(
                 openai_api_key=api_key,
                 model_name=model,
-                temperature=0.7,
+                temperature=0.1,  # Low temp = factual, no hallucination
             )
         except ImportError:
             raise ImportError("langchain-openai is not installed. Run: pip install langchain-openai")
@@ -137,7 +137,7 @@ class LLMFactory:
         return ChatGoogleGenerativeAI(
             google_api_key=api_key,
             model=model,
-            temperature=0.7,
+            temperature=0.1,  # Low temp = factual, no hallucination
         )
 
     def _get_gemini_embeddings(self):
@@ -152,7 +152,7 @@ class LLMFactory:
             )
 
         api_key = os.getenv("GOOGLE_API_KEY")
-        model = os.getenv("GEMINI_EMBEDDING_MODEL", "models/embedding-001")
+        model = os.getenv("GEMINI_EMBEDDING_MODEL", "models/text-embedding-004")
 
         if not api_key:
             raise ValueError("GOOGLE_API_KEY is not set in environment variables.")

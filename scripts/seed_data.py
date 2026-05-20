@@ -36,36 +36,72 @@ logger = logging.getLogger(__name__)
 def fetch_projects_from_db():
     """
     Fetches real projects from the PostgreSQL database using a raw SQL cursor.
-    Formats them into proper dictionaries for the vector store.
+    Formats them into rich content dictionaries for the ChromaDB vector store.
+    Pulls all structured fields so the RAG context is maximally informative.
     """
+    import json as _json
+
     documents = []
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id, title, description, tech_stack, image_url FROM projects")
+        cursor.execute(
+            """
+            SELECT id, title, description, tech_stack, category, image_url,
+                   short_description, motivation, goal, problem_solved, skills,
+                   key_features, target_users, challenges, results, tags, keywords
+            FROM projects
+            """
+        )
         rows = cursor.fetchall()
         for row in rows:
-            proj_id, title, desc, tech, image_url = row
-            
-            # Combine into a rich content string for the LLM context
+            (
+                proj_id, title, desc, tech, category, image_url,
+                short_desc, motivation, goal, problem, skills,
+                key_features, target_users, challenges, results, tags, keywords,
+            ) = row
+
+            # Build a rich textual content blob for semantic search
             content = f"Project Title: {title}\n"
-            if desc:
-                content += f"Description: {desc}\n"
+            if short_desc or desc:
+                content += f"Description: {short_desc or desc}\n"
+            if category:
+                content += f"Category: {category}\n"
             if tech:
                 content += f"Technologies Used: {tech}\n"
-            
+            if skills:
+                content += f"Skills: {skills}\n"
+            if goal:
+                content += f"Goal: {goal}\n"
+            if problem:
+                content += f"Problem Solved: {problem}\n"
+            if motivation:
+                content += f"Motivation: {motivation}\n"
+            if key_features:
+                feats = key_features if isinstance(key_features, list) else _json.loads(key_features)
+                content += f"Key Features: {', '.join(feats)}\n"
+            if results:
+                res = results if isinstance(results, list) else _json.loads(results)
+                content += f"Results: {'; '.join(res)}\n"
+            if tags:
+                t = tags if isinstance(tags, list) else _json.loads(tags)
+                content += f"Tags: {', '.join(t)}\n"
+            if keywords:
+                kw = keywords if isinstance(keywords, list) else _json.loads(keywords)
+                content += f"Keywords: {', '.join(kw)}\n"
+
             documents.append({
                 "project_id": str(proj_id),
                 "title": title or "Untitled",
                 "content": content,
                 "image_url": image_url or "",
             })
-            
-    # Also add a global summary document based on fetched dynamic data
+
+    # Add a global summary document so "what projects do you have?" works
     if documents:
         titles = [d["title"] for d in documents]
         summary_content = (
             "This is the global portfolio overview. "
             "I have worked on various projects, including: " + ", ".join(titles) + ". "
-            "These projects demonstrate my development skills and capabilities."
+            "These projects demonstrate my design and development skills and capabilities."
         )
         documents.append({
             "project_id": "global_summary",
@@ -73,7 +109,7 @@ def fetch_projects_from_db():
             "content": summary_content,
             "image_url": "",
         })
-        
+
     return documents
 
 

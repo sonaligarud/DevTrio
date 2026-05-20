@@ -25,12 +25,34 @@ logger = logging.getLogger("services")
 _llm_factory: Optional[object] = None
 _rag_service: Optional[object] = None
 _speech_service: Optional[object] = None
+_cache_service: Optional[object] = None  # Redis cache singleton
+
+
+def get_cache_service():
+    """
+    Lazily initialize and return the CacheService singleton.
+    Safe to call even when Redis is not running — returns a CacheService
+    instance whose methods will all be no-ops (cache misses).
+    """
+    global _cache_service
+
+    if _cache_service is None:
+        logger.info("Initializing Cache service (first request)...")
+        try:
+            from services.cache_service import CacheService
+            _cache_service = CacheService()
+            logger.info("Cache service initialized.")
+        except Exception as e:
+            logger.error(f"Failed to initialize Cache service: {e}")
+            raise
+
+    return _cache_service
 
 
 def get_rag_service():
     """
     Lazily initialize and return the RAG service singleton.
-    On first call: creates LLMFactory → LLM + Embeddings → VectorStore → RAGService
+    On first call: creates LLMFactory → LLM + Embeddings → VectorStore → CacheService → RAGService
     On subsequent calls: returns the cached instance.
     """
     global _rag_service
@@ -47,7 +69,11 @@ def get_rag_service():
             embeddings = factory.get_embeddings()
 
             vector_store = VectorStoreService(embeddings)
-            _rag_service = RAGService(llm, vector_store)
+
+            # Reuse the shared cache singleton — single Redis connection pool
+            cache = get_cache_service()
+
+            _rag_service = RAGService(llm, vector_store, cache_service=cache)
 
             logger.info(f"RAG service initialized with provider: {factory.get_provider()}")
         except Exception as e:
@@ -80,6 +106,8 @@ def reset_services():
     """
     Reset all singleton services (useful for testing or provider switching).
     Call this if LLM_PROVIDER changes at runtime.
+    Note: Cache service is intentionally NOT reset — cached answers remain
+    valid regardless of which LLM provider is active.
     """
     global _rag_service, _speech_service
     _rag_service = None

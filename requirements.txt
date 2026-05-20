@@ -28,6 +28,7 @@ pydub==0.25.1
 # Utils
 requests==2.32.3
 pillow==10.4.0
+redis>=5.0.0              # Redis client for response caching (redis-py)
 
 # ============================================================
 # OPTIONAL: Google Gemini support

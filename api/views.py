@@ -15,6 +15,7 @@ importing heavy ML libraries at Django startup time.
 """
 
 import os
+import json
 import logging
 import tempfile
 from pathlib import Path
@@ -44,11 +45,20 @@ class HealthCheckView(APIView):
 
     def get(self, request):
         provider = os.getenv("LLM_PROVIDER", "openai")
+
+        # Include Redis cache stats for observability
+        try:
+            from utils.service_registry import get_cache_service
+            cache_stats = get_cache_service().get_stats()
+        except Exception as e:
+            cache_stats = {"status": "error", "details": str(e)}
+
         return Response(
             {
                 "status": "ok",
                 "llm_provider": provider,
                 "message": "Chatbot API is running.",
+                "cache": cache_stats,
             },
             status=status.HTTP_200_OK,
         )
@@ -315,41 +325,62 @@ class CategoryListView(APIView):
             logger.error(f"Error fetching categories: {e}", exc_info=True)
             return Response({"error": "Failed to fetch categories."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# ==================================================================
-# Categories API
-# ==================================================================
 
-class CategoryListView(APIView):
-    """
-    GET /api/categories
-    Returns all unique categories from the database.
-    """
-    def get(self, request):
-        query = "SELECT DISTINCT category FROM projects WHERE category IS NOT NULL ORDER BY category ASC"
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                rows = cursor.fetchall()
-            
-            categories = [row[0] for row in rows]
-            return Response(categories, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(f"Error fetching categories: {e}", exc_info=True)
-            return Response({"error": "Failed to fetch categories."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ==================================================================
 # Projects API
 # ==================================================================
 
+def _parse_jsonb(value):
+    """Safely parse a JSONB field that may come back as a JSON string or already as list/dict."""
+    if value is None:
+        return []
+    if isinstance(value, (list, dict)):
+        return value
+    try:
+        return json.loads(value)
+    except (TypeError, ValueError):
+        return []
+
+
+# Column order must match all SELECT queries below (22 fields total)
+_PROJECT_SELECT = """
+    id, title, description, tech_stack, image_url, created_at, category,
+    short_description, motivation, goal, problem_solved,
+    architecture, design_process, skills,
+    key_features, target_users, challenges, results,
+    future_improvements, tags, keywords, faq
+"""
+
+
 def map_project_row(row):
+    """Maps a DB row (tuple) to a rich project dict. Column order matches _PROJECT_SELECT."""
     return {
-        "id": row[0],
-        "title": row[1],
-        "description": row[2],
-        "tech_stack": row[3],
-        "image_url": row[4],
-        "created_at": row[5],
-        "category": row[6] if len(row) > 6 else None
+        "id":                  row[0],
+        "title":               row[1],
+        "description":         row[2],
+        "tech_stack":          row[3],
+        "image_url":           row[4],
+        "created_at":          row[5],
+        "category":            row[6],
+        # Rich scalar fields
+        "short_description":   row[7],
+        "motivation":          row[8],
+        "goal":                row[9],
+        "problem_solved":      row[10],
+        "architecture":        row[11],
+        "design_process":      row[12],
+        "skills":              row[13],
+        # JSONB array fields — use _parse_jsonb since Django raw cursor
+        # returns JSONB as strings, not Python objects
+        "key_features":        _parse_jsonb(row[14]),
+        "target_users":        _parse_jsonb(row[15]),
+        "challenges":          _parse_jsonb(row[16]),
+        "results":             _parse_jsonb(row[17]),
+        "future_improvements": _parse_jsonb(row[18]),
+        "tags":                _parse_jsonb(row[19]),
+        "keywords":            _parse_jsonb(row[20]),
+        "faq":                 _parse_jsonb(row[21]),
     }
 
 class ProjectListView(APIView):
@@ -363,7 +394,7 @@ class ProjectListView(APIView):
         title = request.query_params.get("title", "")
         category = request.query_params.get("category", "")
 
-        query = "SELECT id, title, description, tech_stack, image_url, created_at, category FROM projects WHERE 1=1"
+        query = f"SELECT {_PROJECT_SELECT} FROM projects WHERE 1=1"
         params = []
 
         if category:
@@ -397,7 +428,7 @@ class ProjectDetailView(APIView):
     Returns single project details by ID.
     """
     def get(self, request, pk):
-        query = "SELECT id, title, description, tech_stack, image_url, created_at, category FROM projects WHERE id = %s"
+        query = f"SELECT {_PROJECT_SELECT} FROM projects WHERE id = %s"
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query, [pk])

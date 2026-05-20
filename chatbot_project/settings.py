@@ -214,3 +214,27 @@ LOGGING = {
 # --------------------------------------------------
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
+
+# --------------------------------------------------
+# Redis Cache Configuration
+#
+# Used by services/cache_service.py to store RAG
+# responses and avoid re-running the LLM pipeline
+# for repeated identical queries.
+#
+# For local dev without Redis: leave these unset —
+#   the CacheService degrades gracefully to no-op.
+# For production: set all values via environment variables.
+#
+# Environment variables (all optional, have defaults):
+#   REDIS_HOST       — Redis server hostname    (default: localhost)
+#   REDIS_PORT       — Redis server port        (default: 6379)
+#   REDIS_DB         — Redis logical database   (default: 0)
+#   REDIS_PASSWORD   — Redis AUTH password      (default: none)
+#   REDIS_CACHE_TTL  — Response TTL in seconds  (default: 86400 = 24h)
+# --------------------------------------------------
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
+REDIS_CACHE_TTL = int(os.getenv("REDIS_CACHE_TTL", "86400"))  # 24 hours

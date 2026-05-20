@@ -5,11 +5,13 @@ Retrieval-Augmented Generation (RAG) pipeline.
 
 Flow:
     1. Receive user query + mode (global | project)
-    2. Embed the query using the configured embedding model
-    3. Retrieve top-k relevant documents from ChromaDB
-    4. Build a prompt with retrieved context
-    5. Pass prompt to the LLM
-    6. Return AI response + source metadata (including image URLs)
+    2. [NEW] Check Redis cache for a previously computed answer
+    3. Embed the query using the configured embedding model
+    4. Retrieve top-k relevant documents from ChromaDB
+    5. Build a prompt with retrieved context
+    6. Pass prompt to the LLM
+    7. [NEW] Store response in Redis cache
+    8. Return AI response + source metadata (including image URLs)
 
 Modes:
     - "ai"  → global search across all projects
@@ -26,6 +28,9 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 import json
 import re
+
+# Redis cache service — imported here; will degrade gracefully if Redis is down
+from services.cache_service import CacheService
 
 logger = logging.getLogger("services")
 
@@ -135,20 +140,27 @@ RAG_HUMAN_PROMPT = "{question}"
 class RAGService:
     """
     Orchestrates the full RAG pipeline:
+      - [NEW] Checks Redis cache before running retrieval
       - Retrieves documents from VectorStoreService
       - Constructs a prompt with context
       - Queries the LLM
+      - [NEW] Stores result in Redis cache
       - Returns response + metadata
     """
 
-    def __init__(self, llm, vector_store_service):
+    def __init__(self, llm, vector_store_service, cache_service: Optional[CacheService] = None):
         """
         Args:
             llm: A LangChain-compatible LLM (ChatOpenAI, ChatGoogleGenerativeAI, Ollama)
             vector_store_service: An instance of VectorStoreService
+            cache_service: Optional CacheService instance. If None, a new one is
+                           created automatically. Pass a mock for testing.
         """
         self.llm = llm
         self.vector_store = vector_store_service
+
+        # Redis cache layer — degrades gracefully if Redis is unavailable
+        self.cache = cache_service if cache_service is not None else CacheService()
 
         # Build a reusable prompt template
         self.prompt_template = ChatPromptTemplate.from_messages([
@@ -173,10 +185,20 @@ class RAGService:
         mode: str = "ai",
         project_id: Optional[str] = None,
         chat_history: Optional[List[Dict[str, str]]] = None,
-        k: int = 3,  # Optimized: retrieve only top-3 to minimize token usage
+        k: int = 5,  # Optimized: retrieve top-5 to allow showing more projects
     ) -> Dict[str, Any]:
         """
-        Full RAG pipeline for a user query.
+        Full RAG pipeline for a user query, with Redis caching.
+
+        Cache flow:
+            1. Normalize the query and build a cache key.
+            2. Check Redis for a prior response → return immediately on HIT.
+            3. On MISS, run the full RAG pipeline.
+            4. Store the new response in Redis (if cacheable).
+
+        Note: Chat history is intentionally excluded from the cache key.
+        The cache targets stateless factual lookups ("what tech stack is used").
+        Follow-up conversational turns are NOT cached.
 
         Args:
             query: The user's question
@@ -190,10 +212,16 @@ class RAGService:
                 - sources     (list): Retrieved document metadata
                 - mode        (str): The mode used
                 - project_id  (str|None): Project used (if any)
+                - from_cache  (bool): True if the response came from Redis
         """
         logger.info(f"RAG chat | mode='{mode}' | project_id='{project_id}' | query='{query[:60]}'")
         
         chat_history = chat_history or []
+
+        # ------------------------------------------------------------------
+        # Short-circuits (identity + chitchat) — these are NOT cached because
+        # they are deterministic hardcoded strings that cost nothing to compute.
+        # ------------------------------------------------------------------
 
         # Short-circuit for identity questions — always answer as Nova
         identity_keywords = ["who are you", "what is your name", "your name", "who built you", "are you an ai", "what are you", "introduce yourself"]
@@ -203,9 +231,31 @@ class RAGService:
                 "sources": [],
                 "mode": mode,
                 "project_id": project_id,
+                "from_cache": False,
             }
 
+        # ------------------------------------------------------------------
+        # CACHE CHECK — before any LLM/embedding work
+        # We only cache non-conversational queries (no active chat history)
+        # because cached responses don't have follow-up context.
+        #
+        # IMPORTANT: capture the cache key mode NOW (before any web→ai switch)
+        # so that GET and SET always use the same key. If we used the switched
+        # mode in SET, a future identical request would MISS even though the
+        # answer is already stored.
+        # ------------------------------------------------------------------
+        use_cache = not chat_history  # Skip cache for conversational follow-ups
+        cache_mode = mode             # Freeze mode for cache key — never changes
+        if use_cache:
+            cached = self.cache.get_cached_response(project_id, cache_mode, query)
+            if cached is not None:
+                # Inject cache flag so frontend/logs can identify cache hits
+                cached["from_cache"] = True
+                return cached
+
+        # ------------------------------------------------------------------
         # Step 0: Classify intent to auto-adjust routing and handle chitchat
+        # ------------------------------------------------------------------
         intent = self._classify_intent(query, project_id or "global portfolio")
         logger.info(f"Intent classified as: {intent}")
         
@@ -216,6 +266,7 @@ class RAGService:
                 "sources": [],
                 "mode": mode,
                 "project_id": project_id,
+                "from_cache": False,
             }
 
         original_mode = mode
@@ -225,8 +276,10 @@ class RAGService:
                 mode = "ai"
                 # We keep project_id to know the context contextually, but mode='ai' avoids strict filtering.
 
+        # ------------------------------------------------------------------
         # Step 1: Retrieve relevant documents
         # Expand query with recent history to ensure follow-up questions retrieve relevant docs
+        # ------------------------------------------------------------------
         search_query = query
         if chat_history:
             recent_msgs = []
@@ -245,6 +298,7 @@ class RAGService:
                 "sources": [],
                 "mode": mode,
                 "project_id": project_id,
+                "from_cache": False,
             }
 
         # Step 2: Build context string from retrieved docs
@@ -259,12 +313,23 @@ class RAGService:
 
         logger.info(f"RAG response generated. Sources: {len(sources)}")
 
-        return {
+        result = {
             "answer": answer,
             "sources": sources,
             "mode": mode,
             "project_id": project_id,
+            "from_cache": False,
         }
+
+        # ------------------------------------------------------------------
+        # CACHE STORE — persist the result for future identical queries.
+        # Use cache_mode (the original mode before any web→ai switch) to
+        # ensure the stored key matches what future GET calls will look up.
+        # ------------------------------------------------------------------
+        if use_cache:
+            self.cache.set_cached_response(project_id, cache_mode, query, result)
+
+        return result
 
     # ------------------------------------------------------------------
     # Private helpers
@@ -350,7 +415,7 @@ class RAGService:
         return docs
 
     # Maximum characters to include per document — prevents bloating the LLM context window
-    MAX_CHARS_PER_DOC = 800
+    MAX_CHARS_PER_DOC = 1500
 
     def _build_context(self, documents: List[Document]) -> str:
         """
