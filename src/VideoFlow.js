@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import CloseIcon from "@mui/icons-material/Close";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
+import { useResizableChatbot } from "./hooks/useResizableChatbot";
+import ResizeHandle from "./ResizeHandle";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -26,6 +29,7 @@ const socialIcons = [
 
 /* ── Welcome split screen ── */
 function WelcomeScreen({ opacity }) {
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
 
   return (
     <Box sx={{
@@ -36,13 +40,17 @@ function WelcomeScreen({ opacity }) {
       px: "4vw", py: "4vh",
     }}>
       {/* Root row: [social pill] [left panel col-9] [right panel col-3] */}
-      <Box sx={{
-        display: "flex",
-        alignItems: "stretch",
-        gap: "12px",
-        width: "90%",
-        height: "min(72vh, 520px)",
-      }}>
+      <Box
+        ref={containerRef}
+        sx={{
+          display: "flex",
+          alignItems: "stretch",
+          gap: "0px",
+          width: "90%",
+          height: "min(72vh, 520px)",
+          position: "relative",
+        }}
+      >
 
         {/* Social icons pill */}
         <Box sx={{
@@ -58,6 +66,7 @@ function WelcomeScreen({ opacity }) {
           py: "18px",
           flexShrink: 0,
           alignSelf: "center",
+          mr: "12px",
         }}>
           {socialIcons.map(({ label, icon }) => (
             <Box key={label} component="img" src={icon} alt={label}
@@ -73,7 +82,8 @@ function WelcomeScreen({ opacity }) {
 
         {/* Left panel — col 9 */}
         <Box sx={{
-          flex: "8 8 0%",
+          flex: 1,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
           background: "rgba(10,14,10,0.92)",
@@ -87,9 +97,15 @@ function WelcomeScreen({ opacity }) {
           <AboutMeContent onClose={() => {}} mobile={false} inline={true} />
         </Box>
 
+        {/* Resize Handle */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+          <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
+        </Box>
+
         {/* Right panel — col 3 */}
         <Box sx={{
-          flex: "4 4 0%",
+          width: { xs: "33.3%", md: `${widthPercent}%` },
+          flexShrink: 0,
           position: "relative",
           overflow: "visible",
         }}>

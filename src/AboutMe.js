@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"; // kept for fallback
 import { PRIMARY, primaryAlpha } from "./theme";
+import CustomTooltip from "./CustomTooltip";
 
 /* ── Styled components ── */
 const ModalBox = styled(Box)(({ mobile }) => ({
@@ -150,14 +151,13 @@ function WorkTab({ onClose, inline }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-      {/* Category cards — single row, 4 equal cols */}
-      <Box sx={{ display: "flex", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
+      {/* Category cards — responsive grid */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
           <Box
             key={cat.label}
             onClick={() => handleCategoryClick(cat.label)}
             sx={{
-              flex: 1,
               display: "flex", flexDirection: "column",
               padding:"45px",
               alignItems: "center", justifyContent: "center",
@@ -174,7 +174,6 @@ function WorkTab({ onClose, inline }) {
                 backgroundImage: "url(/assets/images/bg-images/with-hover.svg)",
                 backgroundSize: "100% 100%",
                 backgroundRepeat: "no-repeat",
-                padding:"65px",
                 "& .cat-icon": { filter: "brightness(0) invert(1)" },
                 "& .cat-label": { color: "#fff" },
               },
@@ -188,11 +187,17 @@ function WorkTab({ onClose, inline }) {
       </Box>
 
      
-           {/* Bio + Download Resume */}
-      <Box >
-        <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", maxWidth: "400px",marginTop:"20px" }}>
-        Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
-      </Typography>
+      {/* Bio + Download Resume */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "20px", alignItems: "center" }}>
+        <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
+          Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
+        </Typography>
+        <CustomTooltip title={<>you can download tht resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+          <DownloadBtn sx={{ flexShrink: 0 }}>
+            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
+            Download Resume
+          </DownloadBtn>
+        </CustomTooltip>
       </Box>
     </Box>
   );
@@ -252,10 +257,12 @@ function AboutMeTab({ mobile, inline }) {
         <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         </Typography>
-        <DownloadBtn sx={{ flexShrink: 0}}>
-          <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
-          Download Resume
-        </DownloadBtn>
+        <CustomTooltip title={<>you can download tht resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+          <DownloadBtn sx={{ flexShrink: 0}}>
+            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
+            Download Resume
+          </DownloadBtn>
+        </CustomTooltip>
       </Box>
     </Box>
   );
@@ -287,9 +294,11 @@ function AboutMeContent({ onClose, mobile, inline }) {
           <Tab active={activeTab === "work" ? 1 : 0} onClick={() => setActiveTab("work")}>
             Work
           </Tab>
-          <Tab active={activeTab === "about" ? 1 : 0} onClick={() => setActiveTab("about")}>
-            About Me
-          </Tab>
+          <CustomTooltip title="click to see about me" placement="top">
+            <Tab active={activeTab === "about" ? 1 : 0} onClick={() => setActiveTab("about")}>
+              About Me
+            </Tab>
+          </CustomTooltip>
         </Box>
       </Box>
 
