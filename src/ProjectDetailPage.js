@@ -5,7 +5,7 @@ import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 
-const PRIMARY = "#00ff9c";
+const PRIMARY = "#00CD1F";
 
 const mainTabs = ["UI/UX", "Social Media", "Videos", "Print Media"];
 const subTabs = ["Project -1", "Project - 2", "Project - 3", "Project - 4"];
@@ -117,7 +117,7 @@ export default function ProjectDetailPage() {
                 <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
                   style={{ width: "100%", display: "block", borderRadius: "12px", maxHeight: "55vh", objectFit: "contain" }} />
                 <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: 1, zIndex: 3 }}>
-                  <Tooltip title="Share" placement="left">
+                  {/* <Tooltip title="Share" placement="left">
                     <IconButton sx={{
                       width: 32, height: 32, borderRadius: "8px",
                       background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)", color: "#aaa",
@@ -125,7 +125,7 @@ export default function ProjectDetailPage() {
                     }}>
                       <ShareIcon />
                     </IconButton>
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip title="Fullscreen" placement="left">
                     <IconButton onClick={openLightbox} sx={{
                       width: 32, height: 32, borderRadius: "8px",

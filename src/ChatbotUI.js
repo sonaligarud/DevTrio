@@ -94,7 +94,7 @@ const GlowingOrbContainer = styled(Box)({
 const SuggestionButton = styled(Box)({
     padding: "8px 20px",
     borderRadius: "20px",
-    backgroundColor: "#00ff9c",
+    backgroundColor: "#00CD1F",
     color: "#000",
     fontSize: "12px",
     fontWeight: "600",
@@ -154,7 +154,7 @@ const MessageBubble = styled(Box)(({ role }) => ({
     "& h1, & h2, & h3, & h4, & h5, & h6": {
         marginTop: "15px",
         marginBottom: "10px",
-        color: "#00ff9c",
+        color: "#00CD1F",
         fontWeight: 600,
         "&:first-of-type": {
             marginTop: 0,
@@ -169,7 +169,7 @@ const MessageBubble = styled(Box)(({ role }) => ({
         marginBottom: "6px",
     },
     "& a": {
-        color: "#00ff9c",
+        color: "#00CD1F",
         textDecoration: "underline",
     },
     "& strong": {
@@ -237,7 +237,7 @@ export default function ChatbotUI({ onClose }) {
                             <Typography sx={{ color: "#aaa", fontSize: "14px", fontWeight: 300, mb: 0.5 }}>
                                 Hello!
                             </Typography>
-                            <Typography sx={{ color: "#00ff9c", fontSize: "24px", fontWeight: 500 }}>
+                            <Typography sx={{ color: "#00CD1F", fontSize: "24px", fontWeight: 500 }}>
                                 Akash Pardeshi
                             </Typography>
                         </Box>
@@ -254,7 +254,7 @@ export default function ChatbotUI({ onClose }) {
                             ))}
                             {isLoading && (
                                 <Box sx={{ alignSelf: "flex-start", p: 1 }}>
-                                    <CircularProgress size={20} sx={{ color: "#00ff9c" }} />
+                                    <CircularProgress size={20} sx={{ color: "#00CD1F" }} />
                                 </Box>
                             )}
                             <div ref={messagesEndRef} />
@@ -283,15 +283,15 @@ export default function ChatbotUI({ onClose }) {
                                     color: "#aaa",
                                     fontSize: "14px",
                                     "& input::placeholder": {
-                                        color: isListening ? "#00ff9c" : "#555",
+                                        color: isListening ? "#00CD1F" : "#555",
                                         opacity: 1,
                                     },
                                 }}
                             />
-                            <IconButton onClick={handleSend} disabled={isLoading || isProcessing} sx={{ border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: "#888", p: "6px", "&:hover": { color: "#00ff9c", borderColor: "#00ff9c" } }}>
+                            <IconButton onClick={handleSend} disabled={isLoading || isProcessing} sx={{ border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: "#888", p: "6px", "&:hover": { color: "#00CD1F", borderColor: "#00CD1F" } }}>
                                 {isLoading || isProcessing ? <CircularProgress size={20} sx={{ color: "#aaa" }} /> : <ArrowUpwardIcon fontSize="small" />}
                             </IconButton>
-                            <IconButton onClick={toggleListening} sx={{ border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: isListening ? "#00ff9c" : "#888", p: "6px", "&:hover": { color: "#00ff9c", borderColor: "#00ff9c" } }}>
+                            <IconButton onClick={toggleListening} sx={{ border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: isListening ? "#00CD1F" : "#888", p: "6px", "&:hover": { color: "#00CD1F", borderColor: "#00CD1F" } }}>
                                 <MicIcon fontSize="small" />
                             </IconButton>
                         </InputContainer>

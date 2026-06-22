@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback} from "react";
 import { Box, Typography } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CloseIcon from "@mui/icons-material/Close";
@@ -61,9 +61,8 @@ function WelcomeScreen({ opacity }) {
           gap: "20px",
           background: "rgba(20,24,20,0.95)",
           border: "1px solid rgba(255,255,255,0.06)",
-          // borderLeft: "2px solid #00CD1F",
-          borderRadius: "32px",
-          px: "14px",
+          borderRadius: "20px",
+          px: "10px",
           py: "24px",
           position: "absolute",
           left: "-28px",
@@ -71,18 +70,25 @@ function WelcomeScreen({ opacity }) {
           transform: "translateY(-50%)",
           zIndex: 10,
           boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: "-2px",
+          right: "-2px",
+          width: "8px",
+          height: "8px",
+    },
         }}>
           {socialIcons.map(({ label, icon }) => (
             <Box key={label} sx={{
               display: "flex", alignItems: "center", justifyContent: "center",
               width: 40, height: 40, borderRadius: "50%",
-              backgroundColor: "rgba(255,255,255,0.03)",
               cursor: "pointer", transition: "all 0.2s",
               "&:hover": { backgroundColor: "rgba(255,255,255,0.1)", "& img": { opacity: 1 } }
             }}>
               <Box component="img" src={icon} alt={label}
                 sx={{
-                  width: 20, height: 20,
+                  width: 40, height: 40,
                   opacity: 0.65, transition: "opacity 0.2s",
                 }}
               />
@@ -102,7 +108,7 @@ function WelcomeScreen({ opacity }) {
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "16px",
           overflow: "hidden",
-          p: "28px 28px 24px 44px",
+          p:"60px"
         }}>
           <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
         </Box>

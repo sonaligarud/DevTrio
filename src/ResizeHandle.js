@@ -21,7 +21,7 @@ export default function ResizeHandle({ onMouseDown, isDragging }) {
           boxShadow: "0 0 10px rgba(0, 255, 156, 0.4)",
         },
         "&:hover .handle-pill, &.dragging .handle-pill": {
-          background: "#00ff9c",
+          background: "#00CD1F",
           boxShadow: "0 0 12px rgba(0, 255, 156, 0.8)",
           borderColor: "rgba(0, 255, 156, 0.5)",
         },

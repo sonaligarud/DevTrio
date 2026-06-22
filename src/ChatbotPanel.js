@@ -7,7 +7,7 @@ import { useChatContext } from "./ChatContext";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 
-const PRIMARY = "#00ff9c";
+const PRIMARY = "#00CD1F";
 const CHIP_BG = "#8F8F8F";
 
 

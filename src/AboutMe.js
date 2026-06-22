@@ -255,9 +255,9 @@ function AboutMeTab({ mobile, inline }) {
       {/* Skills rows + Download Resume */}
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1, textAlign: "left" }}>
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.
         </Typography>
-        <CustomTooltip title={<>you can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+        <CustomTooltip title={<>deltaYou can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>
             <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
             Download Resume
