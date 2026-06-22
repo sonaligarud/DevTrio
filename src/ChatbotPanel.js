@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Box, Typography, InputBase, IconButton, CircularProgress } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
+import CustomTooltip from "./CustomTooltip";
 import { useChatContext } from "./ChatContext";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
 
 const PRIMARY = "#00ff9c";
 const CHIP_BG = "#8F8F8F";
+
 
 /**
  * Shared chatbot panel — homepage right col & project detail right panel.
@@ -46,21 +48,25 @@ export default function ChatbotPanel({
     <Box sx={{ position: "relative", display: "flex", flexDirection: "column", height: "100%", ...wrapperSx }}>
 
       {/* Orb — top-right, overflows the frame */}
-      <Box sx={{
-        position: "absolute",
-        top: -44, right: -44,
-        width: 110, height: 110,
-        borderRadius: "50%",
-        background: "rgba(0,0,0,0.6)",
-        border: "1.5px solid rgba(0,255,150,0.3)",
-        boxShadow: "0 0 32px rgba(0,255,150,0.2), inset 0 0 20px rgba(0,255,150,0.07)",
-        overflow: "hidden",
-        zIndex: 20,
-        flexShrink: 0,
-      }}>
-        <video key={orb} src={orb} autoPlay loop muted playsInline
-          style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
-      </Box>
+      <CustomTooltip title={
+        <>Ask anything<br />about me<br /><span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>
+      } placement="left">
+        <Box sx={{
+          position: "absolute",
+          top: -44, right: -44,
+          width: 110, height: 110,
+          borderRadius: "50%",
+          background: "rgba(0,0,0,0.6)",
+          border: "1.5px solid rgba(0,255,150,0.3)",
+          boxShadow: "0 0 32px rgba(0,255,150,0.2), inset 0 0 20px rgba(0,255,150,0.07)",
+          overflow: "hidden",
+          zIndex: 20,
+          flexShrink: 0,
+        }}>
+          <video key={orb} src={orb} autoPlay loop muted playsInline
+            style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
+        </Box>
+      </CustomTooltip>
 
       {/* HUD frame + content */}
       <Box sx={{
@@ -95,8 +101,7 @@ export default function ChatbotPanel({
               <Typography sx={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.85)" }}>
                 Hi!<br />
                 I'm <span style={{ color: '#fff', fontWeight: 700 }}>Nova</span>, Akash's AI Assistant.<br />
-                I can walk you through projects, thinking,<br />
-                and decisions.<br />
+                I can walk you through projects, thinking, and decisions.<br />
                 Where should we start?
               </Typography>
             </Box>

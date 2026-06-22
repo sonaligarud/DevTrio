@@ -9,6 +9,8 @@ import AudioButton from "./AudioButton";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
 import { transcribeAudio } from "./api/chatApi";
+import { useResizableChatbot } from "./hooks/useResizableChatbot";
+import ResizeHandle from "./ResizeHandle";
 
 // ─── Styled ───────────────────────────────────────────────────────────────────
 
@@ -227,6 +229,7 @@ function ChatbotPanel() {
 
 const PortfolioPage = () => {
   const navigate = useNavigate();
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(28);
 
   return (
     <PageWrapper>
@@ -246,7 +249,7 @@ const PortfolioPage = () => {
         </Box>
 
         {/* Row 2: Body — main panel + chatbot */}
-        <Box sx={{ flex: 1, display: "flex", gap: "10px", minHeight: 0 }}>
+        <Box ref={containerRef} sx={{ flex: 1, display: "flex", gap: "0px", minHeight: 0 }}>
 
           {/* ── Col 8: Main panel ── */}
           <Box sx={{ flex: 1, position: "relative", minWidth: 0, minHeight: 0 }}>
@@ -311,8 +314,11 @@ const PortfolioPage = () => {
             </Box>
           </Box>
 
+          {/* Resize Handle */}
+          <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
+
           {/* ── Col 3: Chatbot panel ── */}
-          <Box sx={{ width: "28%", flexShrink: 0, position: "relative" }}>
+          <Box sx={{ width: `${widthPercent}%`, flexShrink: 0, position: "relative" }}>
             {/* Dark bg */}
             <Box sx={{
               position: "absolute", inset: 0,

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import CloseIcon from "@mui/icons-material/Close";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
+import { useResizableChatbot } from "./hooks/useResizableChatbot";
+import ResizeHandle from "./ResizeHandle";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -26,6 +29,7 @@ const socialIcons = [
 
 /* ── Welcome split screen ── */
 function WelcomeScreen({ opacity }) {
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
 
   return (
     <Box sx={{
@@ -36,13 +40,17 @@ function WelcomeScreen({ opacity }) {
       px: "4vw", py: "4vh",
     }}>
       {/* Root row: [social pill] [left panel col-9] [right panel col-3] */}
-      <Box sx={{
-        display: "flex",
-        alignItems: "stretch",
-        gap: "12px",
-        width: "90%",
-        height: "min(72vh, 520px)",
-      }}>
+      <Box
+        ref={containerRef}
+        sx={{
+          display: "flex",
+          alignItems: "stretch",
+          gap: "0px",
+          width: "90%",
+          height: "min(72vh, 520px)",
+          position: "relative",
+        }}
+      >
 
         {/* Social icons pill */}
         <Box sx={{
@@ -50,30 +58,42 @@ function WelcomeScreen({ opacity }) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: "16px",
-          background: "rgba(14,18,14,0.95)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          borderRadius: "28px",
-          px: "10px",
-          py: "18px",
-          flexShrink: 0,
-          alignSelf: "center",
+          gap: "20px",
+          background: "rgba(20,24,20,0.95)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          // borderLeft: "2px solid #00CD1F",
+          borderRadius: "32px",
+          px: "14px",
+          py: "24px",
+          position: "absolute",
+          left: "-28px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 10,
+          boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
         }}>
           {socialIcons.map(({ label, icon }) => (
-            <Box key={label} component="img" src={icon} alt={label}
-              sx={{
-                width: 28, height: 28,
-                opacity: 0.55, cursor: "pointer",
-                transition: "opacity 0.2s",
-                "&:hover": { opacity: 1 },
-              }}
-            />
+            <Box key={label} sx={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 40, height: 40, borderRadius: "50%",
+              backgroundColor: "rgba(255,255,255,0.03)",
+              cursor: "pointer", transition: "all 0.2s",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.1)", "& img": { opacity: 1 } }
+            }}>
+              <Box component="img" src={icon} alt={label}
+                sx={{
+                  width: 20, height: 20,
+                  opacity: 0.65, transition: "opacity 0.2s",
+                }}
+              />
+            </Box>
           ))}
         </Box>
 
         {/* Left panel — col 9 */}
         <Box sx={{
-          flex: "8 8 0%",
+          flex: 1,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
           background: "rgba(10,14,10,0.92)",
@@ -82,14 +102,20 @@ function WelcomeScreen({ opacity }) {
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "16px",
           overflow: "hidden",
-          p: "28px 28px 24px 28px",
+          p: "28px 28px 24px 44px",
         }}>
-          <AboutMeContent onClose={() => {}} mobile={false} inline={true} />
+          <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
+        </Box>
+
+        {/* Resize Handle */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+          <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
         </Box>
 
         {/* Right panel — col 3 */}
         <Box sx={{
-          flex: "4 4 0%",
+          width: { xs: "33.3%", md: `${widthPercent}%` },
+          flexShrink: 0,
           position: "relative",
           overflow: "visible",
         }}>
@@ -403,7 +429,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
           pointerEvents: "none",
         }}>
-           <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>
+          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>
             scroll down
           </Typography>
           <Box
@@ -412,7 +438,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
             alt="scroll"
             sx={{ width: 20, opacity: 0.85 }}
           />
-         
+
         </Box>
       )}
 

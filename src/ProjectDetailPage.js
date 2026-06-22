@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import ChatbotPanel from "./ChatbotPanel";
+import { useResizableChatbot } from "./hooks/useResizableChatbot";
+import ResizeHandle from "./ResizeHandle";
 
 const PRIMARY = "#00ff9c";
 
@@ -33,6 +35,7 @@ const orbVideos = [
 ];
 
 export default function ProjectDetailPage() {
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
   const [mainTab, setMainTab] = useState(0);
   const [subTab, setSubTab] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -74,11 +77,12 @@ export default function ProjectDetailPage() {
       </Box>
 
       {/* CONTENT ROW — col 8 + col 4 */}
-      <Box sx={{ display: "flex", flex: 1, gap: "12px", minHeight: 0, overflow: "visible" }}>
+      <Box ref={containerRef} sx={{ display: "flex", flex: 1, gap: "0px", minHeight: 0, overflow: "visible" }}>
 
         {/* LEFT PANEL — col 8 */}
         <Box sx={{
-          flex: "8 8 0%",
+          flex: 1,
+          minWidth: 0,
           display: "flex", flexDirection: "column",
           background: "rgba(10,14,10,0.92)",
           backdropFilter: "blur(20px)",
@@ -152,11 +156,14 @@ export default function ProjectDetailPage() {
           </Box>
         </Box>
 
+        {/* Resize Handle */}
+        <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
+
         {/* RIGHT PANEL — col 4 */}
         <ChatbotPanel
           orb={orb}
           chips={["View Case Study", "About Akash"]}
-          wrapperSx={{ flex: "4 4 0%", minWidth: 0, height: "100%" }}
+          wrapperSx={{ width: `${widthPercent}%`, flexShrink: 0, minWidth: 0, height: "100%" }}
         />
       </Box>
 
