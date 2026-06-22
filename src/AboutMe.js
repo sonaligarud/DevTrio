@@ -159,7 +159,7 @@ function WorkTab({ onClose, inline }) {
             onClick={() => handleCategoryClick(cat.label)}
             sx={{
               display: "flex", flexDirection: "column",
-              padding:"45px",
+              padding: "45px",
               alignItems: "center", justifyContent: "center",
               gap: "10px",
               cursor: "pointer",
@@ -186,13 +186,13 @@ function WorkTab({ onClose, inline }) {
         ))}
       </Box>
 
-     
+
       {/* Bio + Download Resume */}
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "20px", alignItems: "center" }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
           Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
         </Typography>
-        <CustomTooltip title={<>you can download tht resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+        <CustomTooltip title={<>you can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>
             <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
             Download Resume
@@ -210,7 +210,7 @@ function AboutMeTab({ mobile, inline }) {
   return (
     <Box sx={{ padding: pad }}>
       {/* Experience label */}
-      <Typography sx={{ fontSize: "12px", letterSpacing: "1.2px", mb: 1.5,textAlign:'left' }}>
+      <Typography sx={{ fontSize: "12px", letterSpacing: "1.2px", mb: 1.5, textAlign: 'left' }}>
         Experience
       </Typography>
 
@@ -218,7 +218,7 @@ function AboutMeTab({ mobile, inline }) {
       <Box sx={{
         display: "flex", gap: 1.5, overflowX: "auto", pb: 1, mb: 2.5,
         "&::-webkit-scrollbar": { height: "3px" },
-        textAlign:"left",
+        textAlign: "left",
         "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
       }}>
         {experiences.map((exp) => (
@@ -237,10 +237,10 @@ function AboutMeTab({ mobile, inline }) {
       </Box>
 
       {/* Cert card */}
-      <CertCard sx={{ mb: 2.5}}>
+      <CertCard sx={{ mb: 2.5 }}>
         <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0 }} />
-        <Box sx={{textAlign:"left"}}>
-          <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#fff"}}>
+        <Box sx={{ textAlign: "left" }}>
+          <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#fff" }}>
             UI/UX Design with Generative AI
           </Typography>
           <Typography sx={{ fontSize: "11px", mt: 0.3 }}>
@@ -253,12 +253,12 @@ function AboutMeTab({ mobile, inline }) {
       <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.07)", mb: 2 }} />
 
       {/* Skills rows + Download Resume */}
-  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3}}>
-        <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1,textAlign:"left" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
+        <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1, textAlign: "left" }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
         </Typography>
-        <CustomTooltip title={<>you can download tht resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
-          <DownloadBtn sx={{ flexShrink: 0}}>
+        <CustomTooltip title={<>you can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+          <DownloadBtn sx={{ flexShrink: 0 }}>
             <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
             Download Resume
           </DownloadBtn>
