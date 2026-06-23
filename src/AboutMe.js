@@ -257,7 +257,7 @@ function AboutMeTab({ mobile, inline }) {
         <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1, textAlign: "left" }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.
         </Typography>
-        <CustomTooltip title={<>deltaYou can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
+        <CustomTooltip title={<>You can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>
             <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
             Download Resume

@@ -59,7 +59,6 @@ function WelcomeScreen({ opacity }) {
           alignItems: "center",
           justifyContent: "center",
           gap: "20px",
-          background: "rgba(20,24,20,0.95)",
           border: "1px solid rgba(255,255,255,0.06)",
           borderRadius: "20px",
           px: "10px",
@@ -70,14 +69,15 @@ function WelcomeScreen({ opacity }) {
           transform: "translateY(-50%)",
           zIndex: 10,
           boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
-        "&::before": {
+          background: "linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(269deg, #131010e3 1%, #636363 40%, #00CD1F 82%, #636363 47%, #131010e3 97%) border-box",
+         "&::before": {
           content: '""',
           position: "absolute",
           top: "-2px",
           right: "-2px",
           width: "8px",
           height: "8px",
-    },
+        } 
         }}>
           {socialIcons.map(({ label, icon }) => (
             <Box key={label} sx={{
@@ -108,7 +108,8 @@ function WelcomeScreen({ opacity }) {
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "16px",
           overflow: "hidden",
-          p:"60px"
+          p:"60px",
+         background:"linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(317deg, #131010e3 1%, #636363 40%,#00CD1F 48%, #636363 59%, #131010e3 97%) border-box"
         }}>
           <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
         </Box>
