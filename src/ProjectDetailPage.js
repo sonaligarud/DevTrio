@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import ChatbotPanel from "./ChatbotPanel";
@@ -35,6 +36,7 @@ const orbVideos = [
 ];
 
 export default function ProjectDetailPage() {
+  const navigate = useNavigate();
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
   const [mainTab, setMainTab] = useState(0);
   const [subTab, setSubTab] = useState(0);
@@ -105,7 +107,17 @@ export default function ProjectDetailPage() {
         }}>
           {/* SUB TABS */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, pt: 2, pb: 1, flexShrink: 0 }}>
-            <img src="/assets/icons/right.svg" alt="back" />
+            <Box onClick={() => navigate("/")} sx={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 32, height: 32,
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.15)",
+              cursor: "pointer",
+              transition: "all 0.2s",
+              "&:hover": { background: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.3)" }
+            }}>
+              <img src="/assets/icons/right.svg" alt="back" />
+            </Box>
             {subTabs.map((tab, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                 px: 2, py: 0.6, borderRadius: "8px", cursor: "pointer",

@@ -3,6 +3,7 @@ import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"; // kept for fallback
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { PRIMARY, primaryAlpha } from "./theme";
 import CustomTooltip from "./CustomTooltip";
 
@@ -163,25 +164,37 @@ function WorkTab({ onClose, inline }) {
               alignItems: "center", justifyContent: "center",
               gap: "10px",
               cursor: "pointer",
-              backgroundImage: "url(/assets/images/bg-images/without-hover.svg)",
-              backgroundSize: "100% 100%",
-              backgroundRepeat: "no-repeat",
-              borderRadius: "14px",
-              transition: "background-image 0.2s",
-              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s" },
-              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "12px", fontWeight: 500, transition: "color 0.2s" },
+              position: "relative",
+              background: "rgba(255,255,255,0.08)", // Unhovered border color
+              clipPath: "polygon(0 0, 100% 0, 100% 40px, calc(100% - 8px) 48px, calc(100% - 8px) calc(100% - 10px), calc(100% - 32px) calc(100% - 10px), calc(100% - 40px) 100%, 40px 100%, 32px calc(100% - 10px), 0 calc(100% - 10px))",
+              transition: "background 0.2s",
+              zIndex: 1,
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                inset: "1px",
+                background: "rgba(20,24,20,0.95)", // Inner card background
+                clipPath: "polygon(0 0, 100% 0, 100% 39px, calc(100% - 8px) 47px, calc(100% - 8px) calc(100% - 10px), calc(100% - 32px) calc(100% - 10px), calc(100% - 40px) 100%, 40px 100%, 32px calc(100% - 10px), 0 calc(100% - 10px))",
+                zIndex: -1,
+                transition: "background 0.2s",
+              },
+              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s", mb: "4px" },
+              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "14px", fontWeight: 500, transition: "color 0.2s" },
+              "& .cat-arrow": { opacity: 0, height: 0, overflow: "hidden", transition: "all 0.2s ease-in-out", mt: 0 },
               "&:hover": {
-                backgroundImage: "url(/assets/images/bg-images/with-hover.svg)",
-                backgroundSize: "100% 100%",
-                backgroundRepeat: "no-repeat",
+                background: "radial-gradient(ellipse at 30% 100%, #00CD1F 0%, rgba(255,255,255,0.08) 55%)", // Green glow at bottom edge
                 "& .cat-icon": { filter: "brightness(0) invert(1)" },
                 "& .cat-label": { color: "#fff" },
+                "& .cat-arrow": { opacity: 1, height: "24px", mt: "8px" },
               },
             }}
           >
             <Box component="img" src={cat.icon} alt={cat.label} className="cat-icon"
-              sx={{ width: 36, height: 36, objectFit: "contain" }} />
+              sx={{ width: 44, height: 44, objectFit: "contain" }} />
             <Typography className="cat-label">{cat.label}</Typography>
+            <Box className="cat-arrow">
+              <ArrowForwardIcon sx={{ color: "#fff", fontSize: 22 }} />
+            </Box>
           </Box>
         ))}
       </Box>
