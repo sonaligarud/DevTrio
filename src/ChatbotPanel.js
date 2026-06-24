@@ -80,6 +80,8 @@ export default function ChatbotPanel({
         overflow: "hidden",
         position: "relative",
         zIndex: 1,
+        clipPath:
+      "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
         background: "linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(124deg, #131010e3 1%, #636363 40%, #00CD1F 67%, #636363 47%, #131010e3 97%) border-box"
       }}>
         {/* Messages area */}

@@ -54,23 +54,32 @@ export default function ProjectDetailPage() {
   return (
     <Box sx={{
       width: "100vw", height: "100vh", overflow: "hidden",
-      background: "radial-gradient(circle at 20% 20%, #0b1f1a, #020605 70%)",
+      backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)), url('/assets/images/bg-images/bg.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
       display: "flex", flexDirection: "column",
-      px: "4vw", py: "3vh",
+      p: "65px",
       color: "#fff",
     }}>
       {/* MAIN TABS */}
       <Box sx={{ display: "flex", justifyContent: "center", mb: "16px", flexShrink: 0 }}>
-        <Box sx={{ display: "flex", background: "rgba(0,0,0,0.4)", borderRadius: "12px", p: "4px", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <Box sx={{ display: "flex", gap: "6px" }}>
           {mainTabs.map((tab, i) => (
             <Box key={i} onClick={() => { setMainTab(i); setSubTab(0); setSlideIndex(0); }} sx={{
-              px: 3, py: 1, borderRadius: "8px", cursor: "pointer",
-              fontSize: "13px", fontWeight: 500,
-              color: mainTab === i ? PRIMARY : "rgba(255,255,255,0.5)",
-              background: mainTab === i ? "rgba(0,255,150,0.08)" : "transparent",
-              border: mainTab === i ? "1px solid rgba(0,255,150,0.5)" : "1px solid transparent",
+              px: "22px", py: "7px", borderRadius: "8px", cursor: "pointer",
+              fontSize: "13px", fontWeight: mainTab === i ? 600 : 400,
+              color: mainTab === i ? "#000" : "rgba(255,255,255,0.75)",
+              background: mainTab === i ? PRIMARY : "rgba(20,28,22,0.75)",
+              border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.18)",
+              boxShadow: mainTab === i ? `0 0 14px rgba(0,205,31,0.4)` : "none",
+              backdropFilter: "blur(8px)",
               transition: "all 0.2s",
-              "&:hover": { color: "#fff" },
+              whiteSpace: "nowrap",
+              "&:hover": {
+                color: mainTab === i ? "#000" : "#fff",
+                border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.4)",
+              },
             }}>{tab}</Box>
           ))}
         </Box>
@@ -87,7 +96,9 @@ export default function ProjectDetailPage() {
           background: "rgba(10,14,10,0.92)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "3px solid rgba(255,255,255,0.08)",
+          clipPath:
+      "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
           borderRadius: "16px",
           overflow: "hidden",
           minHeight: 0,
@@ -112,7 +123,7 @@ export default function ProjectDetailPage() {
             <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
               <img src="/assets/icons/right.svg" alt="prev" />
             </IconButton>
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center", px: "52px", height: "100%" }}>
+            <Box sx={{ flex: 1, display: "flex", alignItems: "center", p:1, height: "100%" }}>
               <Box sx={{ flex: "0 0 100%", position: "relative" }}>
                 <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
                   style={{ width: "100%", display: "block", borderRadius: "12px", maxHeight: "55vh", objectFit: "contain" }} />
