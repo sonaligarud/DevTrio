@@ -65,23 +65,24 @@ export default function ProjectDetailPage() {
       color: "#fff",
     }}>
       {/* MAIN TABS */}
-      <Box sx={{ display: "flex", justifyContent: "center", mb: "16px", flexShrink: 0 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mb: "0px", flexShrink: 0 }}>
         <Box sx={{ display: "flex", gap: "6px" }}>
           {mainTabs.map((tab, i) => (
             <Box key={i} onClick={() => { setMainTab(i); setSubTab(0); setSlideIndex(0); }} sx={{
               px: "22px", py: "7px", borderRadius: "8px", cursor: "pointer",
               fontSize: "13px", fontWeight: mainTab === i ? 600 : 400,
-              color: mainTab === i ? "#000" : "rgba(255,255,255,0.75)",
-              background: mainTab === i ? PRIMARY : "rgba(20,28,22,0.75)",
+              color: mainTab === i ? "#00CD1F" : "rgba(255,255,255,0.75)",
+              background: "rgba(20,28,22,0.75)",
               border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.18)",
               boxShadow: mainTab === i ? `0 0 14px rgba(0,205,31,0.4)` : "none",
               backdropFilter: "blur(8px)",
               transition: "all 0.2s",
               whiteSpace: "nowrap",
               "&:hover": {
-                color: mainTab === i ? "#000" : "#fff",
+                color: mainTab === i ? "#00CD1F" : "#fff",
                 border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.4)",
               },
+              clipPath: "polygon(20px 0,calc(100% - 20px) 0,100% 100%,0 100%)",
             }}>{tab}</Box>
           ))}
         </Box>
@@ -110,18 +111,16 @@ export default function ProjectDetailPage() {
             <Box onClick={() => navigate("/")} sx={{
               display: "flex", alignItems: "center", justifyContent: "center",
               width: 32, height: 32,
-              borderRadius: "8px",
-              border: "1px solid rgba(255,255,255,0.15)",
               cursor: "pointer",
-              transition: "all 0.2s",
-              "&:hover": { background: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.3)" }
+              marginRight:2
             }}>
               <img src="/assets/icons/right.svg" alt="back" />
             </Box>
             {subTabs.map((tab, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
-                px: 2, py: 0.6, borderRadius: "8px", cursor: "pointer",
-                fontSize: "12px", fontWeight: 500,
+                borderRadius: "8px", cursor: "pointer",
+                padding:"10px 30px",
+                fontSize: "13px", fontWeight: 500,
                 color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
                 border: subTab === i ? "1px solid rgba(0,255,150,0.5)" : "1px solid rgba(255,255,255,0.08)",
                 background: subTab === i ? "rgba(0,255,150,0.08)" : "rgba(255,255,255,0.02)",
