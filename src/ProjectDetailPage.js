@@ -65,26 +65,52 @@ export default function ProjectDetailPage() {
       color: "#fff",
     }}>
       {/* MAIN TABS */}
-      <Box sx={{ display: "flex", justifyContent: "center", mb: "0px", flexShrink: 0 }}>
-        <Box sx={{ display: "flex", gap: "6px" }}>
-          {mainTabs.map((tab, i) => (
-            <Box key={i} onClick={() => { setMainTab(i); setSubTab(0); setSlideIndex(0); }} sx={{
-              px: "22px", py: "7px", borderRadius: "8px", cursor: "pointer",
-              fontSize: "13px", fontWeight: mainTab === i ? 600 : 400,
-              color: mainTab === i ? "#00CD1F" : "rgba(255,255,255,0.75)",
-              background: "rgba(20,28,22,0.75)",
-              border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.18)",
-              boxShadow: mainTab === i ? `0 0 14px rgba(0,205,31,0.4)` : "none",
-              backdropFilter: "blur(8px)",
-              transition: "all 0.2s",
-              whiteSpace: "nowrap",
-              "&:hover": {
-                color: mainTab === i ? "#00CD1F" : "#fff",
-                border: mainTab === i ? `1px solid ${PRIMARY}` : "1px solid rgba(255,255,255,0.4)",
-              },
-              clipPath: "polygon(20px 0,calc(100% - 20px) 0,100% 100%,0 100%)",
-            }}>{tab}</Box>
-          ))}
+      <Box sx={{ display: "flex", width: "100%", pr: `${widthPercent}%`, justifyContent: "center", mb: "0px", flexShrink: 0, position: "relative", zIndex: 2 }}>
+        <Box sx={{ display: "flex", gap: "0px" }}>
+          {mainTabs.map((tab, i) => {
+            const isActive = mainTab === i;
+            // trapezoid: narrower at top, wider at bottom — sides flare outward
+            const CLIP = "polygon(18px 0%, calc(100% - 18px) 0%, 100% 100%, 0% 100%)";
+            return (
+              <Box
+                key={i}
+                onClick={() => { setMainTab(i); setSubTab(0); setSlideIndex(0); }}
+                sx={{
+                  position: "relative",
+                  cursor: "pointer",
+                  // outer wrapper = 1px border via background color
+                  padding: "1px 1px 0px 1px",
+                  background: isActive ? PRIMARY : "rgba(255,255,255,0.2)",
+                  clipPath: CLIP,
+                  // right tabs are on top (cover left tab's right edge)
+                  zIndex: isActive ? 10 : i + 1,
+                  marginLeft: i === 0 ? "0px" : "-18px",
+                  top: isActive ? "1px" : "0px",
+                  transition: "all 0.2s",
+                  filter: isActive ? "drop-shadow(0px -2px 10px rgba(0,205,31,0.55))" : "none",
+                  "&:hover": {
+                    background: isActive ? PRIMARY : "rgba(255,255,255,0.4)",
+                  },
+                }}
+              >
+                {/* inner fill */}
+                <Box sx={{
+                  clipPath: CLIP,
+                  background: isActive ? "rgba(10,14,10,1)" : "rgba(20,28,22,1)",
+                  px: "28px", py: "9px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "14px", fontWeight: isActive ? 600 : 400,
+                  color: isActive ? PRIMARY : "rgba(255,255,255,0.7)",
+                  transition: "all 0.2s",
+                  whiteSpace: "nowrap",
+                  userSelect: "none",
+                  "&:hover": { color: isActive ? PRIMARY : "#fff" }
+                }}>
+                  {tab}
+                </Box>
+              </Box>
+            );
+          })}
         </Box>
       </Box>
 
@@ -99,9 +125,10 @@ export default function ProjectDetailPage() {
           background: "rgba(10,14,10,0.92)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          border: "3px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          borderTop: `1px solid ${PRIMARY}`,
           clipPath:
-      "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+            "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
           borderRadius: "16px",
           overflow: "hidden",
           minHeight: 0,
@@ -112,14 +139,14 @@ export default function ProjectDetailPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               width: 32, height: 32,
               cursor: "pointer",
-              marginRight:2
+              marginRight: 2
             }}>
               <img src="/assets/icons/right.svg" alt="back" />
             </Box>
             {subTabs.map((tab, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                 borderRadius: "8px", cursor: "pointer",
-                padding:"10px 30px",
+                padding: "10px 30px",
                 fontSize: "13px", fontWeight: 500,
                 color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
                 border: subTab === i ? "1px solid rgba(0,255,150,0.5)" : "1px solid rgba(255,255,255,0.08)",
@@ -134,7 +161,7 @@ export default function ProjectDetailPage() {
             <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
               <img src="/assets/icons/right.svg" alt="prev" />
             </IconButton>
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center", p:1, height: "100%" }}>
+            <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 1, height: "100%" }}>
               <Box sx={{ flex: "0 0 100%", position: "relative" }}>
                 <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
                   style={{ width: "100%", display: "block", borderRadius: "12px", maxHeight: "55vh", objectFit: "contain" }} />
@@ -206,7 +233,7 @@ export default function ProjectDetailPage() {
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
             <IconButton onClick={lbNext} sx={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="next"/>
+              <img src="/assets/icons/right.svg" alt="next" />
             </IconButton>
             <IconButton onClick={() => setLightboxOpen(false)} sx={{
               position: "absolute", bottom: 10, right: 10, zIndex: 2,
