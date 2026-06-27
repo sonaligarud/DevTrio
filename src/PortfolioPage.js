@@ -98,25 +98,25 @@ const PillTab = styled(Button)(({ active }) => ({
 }));
 
 const CATEGORIES = [
-  { label: "UI/UX",        route: "UI/UX" },
+  { label: "UI/UX", route: "UI/UX" },
   { label: "Social Media", route: "Social Media" },
-  { label: "Videos",       route: "Video" },
-  { label: "Print Media",  route: "Print-Designs" },
+  { label: "Videos", route: "Video" },
+  { label: "Print Media", route: "Print-Designs" },
 ];
 
 const desktopCategories = [
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
-  { label: "Social Media",  icon: "/assets/icons/social-media.svg" },
-  { label: "UI/UX",         icon: "/assets/icons/UX.svg" },
-  { label: "Video",         icon: "/assets/icons/Video.svg" },
-  { label: "XR",            icon: "/assets/icons/XR.svg" },
+  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
+  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
+  { label: "Video", icon: "/assets/icons/Video.svg" },
+  { label: "XR", icon: "/assets/icons/XR.svg" },
 ];
 
 const mobileCategories = [
-  { label: "UI/UX",         icon: "/assets/icons/UX.svg" },
-  { label: "Social Media",  icon: "/assets/icons/social-media.svg" },
-  { label: "XR",            icon: "/assets/icons/XR.svg" },
-  { label: "Video",         icon: "/assets/icons/Video.svg" },
+  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
+  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
+  { label: "XR", icon: "/assets/icons/XR.svg" },
+  { label: "Video", icon: "/assets/icons/Video.svg" },
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
 ];
 

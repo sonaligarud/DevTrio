@@ -72,22 +72,40 @@ export default function ChatbotPanel({
       <Box sx={{
         flex: 1,
         display: "flex", flexDirection: "column",
-        background: "rgba(10,14,10,0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: "16px",
         overflow: "hidden",
         position: "relative",
         zIndex: 1,
-        clipPath:
-      "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-        background: "linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(124deg, #131010e3 1%, #636363 40%, #00CD1F 67%, #636363 47%, #131010e3 97%) border-box"
+        transform: "translateZ(0)", // Force compositing so maskImage properly clips the scrolling child
+        clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+        
+        // This mask cuts a perfect circle out of the top right corner to hug the orb
+        maskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
+        WebkitMaskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
+        
+        background: "linear-gradient(rgba(10,14,10,0.92), rgba(10,14,10,0.92)) padding-box, linear-gradient(124deg, #131010e3 1%, #636363 40%, #00CD1F 67%, #636363 47%, #131010e3 97%) border-box",
+        border: "1px solid transparent",
+        
+        // This pseudo-element draws the glowing green border perfectly along the curved cutout
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          top: "11px",
+          right: "11px",
+          transform: "translate(50%, -50%)",
+          width: "124px", height: "124px",
+          borderRadius: "50%",
+          border: `1.5px solid rgba(0, 205, 31, 0.8)`,
+          filter: "drop-shadow(0 0 6px rgba(0,205,31,0.6))",
+          pointerEvents: "none",
+        }
       }}>
         {/* Messages area */}
         <Box sx={{
           flex: 1, overflowY: "auto",
-          pt: "20px", px: "20px", pb: "8px",
+          pt: "75px", px: "20px", pb: "8px", // Increased pt to 75px so messages start below the orb
           "&::-webkit-scrollbar": { width: "3px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
           textAlign:"left"

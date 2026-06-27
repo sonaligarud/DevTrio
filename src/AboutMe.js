@@ -32,7 +32,11 @@ const ModalBox = styled(Box)(({ mobile }) => ({
 
 const Tab = styled(Box)(({ active }) => ({
   position: "relative",
-  padding: "6px 22px",
+  padding: "6px 16px", // slightly reduced padding so it fits nicely inside the fixed width
+  minWidth: "110px", // Force both tabs to be the exact same width
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
   borderRadius: "8px",
   fontSize: "13px",
   fontWeight: 500,
@@ -160,7 +164,8 @@ function WorkTab({ onClose, inline }) {
             onClick={() => handleCategoryClick(cat.label)}
             sx={{
               display: "flex", flexDirection: "column",
-              padding: "45px",
+              height: "190px", // Fixed height so it doesn't grow on hover
+              padding: "20px",
               alignItems: "center", justifyContent: "center",
               gap: "10px",
               cursor: "pointer",
@@ -178,8 +183,8 @@ function WorkTab({ onClose, inline }) {
                 zIndex: -1,
                 transition: "background 0.2s",
               },
-              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s", mb: "4px" },
-              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "14px", fontWeight: 500, transition: "color 0.2s" },
+              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s, transform 0.2s", mb: "4px" },
+              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "14px", fontWeight: 500, transition: "color 0.2s, transform 0.2s" },
               "& .cat-arrow": { opacity: 0, height: 0, overflow: "hidden", transition: "all 0.2s ease-in-out", mt: 0 },
               "&:hover": {
                 background: "radial-gradient(ellipse at 30% 100%, #00CD1F 0%, rgba(255,255,255,0.08) 55%)", // Green glow at bottom edge
