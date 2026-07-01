@@ -43,9 +43,10 @@ const Tab = styled(Box)(({ active }) => ({
   cursor: "pointer",
   color: active ? PRIMARY : "rgba(255,255,255,0.75)",
   background: active
-    ? `linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`
+    ? "rgba(11, 11, 11, 0.4)"
     : "rgba(255,255,255,0.04)",
-  border: active ? "1px solid transparent" : "1px solid rgba(255,255,255,0.12)",
+  borderTop: active ? `1px solid ${PRIMARY}` : "1px solid transparent",
+  border: active ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.12)",
   backdropFilter: "blur(50px)",
   WebkitBackdropFilter: "blur(50px)",
   transition: "all 0.2s",
@@ -62,9 +63,9 @@ const Tab = styled(Box)(({ active }) => ({
     borderTop: `8px solid ${PRIMARY}`,
   } : { content: '""' },
   "&:hover": {
-    color: PRIMARY,
-    background: `linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`,
-    border: "1px solid transparent",
+    background: "rgba(11, 11, 11, 0.4)",
+    borderTop: `1px solid ${PRIMARY}`,
+    border: "1px solid rgba(255,255,255,0.15)",
   },
   "&:hover::after": {
     content: '""',
@@ -101,9 +102,9 @@ const CertCard = styled(Box)({
   backdropFilter: "blur(38px)",
   WebkitBackdropFilter: "blur(38px)",
   boxShadow: "0 6px 13px 0 rgba(0,0,0,0.3), inset 0 1px 2px 0 rgba(0,0,0,0.25)",
-  background: `linear-gradient(#0b0b0b, #0b0b0b) padding-box,
-    linear-gradient(100deg, #8f8f8f 1%, #636363 27%, ${PRIMARY} 48%, #636363 69%, #8f8f8f 97%) border-box`,
-  border: "1px solid transparent",
+  background: "rgba(11, 11, 11, 0.4)",
+  border: "1px solid rgba(255,255,255,0.15)",
+  borderTop: `1px solid ${PRIMARY}`,
 });
 
 const DownloadBtn = styled(Box)({

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
@@ -65,7 +66,27 @@ export default function ProjectDetailPage() {
       color: "#fff",
     }}>
       {/* MAIN TABS */}
-      <Box sx={{ display: "flex", width: "100%", pr: `${widthPercent}%`, justifyContent: "center", mb: "0px", flexShrink: 0, position: "relative", zIndex: 2 }}>
+      <Box sx={{ display: "flex", width: "100%", pr: `${widthPercent}%`, alignItems: "center", justifyContent: "flex-start", gap: "12px", mb: "0px", flexShrink: 0, position: "relative", zIndex: 2 }}>
+        {/* Back Button */}
+        <Box onClick={() => navigate("/")} sx={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: 32, height: 32,
+          cursor: "pointer",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.12)",
+          background: "rgba(255,255,255,0.02)",
+          color: "rgba(255,255,255,0.6)",
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            border: `1px solid ${PRIMARY}`,
+            background: "rgba(0,205,31,0.08)",
+            color: PRIMARY,
+            boxShadow: "0 0 10px rgba(0,205,31,0.3)",
+            transform: "scale(1.05)"
+          }
+        }}>
+          <ArrowBackIosNewIcon sx={{ fontSize: 13, marginLeft: "-1px" }} />
+        </Box>
         <Box sx={{ display: "flex", gap: "0px" }}>
           {mainTabs.map((tab, i) => {
             const isActive = mainTab === i;
@@ -122,7 +143,7 @@ export default function ProjectDetailPage() {
           flex: 1,
           minWidth: 0,
           display: "flex", flexDirection: "column",
-          background: "rgba(10,14,10,0.92)",
+          background: "rgba(11, 11, 11, 0.4)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           border: "1px solid rgba(255,255,255,0.15)",
@@ -135,14 +156,6 @@ export default function ProjectDetailPage() {
         }}>
           {/* SUB TABS */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, pt: 2, pb: 1, flexShrink: 0 }}>
-            <Box onClick={() => navigate("/")} sx={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              width: 32, height: 32,
-              cursor: "pointer",
-              marginRight: 2
-            }}>
-              <img src="/assets/icons/right.svg" alt="back" />
-            </Box>
             {subTabs.map((tab, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                 borderRadius: "8px", cursor: "pointer",
