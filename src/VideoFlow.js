@@ -69,7 +69,7 @@ function WelcomeScreen({ opacity }) {
           transform: "translateY(-50%)",
           zIndex: 10,
           boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
-          background: "linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(269deg, #131010e3 1%, #636363 40%, #00CD1F 82%, #636363 47%, #131010e3 97%) border-box",
+          background: "rgba(11, 11, 11, 0.4)",
          "&::before": {
           content: '""',
           position: "absolute",
@@ -97,19 +97,23 @@ function WelcomeScreen({ opacity }) {
         </Box>
 
         {/* Left panel — col 9 */}
-        <Box sx={{
+        <Box 
+          onWheel={(e) => e.stopPropagation()}
+          sx={{
           flex: 1,
           minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          background: "rgba(10,14,10,0.92)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "16px",
-          overflow: "hidden",
+          overflowY: "auto", // Allow scrolling if content doesn't fit
+          "&::-webkit-scrollbar": { width: "4px" },
+          "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
           p:"60px",
-         background:"linear-gradient(#0b0b0b, #0b0b0b) padding-box, linear-gradient(317deg, #131010e3 1%, #636363 40%,#00CD1F 48%, #636363 59%, #131010e3 97%) border-box"
+          borderTop: "1px solid #00CD1F",
+          background: "rgba(11, 11, 11, 0.4)",
         }}>
           <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
         </Box>
