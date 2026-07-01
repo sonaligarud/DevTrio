@@ -158,7 +158,7 @@ function WorkTab({ onClose, inline }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
       {/* Category cards — responsive grid */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
           <Box
             key={cat.label}
@@ -274,7 +274,7 @@ function AboutMeTab({ mobile, inline }) {
       {/* Skills rows + Download Resume */}
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1, textAlign: "left" }}>
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's.
         </Typography>
         <CustomTooltip title={<>You can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>

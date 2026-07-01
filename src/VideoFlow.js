@@ -46,7 +46,7 @@ function WelcomeScreen({ opacity }) {
           display: "flex",
           alignItems: "stretch",
           gap: "0px",
-          width: "90%",
+          width: "80%",
           height: "min(72vh, 520px)",
           position: "relative",
         }}
@@ -69,7 +69,7 @@ function WelcomeScreen({ opacity }) {
           transform: "translateY(-50%)",
           zIndex: 10,
           boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
-          background: "rgba(11, 11, 11, 0.4)",
+          background: "rgba(10, 8, 8, 0.4)",
          "&::before": {
           content: '""',
           position: "absolute",

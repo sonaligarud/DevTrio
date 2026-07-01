@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import HomeIcon from "@mui/icons-material/Home";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
@@ -77,6 +77,7 @@ export default function ProjectDetailPage() {
           background: "rgba(255,255,255,0.02)",
           color: "rgba(255,255,255,0.6)",
           transition: "all 0.2s ease-in-out",
+          padding: "25px",
           "&:hover": {
             border: `1px solid ${PRIMARY}`,
             background: "rgba(0,205,31,0.08)",
@@ -85,7 +86,10 @@ export default function ProjectDetailPage() {
             transform: "scale(1.05)"
           }
         }}>
-          <ArrowBackIosNewIcon sx={{ fontSize: 13, marginLeft: "-1px" }} />
+          <HomeIcon sx={{
+            fontSize: "22px"
+            , marginLeft: "-1px"
+          }} />
         </Box>
         <Box sx={{ display: "flex", gap: "0px" }}>
           {mainTabs.map((tab, i) => {
@@ -118,7 +122,7 @@ export default function ProjectDetailPage() {
                 <Box sx={{
                   clipPath: CLIP,
                   background: isActive ? "rgba(10,14,10,1)" : "rgba(20,28,22,1)",
-                  px: "28px", py: "9px",
+                  px: "32px", py: "12px",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "14px", fontWeight: isActive ? 600 : 400,
                   color: isActive ? PRIMARY : "rgba(255,255,255,0.7)",
@@ -188,15 +192,10 @@ export default function ProjectDetailPage() {
                       <ShareIcon />
                     </IconButton>
                   </Tooltip> */}
-                  <Tooltip title="Fullscreen" placement="left">
-                    <IconButton onClick={openLightbox} sx={{
-                      width: 32, height: 32, borderRadius: "8px",
-                      background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)",
-                      "&:hover": { border: "1px solid rgba(0,255,150,0.4)" },
-                    }}>
-                      <Box component="img" src="/assets/images/extend.svg" alt="fullscreen" />
-                    </IconButton>
+                  <Tooltip title="Fullscreen" placement="left" onClick={openLightbox}>
+                    <Box component="img" src="/assets/images/extend.svg" alt="fullscreen" sx={{ cursor: "pointer" }} />
                   </Tooltip>
+
                 </Box>
               </Box>
             </Box>
@@ -239,23 +238,31 @@ export default function ProjectDetailPage() {
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
           <Box sx={{ position: "relative", maxWidth: "80vw", maxHeight: "80vh" }}>
             <IconButton onClick={lbPrev} sx={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="prev" style={{ width: 36, height: 36 }} />
+              <img src="/assets/icons/right.svg" alt="prev"/>
             </IconButton>
             <Box sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
               <img src={slides[lightboxIndex]} alt={`slide ${lightboxIndex + 1}`}
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
             <IconButton onClick={lbNext} sx={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="next" />
+              <img src="/assets/icons/left.svg" alt="next" />
             </IconButton>
-            <IconButton onClick={() => setLightboxOpen(false)} sx={{
-              position: "absolute", bottom: 10, right: 10, zIndex: 2,
-              width: 32, height: 32, borderRadius: "8px",
-              background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)",
-              "&:hover": { border: "1px solid rgba(0,255,150,0.4)" },
-            }}>
-              <Box component="img" src="/assets/images/extend.svg" alt="minimize" sx={{ width: 15, height: 15 }} />
-            </IconButton>
+
+            <Tooltip title="Minimize" placement="left">
+              <Box
+                component="img"
+                src="/assets/images/extend.svg"
+                alt="minimize"
+                onClick={() => setLightboxOpen(false)}
+                sx={{
+                  position: "absolute",
+                  bottom: 10,
+                  right: 10,
+                  zIndex: 2,
+                  cursor: "pointer",
+                }}
+              />
+            </Tooltip>
           </Box>
           <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
             {slides.map((_, i) => (
