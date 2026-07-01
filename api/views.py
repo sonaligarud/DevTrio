@@ -313,7 +313,7 @@ class CategoryListView(APIView):
     Returns all unique categories from the database.
     """
     def get(self, request):
-        query = "SELECT DISTINCT category FROM projects WHERE category IS NOT NULL ORDER BY category ASC"
+        query = "SELECT name FROM categories ORDER BY display_order ASC, name ASC"
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
@@ -345,11 +345,11 @@ def _parse_jsonb(value):
 
 # Column order must match all SELECT queries below (22 fields total)
 _PROJECT_SELECT = """
-    id, title, description, tech_stack, image_url, created_at, category,
-    short_description, motivation, goal, problem_solved,
-    architecture, design_process, skills,
-    key_features, target_users, challenges, results,
-    future_improvements, tags, keywords, faq
+    p.id, p.title, p.description, p.tech_stack, p.image_url, p.created_at, c.name AS category,
+    p.short_description, p.motivation, p.goal, p.problem_solved,
+    p.architecture, p.design_process, p.skills,
+    p.key_features, p.target_users, p.challenges, p.results,
+    p.future_improvements, p.tags, p.keywords, p.faq
 """
 
 
@@ -383,6 +383,7 @@ def map_project_row(row):
         "faq":                 _parse_jsonb(row[21]),
     }
 
+
 class ProjectListView(APIView):
     """
     GET /api/projects
@@ -394,22 +395,22 @@ class ProjectListView(APIView):
         title = request.query_params.get("title", "")
         category = request.query_params.get("category", "")
 
-        query = f"SELECT {_PROJECT_SELECT} FROM projects WHERE 1=1"
+        query = f"SELECT {_PROJECT_SELECT} FROM projects p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1"
         params = []
 
         if category:
-            query += " AND category ILIKE %s"
+            query += " AND c.name ILIKE %s"
             params.append(f"%{category}%")
 
         if tech_stack:
-            query += " AND tech_stack ILIKE %s"
+            query += " AND p.tech_stack ILIKE %s"
             params.append(f"%{tech_stack}%")
         
         if title:
-            query += " AND title ILIKE %s"
+            query += " AND p.title ILIKE %s"
             params.append(f"%{title}%")
         
-        query += " ORDER BY id ASC"
+        query += " ORDER BY p.id ASC"
 
         try:
             with connection.cursor() as cursor:
@@ -422,13 +423,14 @@ class ProjectListView(APIView):
             logger.error(f"Error fetching projects: {e}", exc_info=True)
             return Response({"error": "Failed to fetch projects."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class ProjectDetailView(APIView):
     """
     GET /api/projects/:id
     Returns single project details by ID.
     """
     def get(self, request, pk):
-        query = f"SELECT {_PROJECT_SELECT} FROM projects WHERE id = %s"
+        query = f"SELECT {_PROJECT_SELECT} FROM projects p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = %s"
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query, [pk])

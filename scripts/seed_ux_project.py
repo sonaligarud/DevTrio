@@ -170,6 +170,11 @@ def seed():
         cursor.execute("SELECT id FROM projects WHERE title = %s", [PROJECT["title"]])
         existing = cursor.fetchone()
 
+        # Get category_id
+        cursor.execute("SELECT id FROM categories WHERE name = %s", [PROJECT["category"]])
+        cat_row = cursor.fetchone()
+        category_id = cat_row[0] if cat_row else None
+
         if existing:
             project_id = existing[0]
             logger.info(f"Project already exists (id={project_id}). Updating...")
@@ -185,7 +190,7 @@ def seed():
                     architecture         = %s,
                     design_process       = %s,
                     image_url            = %s,
-                    category             = %s,
+                    category_id          = %s,
                     skills               = %s,
                     key_features         = %s,
                     target_users         = %s,
@@ -207,7 +212,7 @@ def seed():
                     PROJECT["architecture"],
                     PROJECT["design_process"],
                     PROJECT["image_url"],
-                    PROJECT["category"],
+                    category_id,
                     PROJECT["skills"],
                     json.dumps(PROJECT["key_features"]),
                     json.dumps(PROJECT["target_users"]),
@@ -227,7 +232,7 @@ def seed():
                 INSERT INTO projects (
                     title, description, short_description, motivation, goal,
                     problem_solved, tech_stack, architecture, design_process,
-                    image_url, category, skills,
+                    image_url, category_id, skills,
                     key_features, target_users, challenges, results,
                     future_improvements, tags, keywords, faq
                 ) VALUES (
@@ -249,7 +254,7 @@ def seed():
                     PROJECT["architecture"],
                     PROJECT["design_process"],
                     PROJECT["image_url"],
-                    PROJECT["category"],
+                    category_id,
                     PROJECT["skills"],
                     json.dumps(PROJECT["key_features"]),
                     json.dumps(PROJECT["target_users"]),
@@ -276,16 +281,19 @@ def seed():
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, title, description, tech_stack, category, image_url,
-                       short_description, motivation, goal, problem_solved, skills
-                FROM projects WHERE title = %s
+                SELECT p.id, p.title, p.description, p.tech_stack, c.name AS category, p.image_url,
+                       p.short_description, p.motivation, p.goal, p.problem_solved, p.skills,
+                       p.key_features, p.target_users, p.challenges, p.results, p.tags, p.keywords
+                FROM projects p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.id = %s
                 """,
-                [PROJECT["title"]],
+                [project_id],
             )
             row = cursor.fetchone()
 
         if row:
-            proj_id, title, desc, tech, cat, img, short_desc, motivation, goal, problem, skills = row
+            proj_id, title, desc, tech, cat, img, short_desc, motivation, goal, problem, skills = row[:11]
             content = (
                 f"Project Title: {title}\n"
                 f"Short Description: {short_desc or desc}\n"

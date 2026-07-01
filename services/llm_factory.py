@@ -5,9 +5,10 @@ Factory class that dynamically loads the correct LLM and Embedding model
 based on the LLM_PROVIDER environment variable.
 
 Supported providers:
-  - openai  → Uses OpenAI GPT + text-embedding models
-  - gemini  → Uses Google Gemini LLM + embedding models
-  - ollama  → Uses a local Ollama server (e.g., llama3.2)
+  - openai      → Uses OpenAI GPT + text-embedding models
+  - openrouter  → Uses OpenRouter (any model) via OpenAI-compatible API
+  - gemini      → Uses Google Gemini LLM + embedding models
+  - ollama      → Uses a local Ollama server (e.g., llama3.2)
 
 Usage:
     factory = LLMFactory()
@@ -30,7 +31,7 @@ class LLMFactory:
     The provider is controlled by the LLM_PROVIDER env variable.
     """
 
-    SUPPORTED_PROVIDERS = {"openai", "gemini", "ollama"}
+    SUPPORTED_PROVIDERS = {"openai", "openrouter", "gemini", "ollama"}
 
     def __init__(self):
         self.provider = os.getenv("LLM_PROVIDER", "openai").lower().strip()
@@ -49,6 +50,8 @@ class LLMFactory:
         """Return the configured LLM instance."""
         if self.provider == "openai":
             return self._get_openai_llm()
+        elif self.provider == "openrouter":
+            return self._get_openrouter_llm()
         elif self.provider == "gemini":
             return self._get_gemini_llm()
         elif self.provider == "ollama":
@@ -58,6 +61,11 @@ class LLMFactory:
         """Return the configured Embeddings instance."""
         if self.provider == "openai":
             return self._get_openai_embeddings()
+        elif self.provider == "openrouter":
+            # OpenRouter does not support embeddings.
+            # Use Ollama embeddings locally (zero extra API key needed).
+            # To switch to OpenAI embeddings, set OPENAI_API_KEY and change this.
+            return self._get_ollama_embeddings()
         elif self.provider == "gemini":
             return self._get_gemini_embeddings()
         elif self.provider == "ollama":
@@ -106,6 +114,46 @@ class LLMFactory:
             return OpenAIEmbeddings(
                 openai_api_key=api_key,
                 model=model,
+            )
+        except ImportError:
+            raise ImportError("langchain-openai is not installed. Run: pip install langchain-openai")
+
+    # ------------------------------------------------------------------
+    # OpenRouter  (OpenAI-compatible — no extra library needed)
+    # https://openrouter.ai/docs#quick-start
+    # ------------------------------------------------------------------
+
+    def _get_openrouter_llm(self):
+        """
+        Load any OpenRouter model using ChatOpenAI pointed at the
+        OpenRouter base URL.  Set OPENROUTER_MODEL to any slug from
+        https://openrouter.ai/models
+        Free model options:
+          - meta-llama/llama-3.3-70b-instruct:free  (recommended)
+          - deepseek/deepseek-v4-flash:free
+        Paid model options:
+          - google/gemini-2.5-flash
+          - openai/gpt-4o-mini
+        """
+        try:
+            from langchain_openai import ChatOpenAI
+
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            model = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
+
+            if not api_key:
+                raise ValueError("OPENROUTER_API_KEY is not set in environment variables.")
+
+            logger.debug(f"Loading OpenRouter LLM: {model}")
+            return ChatOpenAI(
+                openai_api_key=api_key,
+                model_name=model,
+                temperature=0.1,  # Low temp = factual, no hallucination
+                openai_api_base="https://openrouter.ai/api/v1",
+                default_headers={
+                    "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "http://localhost"),
+                    "X-Title": os.getenv("OPENROUTER_SITE_NAME", "Portfolio Chatbot"),
+                },
             )
         except ImportError:
             raise ImportError("langchain-openai is not installed. Run: pip install langchain-openai")

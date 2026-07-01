@@ -7,7 +7,7 @@ django.setup()
 from utils.service_registry import get_rag_service
 
 def inspect():
-    rag = get_rag_service()
+    rag = get_rag_service
     collection = rag.vector_store.vector_store._collection
     data = collection.get() # Get all docs
     print("Total docs:", len(data['ids']))

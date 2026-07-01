@@ -45,10 +45,11 @@ def fetch_projects_from_db():
     with connection.cursor() as cursor:
         cursor.execute(
             """
-            SELECT id, title, description, tech_stack, category, image_url,
-                   short_description, motivation, goal, problem_solved, skills,
-                   key_features, target_users, challenges, results, tags, keywords
-            FROM projects
+            SELECT p.id, p.title, p.description, p.tech_stack, c.name AS category, p.image_url,
+                   p.short_description, p.motivation, p.goal, p.problem_solved, p.skills,
+                   p.key_features, p.target_users, p.challenges, p.results, p.tags, p.keywords
+            FROM projects p
+            LEFT JOIN categories c ON p.category_id = c.id
             """
         )
         rows = cursor.fetchall()
