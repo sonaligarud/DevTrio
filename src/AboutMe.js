@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { PRIMARY, primaryAlpha } from "./theme";
 import CustomTooltip from "./CustomTooltip";
+import { fetchCategories } from "./api/chatApi";
 
 /* ── Styled components ── */
 const ModalBox = styled(Box)(({ mobile }) => ({
@@ -138,17 +139,40 @@ const experiences = [
 ];
 
 
-const workCategories = [
-  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
-  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
-  { label: "Video", icon: "/assets/icons/Video.svg" },
-  { label: "Print Media", icon: "/assets/icons/print-designs.svg" },
-];
+const ICON_MAP = {
+  "UI/UX":        "/assets/icons/UX.svg",
+  "Social Media": "/assets/icons/social-media.svg",
+  "Video":        "/assets/icons/Video.svg",
+  "Videos":       "/assets/icons/Video.svg",
+  "Print Media":  "/assets/icons/print-designs.svg",
+  "Print-Designs":"/assets/icons/print-designs.svg",
+  "XR":           "/assets/icons/XR.svg",
+};
 
+const DEFAULT_WORK_CATEGORIES = [
+  { label: "UI/UX",        icon: "/assets/icons/UX.svg" },
+  { label: "Social Media", icon: "/assets/icons/social-media.svg" },
+  { label: "Video",        icon: "/assets/icons/Video.svg" },
+  { label: "Print Media",  icon: "/assets/icons/print-designs.svg" },
+];
 
 /* ── Work tab ── */
 function WorkTab({ onClose, inline }) {
   const navigate = useNavigate();
+  const [workCategories, setWorkCategories] = useState(DEFAULT_WORK_CATEGORIES);
+
+  useEffect(() => {
+    fetchCategories()
+      .then(data => {
+        if (data && data.length > 0) {
+          setWorkCategories(data.map(cat => ({
+            label: cat,
+            icon: ICON_MAP[cat] || "/assets/icons/UX.svg",
+          })));
+        }
+      })
+      .catch(() => {}); // silently keep defaults if API is down
+  }, []);
 
   const handleCategoryClick = (label) => {
     if (onClose) onClose();

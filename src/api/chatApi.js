@@ -94,3 +94,19 @@ export async function ingestDocuments(documents) {
 
   return response.json();
 }
+
+/**
+ * GET /api/categories/
+ * 
+ * Fetch all project categories.
+ * @returns {Promise<Array<string>>}
+ */
+export async function fetchCategories() {
+  const response = await fetch(`${BASE_URL}/api/categories/`);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch categories (${response.status})`);
+  }
+  
+  return response.json();
+}

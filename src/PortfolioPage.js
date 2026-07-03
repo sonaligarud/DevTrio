@@ -3,12 +3,12 @@ import { styled } from "@mui/material/styles";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AudioButton from "./AudioButton";
 import { useChat } from "./hooks/useChat";
 import { useSpeech } from "./hooks/useSpeech";
-import { transcribeAudio } from "./api/chatApi";
+import { transcribeAudio, fetchCategories } from "./api/chatApi";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 
@@ -97,14 +97,14 @@ const PillTab = styled(Button)(({ active }) => ({
   "&:hover": { background: "rgba(255,255,255,0.08)" },
 }));
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   { label: "UI/UX", route: "UI/UX" },
   { label: "Social Media", route: "Social Media" },
   { label: "Videos", route: "Video" },
   { label: "Print Media", route: "Print-Designs" },
 ];
 
-const desktopCategories = [
+const DEFAULT_DESKTOP_CATEGORIES = [
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
   { label: "Social Media", icon: "/assets/icons/social-media.svg" },
   { label: "UI/UX", icon: "/assets/icons/UX.svg" },
@@ -112,13 +112,23 @@ const desktopCategories = [
   { label: "XR", icon: "/assets/icons/XR.svg" },
 ];
 
-const mobileCategories = [
+const DEFAULT_MOBILE_CATEGORIES = [
   { label: "UI/UX", icon: "/assets/icons/UX.svg" },
   { label: "Social Media", icon: "/assets/icons/social-media.svg" },
   { label: "XR", icon: "/assets/icons/XR.svg" },
   { label: "Video", icon: "/assets/icons/Video.svg" },
   { label: "Print-Designs", icon: "/assets/icons/print-designs.svg" },
 ];
+
+const iconMapping = {
+  "UI/UX": "/assets/icons/UX.svg",
+  "Social Media": "/assets/icons/social-media.svg",
+  "Videos": "/assets/icons/Video.svg",
+  "Video": "/assets/icons/Video.svg",
+  "Print Media": "/assets/icons/print-designs.svg",
+  "Print-Designs": "/assets/icons/print-designs.svg",
+  "XR": "/assets/icons/XR.svg"
+};
 
 // ─── Chatbot Panel ────────────────────────────────────────────────────────────
 
@@ -230,6 +240,23 @@ function ChatbotPanel() {
 const PortfolioPage = () => {
   const navigate = useNavigate();
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(28);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [desktopCats, setDesktopCats] = useState(DEFAULT_DESKTOP_CATEGORIES);
+  const [mobileCats, setMobileCats] = useState(DEFAULT_MOBILE_CATEGORIES);
+
+  useEffect(() => {
+    fetchCategories().then(data => {
+      if (data && data.length > 0) {
+        setCategories(data.map(cat => ({ label: cat, route: cat })));
+        const mappedWithIcons = data.map(cat => ({
+          label: cat,
+          icon: iconMapping[cat] || "/assets/icons/UX.svg"
+        }));
+        setDesktopCats(mappedWithIcons);
+        setMobileCats(mappedWithIcons);
+      }
+    }).catch(console.error);
+  }, []);
 
   return (
     <PageWrapper>
@@ -240,7 +267,7 @@ const PortfolioPage = () => {
 
         {/* Row 1: Category tabs — same as ProjectDetailPage */}
         <Box sx={{ display: "flex", alignItems: "flex-end", mb: 0, pl: "2px", flexShrink: 0 }}>
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <CategoryTab key={cat.route} active={0}
               onClick={() => navigate(`/portfolio/${encodeURIComponent(cat.route)}`)}>
               <span>{cat.label}</span>
@@ -297,7 +324,7 @@ const PortfolioPage = () => {
                   gridTemplateRows: "repeat(3, 115px)",
                   gap: "14px",
                 }}>
-                  {desktopCategories.map((cat, i) => (
+                  {desktopCats.map((cat, i) => (
                     <CategoryCard
                       key={i}
                       onClick={() => navigate(`/portfolio/${encodeURIComponent(cat.label)}`)}
@@ -393,14 +420,16 @@ const PortfolioPage = () => {
             gap: "10px",
             flex: 1, zIndex: 1,
           }}>
-            {mobileCategories.map((cat, i) => (
+            {mobileCats.map((cat, i) => (
               <CategoryCard
                 key={i}
                 onClick={() => navigate(`/portfolio/${encodeURIComponent(cat.label)}`)}
                 sx={{ ...(i === 4 && { gridColumn: "1 / 2" }) }}
               >
                 <Box component="img" src={cat.icon} alt={cat.label} sx={{ width: 32, height: 32, objectFit: "contain" }} />
-                <Typography sx={{ fontSize: "10px", color: "#aaa", letterSpacing: "0.5px" }}>{cat.label}</Typography>
+                <Typography sx={{ fontSize: "11px", color: "#bbb", letterSpacing: "0.5px", fontWeight: 500 }}>
+                  {cat.label}
+                </Typography>
               </CategoryCard>
             ))}
           </Box>
