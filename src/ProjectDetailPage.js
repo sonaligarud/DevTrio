@@ -181,21 +181,14 @@ export default function ProjectDetailPage() {
             <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 1, height: "100%" }}>
               <Box sx={{ flex: "0 0 100%", position: "relative" }}>
                 <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
-                  style={{ width: "100%", display: "block", borderRadius: "12px", maxHeight: "55vh", objectFit: "contain" }} />
+                  style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }} />
                 <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: 1, zIndex: 3 }}>
-                  {/* <Tooltip title="Share" placement="left">
-                    <IconButton sx={{
-                      width: 32, height: 32, borderRadius: "8px",
-                      background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)", color: "#aaa",
-                      "&:hover": { border: "1px solid rgba(0,255,150,0.4)", color: PRIMARY },
-                    }}>
-                      <ShareIcon />
-                    </IconButton>
-                  </Tooltip> */}
+                  <Tooltip title="Ask To AI" placement="left">
+                    <Box component="img" src="/assets/icons/AI.svg" alt="Ask To AI" sx={{ cursor: "pointer" }} />
+                  </Tooltip>
                   <Tooltip title="Fullscreen" placement="left" onClick={openLightbox}>
                     <Box component="img" src="/assets/images/extend.svg" alt="fullscreen" sx={{ cursor: "pointer" }} />
                   </Tooltip>
-
                 </Box>
               </Box>
             </Box>
@@ -205,7 +198,7 @@ export default function ProjectDetailPage() {
           </Box>
 
           {/* DOTS */}
-          <Box sx={{ display: "flex", gap: 1, py: 1.5, pl: 2, flexShrink: 0 }}>
+          <Box sx={{ display: "flex", gap: 1, py: 1.5, justifyContent: "center", flexShrink: 0 }}>
             {slides.map((_, i) => (
               <Box key={i} onClick={() => setSlideIndex(i)} sx={{
                 width: 10, height: 10, borderRadius: "50%", cursor: "pointer",

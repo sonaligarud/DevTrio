@@ -440,8 +440,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
           pointerEvents: "none",
         }}>
-          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>
-            scroll down
+          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "capitalize" }}>
+            scroll <br/>down
           </Typography>
           <Box
             component="img"
