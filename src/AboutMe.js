@@ -237,7 +237,7 @@ function WorkTab({ onClose, inline }) {
         </Typography>
         <CustomTooltip title={<>you can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>
-            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
+            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 26, height: 26 }} />
             Download Resume
           </DownloadBtn>
         </CustomTooltip>
@@ -302,7 +302,7 @@ function AboutMeTab({ mobile, inline }) {
         </Typography>
         <CustomTooltip title={<>You can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
           <DownloadBtn sx={{ flexShrink: 0 }}>
-            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 18, height: 18 }} />
+            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 26, height: 26 }} />
             Download Resume
           </DownloadBtn>
         </CustomTooltip>
