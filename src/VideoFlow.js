@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, useCallback} from "react";
 import { Box, Typography } from "@mui/material";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import CloseIcon from "@mui/icons-material/Close";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
@@ -58,38 +56,35 @@ function WelcomeScreen({ opacity }) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: "20px",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: "20px",
-          px: "10px",
-          py: "24px",
+          gap: "15px",
+          borderRadius: "15px",
+          px: "6px",
+          py: "18px",
           position: "absolute",
           left: "-28px",
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 10,
-          boxShadow: "-4px 0 24px rgba(0,0,0,0.4)",
-          background: "rgba(10, 8, 8, 0.4)",
-         "&::before": {
-          content: '""',
-          position: "absolute",
-          top: "-2px",
-          right: "-2px",
-          width: "8px",
-          height: "8px",
-        } 
+          background: "rgba(18, 22, 18, 0.88)",
+          border: "1px solid rgba(0, 205, 31, 0.18)",
+          boxShadow: "0 0 0 1px rgba(0,0,0,0.4), 0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,205,31,0.25), inset 0 -1px 0 rgba(0,205,31,0.25)",
         }}>
           {socialIcons.map(({ label, icon }) => (
             <Box key={label} sx={{
               display: "flex", alignItems: "center", justifyContent: "center",
-              width: 40, height: 40, borderRadius: "50%",
+              width: 44, height: 44, borderRadius: "50%",
               cursor: "pointer", transition: "all 0.2s",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.1)", "& img": { opacity: 1 } }
+              "&:hover": {
+                background: "rgba(0,205,31,0.12)",
+                border: "1px solid rgba(0,205,31,0.4)",
+                "& img": { opacity: 1 }
+              }
             }}>
               <Box component="img" src={icon} alt={label}
                 sx={{
                   width: 40, height: 40,
-                  opacity: 0.65, transition: "opacity 0.2s",
+                  opacity: 0.75, transition: "opacity 0.2s",
+                  filter: "brightness(0) invert(0.75)",
                 }}
               />
             </Box>
@@ -440,8 +435,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
           pointerEvents: "none",
         }}>
-          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>
-            scroll down
+          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "capitalize" }}>
+            scroll <br/>down
           </Typography>
           <Box
             component="img"
@@ -455,9 +450,21 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
 
       {/* Scroll UP hint — on final UI screen */}
       {showScrollUpHint && (
-        <Box sx={{ position: "fixed", bottom: 36, left: 36, zIndex: 99998, display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5, pointerEvents: "none" }}>
-          <KeyboardArrowUpIcon sx={{ color: "rgba(0,255,150,0.7)", fontSize: 22, animation: "bounceUp 1.4s ease-in-out infinite" }} />
-          <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase" }}>scroll</Typography>
+         <Box sx={{
+          position: "fixed", bottom: 28, left: 28, zIndex: 99998,
+          display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
+          pointerEvents: "none",
+        }}>
+          <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "capitalize" }}>
+            scroll <br/>down
+          </Typography>
+          <Box
+            component="img"
+            src="/assets/gif/scroll.gif"
+            alt="scroll"
+            sx={{ width: 20, opacity: 0.85 }}
+          />
+
         </Box>
       )}
 
