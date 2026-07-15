@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, IconButton, Tooltip } from "@mui/material";
-import ShareIcon from "@mui/icons-material/Share";
-import HomeIcon from "@mui/icons-material/Home";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
@@ -86,10 +84,7 @@ export default function ProjectDetailPage() {
             transform: "scale(1.05)"
           }
         }}>
-          <HomeIcon sx={{
-            fontSize: "22px"
-            , marginLeft: "-1px"
-          }} />
+          <img src="/assets/icons/home.png"/>
         </Box>
         <Box sx={{ display: "flex", gap: "0px" }}>
           {mainTabs.map((tab, i) => {
@@ -182,12 +177,12 @@ export default function ProjectDetailPage() {
               <Box sx={{ flex: "0 0 100%", position: "relative" }}>
                 <img src={slides[slideIndex]} alt={`slide ${slideIndex + 1}`}
                   style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }} />
-                <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: 1, zIndex: 3 }}>
+                <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", zIndex: 3 }}>
                   <Tooltip title="Ask To AI" placement="left">
                     <Box component="img" src="/assets/icons/AI.svg" alt="Ask To AI" sx={{ cursor: "pointer" }} />
                   </Tooltip>
-                  <Tooltip title="Fullscreen" placement="left" onClick={openLightbox}>
-                    <Box component="img" src="/assets/images/extend.svg" alt="fullscreen" sx={{ cursor: "pointer" }} />
+                  <Tooltip title="Maximize" placement="left" onClick={openLightbox}>
+                    <Box component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
                   </Tooltip>
                 </Box>
               </Box>
@@ -224,9 +219,7 @@ export default function ProjectDetailPage() {
       {/* LIGHTBOX */}
       {lightboxOpen && (
         <Box sx={{
-          position: "fixed", inset: 0, zIndex: 9999,
-          background: "rgba(0,0,0,0.92)",
-          backgroundSize: "cover", backgroundPosition: "center",
+          position: "fixed", inset: 0, zIndex: 999,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
           <Box sx={{ position: "relative", maxWidth: "80vw", maxHeight: "80vh" }}>
@@ -244,7 +237,7 @@ export default function ProjectDetailPage() {
             <Tooltip title="Minimize" placement="left">
               <Box
                 component="img"
-                src="/assets/images/extend.svg"
+                src="/assets/icons/minimize.png"
                 alt="minimize"
                 onClick={() => setLightboxOpen(false)}
                 sx={{
