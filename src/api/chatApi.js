@@ -110,3 +110,18 @@ export async function fetchCategories() {
   
   return response.json();
 }
+
+/**
+ * Fetch projects for a specific category.
+ * @param {string} category
+ * @returns {Promise<Array<object>>}
+ */
+export async function fetchProjects(category) {
+  const response = await fetch(`${BASE_URL}/api/projects/?category=${encodeURIComponent(category)}`);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch projects (${response.status})`);
+  }
+  
+  return response.json();
+}

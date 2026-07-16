@@ -1,31 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
+import { fetchCategories, fetchProjects } from "./api/chatApi";
 
 const PRIMARY = "#00CD1F";
-
-const mainTabs = ["UI/UX", "Social Media", "Videos", "Print Media"];
-const subTabs = ["Project -1", "Project - 2", "Project - 3", "Project - 4"];
-
-const projectSlides = {
-  0: [
-    "/assets/images/projects/swift/1.jpg",
-    "/assets/images/projects/swift/2.jpg",
-    "/assets/images/projects/swift/3.jpg",
-    "/assets/images/projects/swift/4.jpg",
-    "/assets/images/projects/swift/5.jpg",
-    "/assets/images/projects/swift/6.jpg",
-    "/assets/images/projects/swift/7.jpg",
-    "/assets/images/projects/swift/8.jpg",
-    "/assets/images/projects/swift/9.jpg",
-  ],
-  1: ["/assets/images/projects/swift/1.jpg"],
-  2: ["/assets/images/projects/swift/1.jpg"],
-  3: ["/assets/images/projects/swift/1.jpg"],
-};
 
 const orbVideos = [
   "/assets/orb/Idle State.mp4",
@@ -36,15 +17,57 @@ const orbVideos = [
 
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
+  const { category: urlCategory } = useParams();
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
+  
+  const [mainTabs, setMainTabs] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [mainTab, setMainTab] = useState(0);
   const [subTab, setSubTab] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const slides = projectSlides[subTab] || projectSlides[0];
-  const orb = orbVideos[mainTab];
+  // Load categories and set initial mainTab based on URL
+  useEffect(() => {
+    fetchCategories().then(data => {
+      if (data && data.length > 0) {
+        setMainTabs(data);
+        const urlCatDecoded = decodeURIComponent(urlCategory || "");
+        let index = data.findIndex(c => c === urlCatDecoded);
+        if (index === -1) index = 0;
+        setMainTab(index);
+      }
+    }).catch(console.error);
+  }, [urlCategory]);
+
+  // Load projects when mainTab changes
+  useEffect(() => {
+    if (mainTabs.length > 0) {
+      setLoading(true);
+      fetchProjects(mainTabs[mainTab])
+        .then(data => {
+          setProjects(data);
+          setSubTab(0);
+          setSlideIndex(0);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setProjects([]);
+          setLoading(false);
+        });
+    }
+  }, [mainTab, mainTabs]);
+
+  const activeProject = projects[subTab] || null;
+  const slides = activeProject && activeProject.slides && activeProject.slides.length > 0 
+      ? activeProject.slides 
+      : ["/assets/images/projects/swift/1.jpg"]; // fallback
+
+  const orb = orbVideos[mainTab % orbVideos.length];
 
   const next = () => setSlideIndex((p) => (p + 1) % slides.length);
   const prev = () => setSlideIndex((p) => (p === 0 ? slides.length - 1 : p - 1));
@@ -94,7 +117,10 @@ export default function ProjectDetailPage() {
             return (
               <Box
                 key={i}
-                onClick={() => { setMainTab(i); setSubTab(0); setSlideIndex(0); }}
+                onClick={() => { 
+                  // When clicking a tab, update the URL so it's shareable and consistent
+                  navigate(`/portfolio/${encodeURIComponent(tab)}`); 
+                }}
                 sx={{
                   position: "relative",
                   cursor: "pointer",
@@ -155,7 +181,10 @@ export default function ProjectDetailPage() {
         }}>
           {/* SUB TABS */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, pt: 2, pb: 1, flexShrink: 0 }}>
-            {subTabs.map((tab, i) => (
+            {!loading && projects.length === 0 && (
+              <Box sx={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", p: 1 }}>No projects found for this category.</Box>
+            )}
+            {projects.map((proj, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                 borderRadius: "8px", cursor: "pointer",
                 padding: "10px 30px",
@@ -164,7 +193,7 @@ export default function ProjectDetailPage() {
                 border: subTab === i ? "1px solid rgba(0,255,150,0.5)" : "1px solid rgba(255,255,255,0.08)",
                 background: subTab === i ? "rgba(0,255,150,0.08)" : "rgba(255,255,255,0.02)",
                 transition: "all 0.2s",
-              }}>{tab}</Box>
+              }}>{proj.title}</Box>
             ))}
           </Box>
 
