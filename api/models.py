@@ -45,3 +45,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+class ProjectImage(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="slides")
+    image_url = models.CharField(max_length=500)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "project_images"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.project.title} - Slide {self.order}"

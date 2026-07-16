@@ -1,6 +1,10 @@
 import os
+import sys
 import django
 import logging
+
+# Add the root backend directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatbot_project.settings')

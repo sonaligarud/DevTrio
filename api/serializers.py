@@ -78,3 +78,31 @@ class SpeechToTextResponseSerializer(serializers.Serializer):
     """Shape of the speech-to-text API response."""
     transcript = serializers.CharField()
     provider = serializers.CharField()
+
+# ------------------------------------------------------------------
+# Project endpoints
+# ------------------------------------------------------------------
+from .models import Project, ProjectImage
+
+class ProjectImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectImage
+        fields = ['image_url', 'order']
+
+class ProjectSerializer(serializers.ModelSerializer):
+    slides = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source='category.name', read_only=True)
+
+    class Meta:
+        model = Project
+        fields = [
+            'id', 'title', 'description', 'tech_stack', 'created_at', 
+            'category_name', 'short_description', 'motivation', 'goal',
+            'problem_solved', 'architecture', 'design_process', 'skills',
+            'key_features', 'target_users', 'challenges', 'results',
+            'future_improvements', 'tags', 'keywords', 'faq', 'slides'
+        ]
+
+    def get_slides(self, obj):
+        # Return a flat list of image URLs just like the frontend expects
+        return [img.image_url for img in obj.slides.all()]

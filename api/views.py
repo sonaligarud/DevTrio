@@ -327,118 +327,39 @@ class CategoryListView(APIView):
 
 
 
-# ==================================================================
-# Projects API
-# ==================================================================
+from rest_framework import generics
+from .models import Project
+from .serializers import ProjectSerializer
 
-def _parse_jsonb(value):
-    """Safely parse a JSONB field that may come back as a JSON string or already as list/dict."""
-    if value is None:
-        return []
-    if isinstance(value, (list, dict)):
-        return value
-    try:
-        return json.loads(value)
-    except (TypeError, ValueError):
-        return []
-
-
-# Column order must match all SELECT queries below (22 fields total)
-_PROJECT_SELECT = """
-    p.id, p.title, p.description, p.tech_stack, p.image_url, p.created_at, c.name AS category,
-    p.short_description, p.motivation, p.goal, p.problem_solved,
-    p.architecture, p.design_process, p.skills,
-    p.key_features, p.target_users, p.challenges, p.results,
-    p.future_improvements, p.tags, p.keywords, p.faq
-"""
-
-
-def map_project_row(row):
-    """Maps a DB row (tuple) to a rich project dict. Column order matches _PROJECT_SELECT."""
-    return {
-        "id":                  row[0],
-        "title":               row[1],
-        "description":         row[2],
-        "tech_stack":          row[3],
-        "image_url":           row[4],
-        "created_at":          row[5],
-        "category":            row[6],
-        # Rich scalar fields
-        "short_description":   row[7],
-        "motivation":          row[8],
-        "goal":                row[9],
-        "problem_solved":      row[10],
-        "architecture":        row[11],
-        "design_process":      row[12],
-        "skills":              row[13],
-        # JSONB array fields — use _parse_jsonb since Django raw cursor
-        # returns JSONB as strings, not Python objects
-        "key_features":        _parse_jsonb(row[14]),
-        "target_users":        _parse_jsonb(row[15]),
-        "challenges":          _parse_jsonb(row[16]),
-        "results":             _parse_jsonb(row[17]),
-        "future_improvements": _parse_jsonb(row[18]),
-        "tags":                _parse_jsonb(row[19]),
-        "keywords":            _parse_jsonb(row[20]),
-        "faq":                 _parse_jsonb(row[21]),
-    }
-
-
-class ProjectListView(APIView):
+class ProjectListView(generics.ListAPIView):
     """
     GET /api/projects
     Returns all projects from the database.
-    Optional query parameters for filtering: ?tech_stack=React
+    Optional query parameters for filtering: ?tech_stack=React&category=UI/UX
     """
-    def get(self, request):
-        tech_stack = request.query_params.get("tech_stack", "")
-        title = request.query_params.get("title", "")
-        category = request.query_params.get("category", "")
+    serializer_class = ProjectSerializer
 
-        query = f"SELECT {_PROJECT_SELECT} FROM projects p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1"
-        params = []
+    def get_queryset(self):
+        queryset = Project.objects.all().order_by('id')
+        category = self.request.query_params.get('category')
+        tech_stack = self.request.query_params.get('tech_stack')
+        title = self.request.query_params.get('title')
 
         if category:
-            query += " AND c.name ILIKE %s"
-            params.append(f"%{category}%")
-
+            # Exact match for category or icontains? The existing view used ILIKE
+            queryset = queryset.filter(category__name__icontains=category)
         if tech_stack:
-            query += " AND p.tech_stack ILIKE %s"
-            params.append(f"%{tech_stack}%")
-        
+            queryset = queryset.filter(tech_stack__icontains=tech_stack)
         if title:
-            query += " AND p.title ILIKE %s"
-            params.append(f"%{title}%")
-        
-        query += " ORDER BY p.id ASC"
-
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query, params)
-                rows = cursor.fetchall()
+            queryset = queryset.filter(title__icontains=title)
             
-            projects = [map_project_row(row) for row in rows]
-            return Response(projects, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger.error(f"Error fetching projects: {e}", exc_info=True)
-            return Response({"error": "Failed to fetch projects."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return queryset
 
 
-class ProjectDetailView(APIView):
+class ProjectDetailView(generics.RetrieveAPIView):
     """
     GET /api/projects/:id
     Returns single project details by ID.
     """
-    def get(self, request, pk):
-        query = f"SELECT {_PROJECT_SELECT} FROM projects p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = %s"
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query, [pk])
-                row = cursor.fetchone()
-            
-            if row:
-                return Response(map_project_row(row), status=status.HTTP_200_OK)
-            return Response({"error": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            logger.error(f"Error fetching project {pk}: {e}", exc_info=True)
-            return Response({"error": "Failed to fetch project."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
