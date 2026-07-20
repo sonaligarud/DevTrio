@@ -8,7 +8,7 @@ import ResizeHandle from "./ResizeHandle";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
-const UI_SHOW_FRAME = 201;
+const UI_SHOW_FRAME = 197;
 const END_FRAME = 202;
 
 const framePath = (i) => {
@@ -73,12 +73,7 @@ function WelcomeScreen({ opacity }) {
             <Box key={label} sx={{
               display: "flex", alignItems: "center", justifyContent: "center",
               width: 44, height: 44, borderRadius: "50%",
-              cursor: "pointer", transition: "all 0.2s",
-              "&:hover": {
-                background: "rgba(0,205,31,0.12)",
-                border: "1px solid rgba(0,205,31,0.4)",
-                "& img": { opacity: 1 }
-              }
+              cursor: "pointer", transition: "all 0.2s"
             }}>
               <Box component="img" src={icon} alt={label}
                 sx={{
