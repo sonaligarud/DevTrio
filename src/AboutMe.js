@@ -31,56 +31,79 @@ const ModalBox = styled(Box)(({ mobile }) => ({
   "&::-webkit-scrollbar-thumb": { background: primaryAlpha(0.25), borderRadius: "4px" },
 }));
 
-const Tab = styled(Box)(({ active }) => ({
-  position: "relative",
-  padding: "6px 16px", // slightly reduced padding so it fits nicely inside the fixed width
-  minWidth: "110px", // Force both tabs to be the exact same width
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  borderRadius: "8px",
-  fontSize: "13px",
-  fontWeight: 500,
-  cursor: "pointer",
-  color: active ? PRIMARY : "rgba(255,255,255,0.75)",
-  background: active
-    ? "rgba(11, 11, 11, 0.4)"
-    : "rgba(255,255,255,0.04)",
-  borderTop: active ? `1px solid ${PRIMARY}` : "1px solid transparent",
-  border: active ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.12)",
-  backdropFilter: "blur(50px)",
-  WebkitBackdropFilter: "blur(50px)",
-  transition: "all 0.2s",
-  "&::after": active ? {
-    content: '""',
-    position: "absolute",
-    bottom: "-8px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 0,
-    height: 0,
-    borderLeft: "7px solid transparent",
-    borderRight: "7px solid transparent",
-    borderTop: `8px solid ${PRIMARY}`,
-  } : { content: '""' },
-  "&:hover": {
-    background: "rgba(11, 11, 11, 0.4)",
-    borderTop: `1px solid ${PRIMARY}`,
-    border: "1px solid rgba(255,255,255,0.15)",
-  },
-  "&:hover::after": {
-    content: '""',
-    position: "absolute",
-    bottom: "-8px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 0,
-    height: 0,
-    borderLeft: "7px solid transparent",
-    borderRight: "7px solid transparent",
-    borderTop: `8px solid ${PRIMARY}`,
-  },
-}));
+// Speech-bubble tab using SVG stroke for pixel-perfect border + curved pointer
+const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
+  const W = 130, H = 35, R = 2;
+  const pw = 12, ph =14; // pointer notch half-width and depth
+  const cx = W / 2;
+  const s = 0.5; // stroke width (half sits outside, so viewBox needs padding)
+  const P = 2; // padding so stroke isn't clipped
+
+  // Full shape path: rounded rect + curved U-notch at bottom center
+  const path = [
+    `M ${P + R} ${P}`,
+    `H ${P + W - R}`,
+    `Q ${P + W} ${P} ${P + W} ${P + R}`,
+    `V ${P + H - R}`,
+    `Q ${P + W} ${P + H} ${P + W - R} ${P + H}`,
+    `H ${P + cx + pw}`,
+    `C ${P + cx + pw} ${P + H} ${P + cx + 6} ${P + H + ph - 2} ${P + cx} ${P + H + ph}`,
+    `C ${P + cx - 6} ${P + H + ph - 2} ${P + cx - pw} ${P + H} ${P + cx - pw} ${P + H}`,
+    `H ${P + R}`,
+    `Q ${P} ${P + H} ${P} ${P + H - R}`,
+    `V ${P + R}`,
+    `Q ${P} ${P} ${P + R} ${P} Z`,
+  ].join(" ");
+
+  const vw = W + P * 2;
+  const vh = H + ph + P * 2;
+
+  return (
+    <Box
+      ref={ref}
+      onClick={onClick}
+      sx={{
+        position: "relative",
+        width: `${vw}px`,
+        height: `${vh}px`,
+        cursor: "pointer",
+        flexShrink: 0,
+        margin: `${P}px`,
+        "&:hover .tab-label": { color: PRIMARY },
+        [`&:hover .tab-stroke`]: { stroke: PRIMARY },
+      }}
+    >
+      <svg
+        width={vw} height={vh}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <path
+          d={path}
+          fill="rgba(18,22,18,0.92)"
+          className="tab-stroke"
+          stroke={active ? PRIMARY : "rgba(255,255,255,0.13)"}
+          strokeWidth={s}
+        />
+      </svg>
+      <Box className="tab-label" sx={{
+        position: "relative",
+        zIndex: 1,
+        width: "100%",
+        height: `${H + P * 2}px`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "13px",
+        fontWeight: 500,
+        color: active ? PRIMARY : "",
+        transition: "color 0.2s",
+        userSelect: "none"
+      }}>
+        {children}
+      </Box>
+    </Box>
+  );
+});
 
 const ExpCard = styled(Box)({
   background: "rgba(255,255,255,0.04)",
