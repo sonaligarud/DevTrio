@@ -179,6 +179,116 @@ const DEFAULT_WORK_CATEGORIES = [
   { label: "Print Media",  icon: "/assets/icons/print-designs.svg" },
 ];
 
+/* ── Category card with exact Figma SVG shape ── */
+function CategoryCard({ cat, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  const safeId = cat.label.replace(/\s+/g, "-");
+
+  // Exact path from Figma with-hover.svg (scaled to fit, viewBox 0 0 224 214)
+  // The shape path (fill area):
+  const shapePath = "M201 11C201 8.23858 198.761 6 196 6H20C17.2386 6 15 8.23858 15 11V169.007C15 171.768 17.2386 174.007 20 174.007H48.2869C49.6135 174.007 50.8857 174.534 51.8235 175.472L56.8827 180.534C57.8204 181.473 59.0927 182 60.4193 182H169.959C171.285 182 172.558 181.473 173.496 180.534L178.088 175.937C179.026 174.998 180.299 174.471 181.626 174.471H189.963C192.725 174.471 194.963 172.232 194.963 169.471V54.3589C194.963 53.0337 195.49 51.7627 196.426 50.8251L199.537 47.711C200.474 46.7734 201 45.5024 201 44.1772V11Z";
+
+  // Stroke path (slightly inset, from with-hover.svg)
+  const strokePath = "M20 6.5H196C198.485 6.5 200.5 8.51472 200.5 11V44.1768C200.5 45.3694 200.026 46.5137 199.184 47.3574L196.072 50.4717C195.042 51.503 194.464 52.9017 194.464 54.3594V169.471C194.464 171.956 192.449 173.97 189.964 173.971H181.626C180.166 173.971 178.766 174.551 177.734 175.584L173.142 180.181C172.298 181.025 171.153 181.5 169.959 181.5H60.4189C59.2251 181.5 58.0802 181.025 57.2363 180.181L52.1768 175.119C51.1453 174.087 49.7463 173.507 48.2871 173.507H20C17.5148 173.507 15.5002 171.492 15.5 169.007V11C15.5 8.51472 17.5147 6.5 20 6.5Z";
+
+  return (
+    <Box
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      sx={{ position: "relative", cursor: "pointer", flexShrink: 0, width: "160px", height: "160px" }}
+    >
+      {/* SVG card shape — exact Figma paths */}
+      <svg
+        width="100%" height="100%"
+        viewBox="0 0 216 190"
+        preserveAspectRatio="none"
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <defs>
+          {/* Hover stroke gradient — exact from Figma */}
+          <linearGradient id={`grad-hover-${safeId}`} x1="16.9732" y1="11.0129" x2="226.955" y2="108.074" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#8F8F8F"/>
+            <stop offset="0.265501" stopColor="#636363"/>
+            <stop offset="0.485577" stopColor="#00CD1F"/>
+            <stop offset="0.709213" stopColor="#636363"/>
+            <stop offset="1" stopColor="#8F8F8F"/>
+          </linearGradient>
+          {/* Hover glow filter */}
+          <filter id={`glow-${safeId}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+
+        {/* Fill — dark background */}
+        <path
+          d={shapePath}
+          fill={hovered ? "rgba(14,20,14,0.97)" : "rgba(18,22,18,0.92)"}
+          style={{ transition: "fill 0.25s" }}
+        />
+
+        {/* Border — grey when default, gradient when hover */}
+        <path
+          d={strokePath}
+          fill="none"
+          stroke={hovered ? `url(#grad-hover-${safeId})` : "rgba(255,255,255,0.12)"}
+          strokeWidth="1"
+        />
+
+        {/* Extra green glow on the stroke when hovered */}
+        {hovered && (
+          <path
+            d={strokePath}
+            fill="none"
+            stroke={`url(#grad-hover-${safeId})`}
+            strokeWidth="2"
+            opacity="0.4"
+            filter={`url(#glow-${safeId})`}
+          />
+        )}
+      </svg>
+
+      {/* Card content */}
+      <Box sx={{
+        position: "relative", zIndex: 2,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        height: "100%",
+        p: "20px",
+      }}>
+        <Box
+          component="img"
+          src={cat.icon}
+          alt={cat.label}
+          sx={{
+            width: 40, height: 40, objectFit: "contain",
+            filter: hovered ? "brightness(0) invert(1)" : "brightness(0) invert(0.5)",
+            transition: "filter 0.2s",
+            mb: "4px",
+          }}
+        />
+        <Typography sx={{
+          color: hovered ? "#fff" : "rgba(255,255,255,0.5)",
+          fontSize: "14px", fontWeight: 500,
+          transition: "color 0.2s",
+        }}>
+          {cat.label}
+        </Typography>
+        <Box sx={{
+          opacity: hovered ? 1 : 0,
+          height: hovered ? "24px" : "0px",
+          overflow: "hidden",
+          transition: "all 0.2s ease-in-out",
+          mt: hovered ? "4px" : 0,
+        }}>
+          <ArrowForwardIcon sx={{ color: "#fff", fontSize: 22 }} />
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 /* ── Work tab ── */
 function WorkTab({ onClose, inline }) {
   const navigate = useNavigate();
@@ -194,7 +304,7 @@ function WorkTab({ onClose, inline }) {
           })));
         }
       })
-      .catch(() => {}); // silently keep defaults if API is down
+      .catch(() => {});
   }, []);
 
   const handleCategoryClick = (label) => {
@@ -204,57 +314,15 @@ function WorkTab({ onClose, inline }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-      {/* Category cards — responsive grid */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
+      {/* Category cards */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
-          <Box
-            key={cat.label}
-            onClick={() => handleCategoryClick(cat.label)}
-            sx={{
-              display: "flex", flexDirection: "column",
-              height: "190px", // Fixed height so it doesn't grow on hover
-              padding: "20px",
-              alignItems: "center", justifyContent: "center",
-              gap: "10px",
-              cursor: "pointer",
-              position: "relative",
-              background: "rgba(255,255,255,0.08)", // Unhovered border color
-              clipPath: "polygon(0 0, 100% 0, 100% 40px, calc(100% - 8px) 48px, calc(100% - 8px) calc(100% - 10px), calc(100% - 32px) calc(100% - 10px), calc(100% - 40px) 100%, 40px 100%, 32px calc(100% - 10px), 0 calc(100% - 10px))",
-              transition: "background 0.2s",
-              zIndex: 1,
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                inset: "1px",
-                background: "rgba(20,24,20,0.95)", // Inner card background
-                clipPath: "polygon(0 0, 100% 0, 100% 39px, calc(100% - 8px) 47px, calc(100% - 8px) calc(100% - 10px), calc(100% - 32px) calc(100% - 10px), calc(100% - 40px) 100%, 40px 100%, 32px calc(100% - 10px), 0 calc(100% - 10px))",
-                zIndex: -1,
-                transition: "background 0.2s",
-              },
-              "& .cat-icon": { filter: "brightness(0) invert(0.5)", transition: "filter 0.2s, transform 0.2s", mb: "4px" },
-              "& .cat-label": { color: "rgba(255,255,255,0.5)", fontSize: "14px", fontWeight: 500, transition: "color 0.2s, transform 0.2s" },
-              "& .cat-arrow": { opacity: 0, height: 0, overflow: "hidden", transition: "all 0.2s ease-in-out", mt: 0 },
-              "&:hover": {
-                background: "radial-gradient(ellipse at 30% 100%, #00CD1F 0%, rgba(255,255,255,0.08) 55%)", // Green glow at bottom edge
-                "& .cat-icon": { filter: "brightness(0) invert(1)" },
-                "& .cat-label": { color: "#fff" },
-                "& .cat-arrow": { opacity: 1, height: "24px", mt: "8px" },
-              },
-            }}
-          >
-            <Box component="img" src={cat.icon} alt={cat.label} className="cat-icon"
-              sx={{ width: 44, height: 44, objectFit: "contain" }} />
-            <Typography className="cat-label">{cat.label}</Typography>
-            <Box className="cat-arrow">
-              <ArrowForwardIcon sx={{ color: "#fff", fontSize: 22 }} />
-            </Box>
-          </Box>
+          <CategoryCard key={cat.label} cat={cat} onClick={() => handleCategoryClick(cat.label)} />
         ))}
       </Box>
 
-
       {/* Bio + Download Resume */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "20px", alignItems: "center" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "auto", alignItems: "center" }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
           Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
         </Typography>
