@@ -22,6 +22,27 @@ load_dotenv()
 logger = logging.getLogger("services")
 
 
+def _get_provider_aware_chroma_settings() -> tuple[str, str]:
+    """
+    Returns (persist_dir, collection_name) scoped to the current LLM provider.
+
+    Each provider stores vectors with different embedding dimensions:
+      - OpenAI: 1536 dimensions
+      - Gemini: 3072 dimensions
+
+    Using separate dirs/collections prevents dimension-mismatch errors when
+    switching providers. Seeds created for one provider are automatically
+    kept separate from another.
+    """
+    provider = os.getenv("LLM_PROVIDER", "openai").lower().strip()
+    base_dir = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
+    base_collection = os.getenv("CHROMA_COLLECTION_NAME", "project_documents")
+
+    persist_dir = os.path.join(base_dir, provider)
+    collection_name = f"{base_collection}_{provider}"
+    return persist_dir, collection_name
+
+
 class VectorStoreService:
     """
     Wraps ChromaDB operations with a clean interface.
@@ -36,8 +57,11 @@ class VectorStoreService:
                         (e.g., OpenAIEmbeddings, GoogleGenerativeAIEmbeddings)
         """
         self.embeddings = embeddings
-        self.persist_dir = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
-        self.collection_name = os.getenv("CHROMA_COLLECTION_NAME", "project_documents")
+        self.persist_dir, self.collection_name = _get_provider_aware_chroma_settings()
+        logger.info(
+            f"VectorStoreService | provider='{os.getenv('LLM_PROVIDER', 'openai')}' | "
+            f"collection='{self.collection_name}' | persist_dir='{self.persist_dir}'"
+        )
 
         # Initialize and persist the Chroma vector store
         self.vector_store = self._init_vector_store()
@@ -46,10 +70,24 @@ class VectorStoreService:
             f"collection='{self.collection_name}' | "
             f"persist_dir='{self.persist_dir}'"
         )
+        self._warn_if_empty()
 
     # ------------------------------------------------------------------
     # Initialization
     # ------------------------------------------------------------------
+
+    def _warn_if_empty(self) -> None:
+        """Log a helpful warning if the collection has no documents yet."""
+        try:
+            count = self.vector_store._collection.count()
+            if count == 0:
+                provider = os.getenv("LLM_PROVIDER", "openai")
+                logger.warning(
+                    f"ChromaDB collection '{self.collection_name}' is EMPTY for provider '{provider}'. "
+                    f"Run: ./venv/bin/python3 scripts/seed_data.py  to populate it."
+                )
+        except Exception:
+            pass
 
     def _init_vector_store(self) -> Chroma:
         """

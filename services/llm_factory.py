@@ -183,7 +183,6 @@ class LLMFactory:
 
         logger.debug(f"Loading Gemini LLM: {model}")
         return ChatGoogleGenerativeAI(
-            google_api_key=api_key,
             model=model,
             temperature=0.1,  # Low temp = factual, no hallucination
         )
@@ -207,7 +206,6 @@ class LLMFactory:
 
         logger.debug(f"Loading Gemini Embeddings: {model}")
         return GoogleGenerativeAIEmbeddings(
-            google_api_key=api_key,
             model=model,
         )
 
