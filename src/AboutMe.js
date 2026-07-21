@@ -134,21 +134,22 @@ const CertCard = styled(Box)({
 const DownloadBtn = styled(Box)({
   display: "flex",
   alignItems: "center",
-  gap: "10px",
-  padding: "12px 24px",
+  gap: "12px",
+  padding: "14px 28px",
   borderRadius: "12px",
-  border: "1px solid rgba(255,255,255,0.15)",
-  background: "rgba(20,25,20,0.9)",
+  border: "1.5px solid transparent",
+  backgroundImage: "linear-gradient(rgba(18,26,18,0.97), rgba(10,22,12,0.97)), linear-gradient(135deg, rgba(0,205,31,0.0) 0%, rgba(0,205,31,0.7) 30%, rgba(0,205,31,0.1) 50%, rgba(0,205,31,0.0) 60%, rgba(0,205,31,0.6) 85%, rgba(0,205,31,0.0) 100%)",
+  backgroundOrigin: "border-box",
+  backgroundClip: "padding-box, border-box",
   cursor: "pointer",
   color: "#fff",
-  fontSize: "13px",
+  fontSize: "14px",
   fontWeight: 500,
   whiteSpace: "nowrap",
-  transition: "background 0.2s, box-shadow 0.2s",
+  boxShadow: "0 0 12px rgba(0,205,31,0.1)",
+  transition: "box-shadow 0.2s",
   "&:hover": {
-    background: "rgba(30,35,30,0.95)",
-    borderColor: primaryAlpha(0.4),
-    boxShadow: `0 0 14px ${primaryAlpha(0.15)}`,
+    boxShadow: "0 0 22px rgba(0,205,31,0.25)",
   },
 });
 
@@ -196,7 +197,7 @@ function CategoryCard({ cat, onClick }) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      sx={{ position: "relative", cursor: "pointer", flexShrink: 0, width: "160px", height: "160px" }}
+      sx={{ position: "relative", cursor: "pointer", flexShrink: 0, width: "170px", height: "170px" }}
     >
       {/* SVG card shape — exact Figma paths */}
       <svg
@@ -313,16 +314,16 @@ function WorkTab({ onClose, inline }) {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, justifyContent: "center" }}>
       {/* Category cards */}
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "12px", mb: "20px", flex: "0 0 auto" }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0px",mt: "48px",  flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
           <CategoryCard key={cat.label} cat={cat} onClick={() => handleCategoryClick(cat.label)} />
         ))}
       </Box>
 
       {/* Bio + Download Resume */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "auto", alignItems: "center" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "48px", alignItems: "center" }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
           Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
         </Typography>
@@ -412,8 +413,8 @@ function AboutMeContent({ onClose, mobile, inline }) {
       <Box sx={{
         display: "flex", justifyContent: "space-between",
         alignItems: "flex-start",
-        mb: inline ? "20px" : "24px",
-        ...(inline ? {} : { margin: "0px 90px", mb: "24px" }),
+        mb: inline ? "24px":"24px",
+        ...(inline ? {} : { margin: "0px 90px", mb: "4px" }),
       }}>
         <Box sx={{ textAlign: "left" }}>
           <Typography sx={{ fontSize: "14px", mb: "4px" }}>
