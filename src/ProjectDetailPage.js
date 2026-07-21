@@ -83,7 +83,8 @@ export default function ProjectDetailPage() {
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
       display: "flex", flexDirection: "column",
-      p: "65px",
+      boxSizing: "border-box",
+      p: "12.5vh 10.5vw",
       color: "#fff",
     }}>
       {/* MAIN TABS */}
@@ -251,7 +252,7 @@ export default function ProjectDetailPage() {
           position: "fixed", inset: 0, zIndex: 999,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
-          <Box sx={{ position: "relative", maxWidth: "80vw", maxHeight: "80vh" }}>
+          <Box sx={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh" }}>
             <IconButton onClick={lbPrev} sx={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
               <img src="/assets/icons/right.svg" alt="prev"/>
             </IconButton>

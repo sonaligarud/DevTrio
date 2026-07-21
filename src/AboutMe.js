@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"; // kept for fallback
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { PRIMARY, primaryAlpha } from "./theme";
 import CustomTooltip from "./CustomTooltip";
 import { fetchCategories } from "./api/chatApi";
+import DownloadResume from "./DownloadResume";
 
 /* ── Styled components ── */
 const ModalBox = styled(Box)(({ mobile }) => ({
@@ -129,28 +129,6 @@ const CertCard = styled(Box)({
   background: "rgba(11, 11, 11, 0.4)",
   border: "1px solid rgba(255,255,255,0.15)",
   borderTop: `1px solid ${PRIMARY}`,
-});
-
-const DownloadBtn = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  padding: "14px 28px",
-  borderRadius: "12px",
-  border: "1.5px solid transparent",
-  backgroundImage: "linear-gradient(rgba(18,26,18,0.97), rgba(10,22,12,0.97)), linear-gradient(135deg, rgba(0,205,31,0.0) 0%, rgba(0,205,31,0.7) 30%, rgba(0,205,31,0.1) 50%, rgba(0,205,31,0.0) 60%, rgba(0,205,31,0.6) 85%, rgba(0,205,31,0.0) 100%)",
-  backgroundOrigin: "border-box",
-  backgroundClip: "padding-box, border-box",
-  cursor: "pointer",
-  color: "#fff",
-  fontSize: "14px",
-  fontWeight: 500,
-  whiteSpace: "nowrap",
-  boxShadow: "0 0 12px rgba(0,205,31,0.1)",
-  transition: "box-shadow 0.2s",
-  "&:hover": {
-    boxShadow: "0 0 22px rgba(0,205,31,0.25)",
-  },
 });
 
 /* ── Data ── */
@@ -327,12 +305,7 @@ function WorkTab({ onClose, inline }) {
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
           Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
         </Typography>
-        <CustomTooltip title={<>you can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
-          <DownloadBtn sx={{ flexShrink: 0 }}>
-            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 26, height: 26 }} />
-            Download Resume
-          </DownloadBtn>
-        </CustomTooltip>
+        <DownloadResume />
       </Box>
     </Box>
   );
@@ -392,12 +365,7 @@ function AboutMeTab({ mobile, inline }) {
         <Typography sx={{ fontSize: "13px", lineHeight: 1.8, flex: 1, textAlign: "left" }}>
           Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's.
         </Typography>
-        <CustomTooltip title={<>You can download the resume by <span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>} placement="top">
-          <DownloadBtn sx={{ flexShrink: 0 }}>
-            <Box component="img" src="/assets/icons/download-resume.svg" alt="" sx={{ width: 26, height: 26 }} />
-            Download Resume
-          </DownloadBtn>
-        </CustomTooltip>
+        <DownloadResume />
       </Box>
     </Box>
   );
