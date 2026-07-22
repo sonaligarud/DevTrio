@@ -201,12 +201,14 @@ function ChatbotPanel() {
       )}
 
       {/* Input bar */}
-      <Box sx={{ px: 2, pb: 2, pt: 1, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <Box sx={{ px: "15px", pb: "20px", pt: "10px" }}>
         <Box sx={{
-          display: "flex", alignItems: "center", gap: 1,
-          background: "rgba(0,0,0,0.35)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "10px", px: 1.5, py: 0.7,
+          display: "flex", alignItems: "center", gap: "9px",
+          minHeight: "54px", boxSizing: "border-box",
+          background: "rgba(61, 76, 75, 0.92)",
+          border: "1px solid rgba(255,255,255,0.16)",
+          borderRadius: "7px", px: "12px",
+          boxShadow: "0 10px 24px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)",
         }}>
           <InputBase
             placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
@@ -214,20 +216,21 @@ function ChatbotPanel() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             disabled={isLoading || isProcessing}
-            sx={{ color: "#ccc", fontSize: "13px", "& input::placeholder": { color: isListening ? "#00CD1F" : "#555", opacity: 1 } }}
+            sx={{ color: "#f4f6f5", fontSize: "14px", "& input::placeholder": { color: isListening ? "#00CD1F" : "rgba(255,255,255,0.62)", opacity: 1 } }}
           />
-          <IconButton onClick={toggleListening} size="small" sx={{ color: isListening ? "#00CD1F" : "#555", p: "4px" }}>
-            <MicIcon sx={{ fontSize: 17 }} />
+          <IconButton onClick={toggleListening} size="small" aria-label={isListening ? "Stop listening" : "Start voice input"} sx={{ width: 36, height: 36, color: isListening ? "#00CD1F" : "#fff", p: 0, flexShrink: 0, border: "1px solid rgba(255,255,255,0.22)", borderRadius: "10px", background: "rgba(14,20,20,0.22)", "&:hover": { background: "rgba(255,255,255,0.08)" } }}>
+            <MicIcon sx={{ fontSize: 20 }} />
           </IconButton>
           <IconButton onClick={handleSend} size="small" disabled={isLoading || isProcessing}
             sx={{
-              background: "#00CD1F", color: "#000", borderRadius: "7px", p: "4px",
-              "&:hover": { background: "#00b81a" },
-              "&.Mui-disabled": { background: "rgba(0,205,31,0.2)" },
+              width: 36, height: 36, color: "#fff", borderRadius: "10px", p: 0, flexShrink: 0,
+              border: "1px solid rgba(255,255,255,0.22)", background: "rgba(14,20,20,0.22)",
+              "&:hover": { background: "rgba(255,255,255,0.08)" },
+              "&.Mui-disabled": { borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.25)" },
             }}>
             {isLoading || isProcessing
-              ? <CircularProgress size={15} sx={{ color: "#000" }} />
-              : <ArrowUpwardIcon sx={{ fontSize: 15 }} />}
+              ? <CircularProgress size={15} sx={{ color: "#fff" }} />
+              : <ArrowUpwardIcon sx={{ fontSize: 21 }} />}
           </IconButton>
         </Box>
       </Box>
