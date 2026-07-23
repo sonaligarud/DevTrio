@@ -65,8 +65,18 @@ function WelcomeScreen({ opacity }) {
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 10,
-          background: "rgba(18, 22, 18, 0.88)",
-          border: "1px solid rgba(0, 205, 31, 0.18)",
+          border: "1px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
           boxShadow: "0 0 0 1px rgba(0,0,0,0.4), 0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,205,31,0.25), inset 0 -1px 0 rgba(0,205,31,0.25)",
         }}>
           {socialIcons.map(({ label, icon }) => (
@@ -96,14 +106,23 @@ function WelcomeScreen({ opacity }) {
           flexDirection: "column",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "16px",
           overflowY: "auto", // Allow scrolling if content doesn't fit
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
           p:"60px",
-          borderTop: "1px solid #00CD1F",
-          background: "rgba(11, 11, 11, 0.4)",
+            border: "1px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
         }}>
           <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
         </Box>
