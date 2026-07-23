@@ -79,28 +79,25 @@ export default function ChatbotPanel({
         position: "relative",
         zIndex: 1,
         transform: "translateZ(0)", // Force compositing so maskImage properly clips the scrolling child
+    
         clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
         
         // This mask cuts a perfect circle out of the top right corner to hug the orb
         maskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
         WebkitMaskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
         
-        background: "rgba(11, 11, 11, 0.4)",
-        border: "1px solid rgba(255,255,255,0.15)",
-        
-        // This pseudo-element draws the glowing green border perfectly along the curved cutout
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          top: "11px",
-          right: "11px",
-          transform: "translate(50%, -50%)",
-          width: "124px", height: "124px",
-          borderRadius: "50%",
-          border: `1.5px solid rgba(0, 205, 31, 0.8)`,
-          filter: "drop-shadow(0 0 6px rgba(0,205,31,0.6))",
-          pointerEvents: "none",
-        }
+      border: "1px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
       }}>
         {/* Messages area */}
         <Box 

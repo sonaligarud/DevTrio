@@ -292,7 +292,7 @@ const PortfolioPage = () => {
               zIndex: 0,
             }} />
             {/* HUD frame */}
-            <Box component="img" src="/assets/images/hud/portfolio-page.svg" alt=""
+            <Box alt=""
               sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "fill", pointerEvents: "none", zIndex: 2 }} />
 
             {/* Inner content */}

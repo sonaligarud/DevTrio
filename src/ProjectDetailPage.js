@@ -172,11 +172,20 @@ export default function ProjectDetailPage() {
           background: "rgba(11, 11, 11, 0.4)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderTop: `1px solid ${PRIMARY}`,
-          clipPath:
-            "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-          borderRadius: "16px",
+            border: "0.5px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
+          
+          borderRadius: "10px",
           overflow: "hidden",
           minHeight: 0,
         }}>
@@ -191,8 +200,18 @@ export default function ProjectDetailPage() {
                 padding: "10px 30px",
                 fontSize: "13px", fontWeight: 500,
                 color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
-                border: subTab === i ? "1px solid rgba(0,255,150,0.5)" : "1px solid rgba(255,255,255,0.08)",
-                background: subTab === i ? "rgba(0,255,150,0.08)" : "rgba(255,255,255,0.02)",
+                border: subTab === i ? "1px solid transparent": "1px solid rgba(255,255,255,0.08)",
+                background:
+      subTab === i
+        ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+           linear-gradient(
+             11deg,
+             #00FF85 0%,
+             #8C8C8C 16%,
+             #8C8C8C 85%,
+             #00FF85 100%
+           ) border-box`
+        : "rgba(255,255,255,0.02)",
                 transition: "all 0.2s",
               }}>{proj.title}</Box>
             ))}
@@ -252,7 +271,34 @@ export default function ProjectDetailPage() {
           position: "fixed", inset: 0, zIndex: 999,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
-          <Box sx={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh" }}>
+         <Box
+  sx={{
+    position: "relative",
+    maxWidth: "90vw",
+    maxHeight: "90vh",
+
+    borderRadius: "10px",
+    border: "1px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
+
+boxShadow: `
+  0 0 2px rgba(0,255,133,.25),
+  inset 0 0 1px rgba(255,255,255,.05)
+`,
+
+  }}
+>
+
             <IconButton onClick={lbPrev} sx={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
               <img src="/assets/icons/right.svg" alt="prev"/>
             </IconButton>

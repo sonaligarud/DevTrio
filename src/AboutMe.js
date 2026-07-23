@@ -128,7 +128,6 @@ const CertCard = styled(Box)({
   boxShadow: "0 6px 13px 0 rgba(0,0,0,0.3), inset 0 1px 2px 0 rgba(0,0,0,0.25)",
   background: "rgba(11, 11, 11, 0.4)",
   border: "1px solid rgba(255,255,255,0.15)",
-  borderTop: `1px solid ${PRIMARY}`,
 });
 
 /* ── Data ── */
@@ -294,7 +293,7 @@ function WorkTab({ onClose, inline }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, justifyContent: "center" }}>
       {/* Category cards */}
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0px",mt: "48px",  flex: "0 0 auto" }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0px",mt: "28px",  flex: "0 0 auto" }}>
         {workCategories.map((cat) => (
           <CategoryCard key={cat.label} cat={cat} onClick={() => handleCategoryClick(cat.label)} />
         ))}
@@ -345,8 +344,20 @@ function AboutMeTab({ mobile, inline }) {
       </Box>
 
       {/* Cert card */}
-      <CertCard sx={{ mb: 2.5 }}>
-        <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0 }} />
+      <CertCard sx={{ mb: 2.5,  border: "0.5px solid transparent",
+
+    background: `
+      linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+      linear-gradient(
+        11deg,
+        #00FF85 0%,
+        #8C8C8C 6%,
+        #8C8C8C 95%,
+        #00FF85 100%
+      ) border-box
+    `,
+          }}>
+        <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0}} />
         <Box sx={{ textAlign: "left" }}>
           <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#fff" }}>
             UI/UX Design with Generative AI
