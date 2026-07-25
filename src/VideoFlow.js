@@ -17,11 +17,19 @@ const framePath = (i) => {
 };
 
 const socialIcons = [
-  { label: "LinkedIn", icon: "/assets/icons/Property-lindedin.svg" },
-  { label: "Behance", icon: "/assets/icons/Property-behance.svg" },
-  { label: "Dribbble", icon: "/assets/icons/Property-dribble.svg" },
-  { label: "Mobile", icon: "/assets/icons/Property-mobile.svg" },
-  { label: "Mail", icon: "/assets/icons/Property-email.svg" },
+  { label: "LinkedIn", icon: "/assets/icons/Property-lindedin.svg",link:"https://www.linkedin.com" },
+  { label: "Behance", icon: "/assets/icons/Property-behance.svg",link:"https://www.behance.net/pardessiaaec66"},
+  { label: "Dribbble", icon: "/assets/icons/Property-dribble.svg" ,link:"https://dribbble.com/pardessiaakash"},
+   {
+    label: "Mobile",
+    icon: "/assets/icons/Property-mobile.svg",
+    link: "tel:+919011566393",
+  },
+  {
+    label: "Mail",
+    icon: "/assets/icons/Property-email.svg",
+    link: "mailto:pardessiaakash@gmail.com",
+  },
 ];
 
 
@@ -71,29 +79,45 @@ function WelcomeScreen({ opacity }) {
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
-        #00FF85 0%,
+        #00CD1F 0%,
         #8C8C8C 6%,
         #8C8C8C 95%,
-        #00FF85 100%
+        #00CD1F 100%
       ) border-box
     `,
           boxShadow: "0 0 0 1px rgba(0,0,0,0.4), 0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,205,31,0.25), inset 0 -1px 0 rgba(0,205,31,0.25)",
         }}>
-          {socialIcons.map(({ label, icon }) => (
-            <Box key={label} sx={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              width: 44, height: 44, borderRadius: "50%",
-              cursor: "pointer", transition: "all 0.2s"
-            }}>
-              <Box component="img" src={icon} alt={label}
-                sx={{
-                  width: 40, height: 40,
-                  opacity: 0.75, transition: "opacity 0.2s",
-                  filter: "brightness(0) invert(0.75)",
-                }}
-              />
-            </Box>
-          ))}
+         {socialIcons.map(({ label, icon, link }) => (
+  <Box
+    key={label}
+    component="a"
+    href={link}
+    target="_blank"
+    rel="noopener noreferrer"
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: 44,
+      height: 44,
+      borderRadius: "50%",
+      cursor: "pointer",
+      textDecoration: "none",
+    }}
+  >
+    <Box
+      component="img"
+      src={icon}
+      alt={label}
+      sx={{
+        width: 40,
+        height: 40,
+        opacity: 0.75,
+        filter: "brightness(0) invert(0.75)",
+      }}
+    />
+  </Box>
+))}
         </Box>
 
         {/* Left panel — col 9 */}
@@ -117,10 +141,10 @@ function WelcomeScreen({ opacity }) {
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
-        #00FF85 0%,
+        #00CD1F 0%,
         #8C8C8C 6%,
         #8C8C8C 95%,
-        #00FF85 100%
+        #00CD1F 100%
       ) border-box
     `,
         }}>
