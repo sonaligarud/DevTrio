@@ -6,7 +6,7 @@ const buttonStyles = {
   py: "12px",
   borderRadius: "10px",
   border: "1px solid transparent",
-  background: `linear-gradient(#1C1C1C, #3A3A3A) padding-box, linear-gradient(11deg, #00FF85 0%, #8C8C8C 14%, #8C8C8C 87%, #00FF85 100%) border-box;
+  background: `linear-gradient(#1C1C1C, #3A3A3A) padding-box, linear-gradient(11deg, #00CD1F 0%, #8C8C8C 14%, #8C8C8C 87%, #00CD1F 100%) border-box;
   `,
   color: "#fff",
   fontSize: "13px",
@@ -20,7 +20,7 @@ const buttonStyles = {
     marginLeft: 0,
   },
   "&:hover": {
-     background: `linear-gradient(#1C1C1C, #3A3A3A) padding-box, linear-gradient(11deg, #00FF85 0%, #8C8C8C 14%, #8C8C8C 87%, #00FF85 100%) border-box;
+     background: `linear-gradient(#1C1C1C, #3A3A3A) padding-box, linear-gradient(11deg, #00CD1F 0%, #8C8C8C 14%, #8C8C8C 87%, #00CD1F 100%) border-box;
   `,
     boxShadow: "none",
   },

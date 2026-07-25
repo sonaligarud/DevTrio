@@ -92,10 +92,10 @@ export default function ChatbotPanel({
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
-        #00FF85 0%,
+        #00CD1F 0%,
         #8C8C8C 6%,
         #8C8C8C 95%,
-        #00FF85 100%
+        #00CD1F 100%
       ) border-box
     `,
       }}>
