@@ -8,6 +8,15 @@ import { fetchCategories, fetchProjects } from "./api/chatApi";
 
 const PRIMARY = "#00CD1F";
 
+// These labels are intentionally independent from the backend category spelling.
+// For example, the navigation says "Videos" even when the API exposes "Video".
+const PORTFOLIO_TABS = [
+  { label: "UI/UX", aliases: ["UI/UX"] },
+  { label: "Social Media", aliases: ["Social Media"] },
+  { label: "Videos", aliases: ["Videos", "Video"] },
+  { label: "XR", aliases: ["XR"] },
+];
+
 const orbVideos = [
   "/assets/orb/Idle State.mp4",
   "/assets/orb/Listening State.mp4",
@@ -18,9 +27,12 @@ const orbVideos = [
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
   const { category: urlCategory } = useParams();
-  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "project_chatbot_width_percentage_v2", 30, 50, [30, 50]);
   
-  const [mainTabs, setMainTabs] = useState([]);
+  const [mainTabs, setMainTabs] = useState(() => PORTFOLIO_TABS.map((tab) => ({
+    ...tab,
+    category: tab.aliases[0],
+  })));
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,21 +45,33 @@ export default function ProjectDetailPage() {
   // Load categories and set initial mainTab based on URL
   useEffect(() => {
     fetchCategories().then(data => {
-      if (data && data.length > 0) {
-        setMainTabs(data);
-        const urlCatDecoded = decodeURIComponent(urlCategory || "");
-        let index = data.findIndex(c => c === urlCatDecoded);
-        if (index === -1) index = 0;
-        setMainTab(index);
-      }
-    }).catch(console.error);
+      const availableCategories = Array.isArray(data) ? data : [];
+      const tabs = PORTFOLIO_TABS.map((tab) => ({
+        ...tab,
+        category: availableCategories.find((category) => tab.aliases.includes(category)) || tab.aliases[0],
+      }));
+      setMainTabs(tabs);
+
+      const urlCatDecoded = decodeURIComponent(urlCategory || "");
+      const index = tabs.findIndex((tab) =>
+        tab.label === urlCatDecoded || tab.aliases.includes(urlCatDecoded)
+      );
+      setMainTab(index === -1 ? 0 : index);
+    }).catch((error) => {
+      console.error(error);
+      const urlCatDecoded = decodeURIComponent(urlCategory || "");
+      const index = PORTFOLIO_TABS.findIndex((tab) =>
+        tab.label === urlCatDecoded || tab.aliases.includes(urlCatDecoded)
+      );
+      setMainTab(index === -1 ? 0 : index);
+    });
   }, [urlCategory]);
 
   // Load projects when mainTab changes
   useEffect(() => {
     if (mainTabs.length > 0) {
       setLoading(true);
-      fetchProjects(mainTabs[mainTab])
+      fetchProjects(mainTabs[mainTab].category)
         .then(data => {
           setProjects(data);
           setSubTab(0);
@@ -113,47 +137,43 @@ export default function ProjectDetailPage() {
         <Box sx={{ display: "flex", gap: "0px" }}>
           {mainTabs.map((tab, i) => {
             const isActive = mainTab === i;
-            // trapezoid: narrower at top, wider at bottom — sides flare outward
-            const CLIP = "polygon(18px 0%, calc(100% - 18px) 0%, 100% 100%, 0% 100%)";
+            const CLIP = "polygon(24px 0%, calc(100% - 24px) 0%, 100% 100%, 0% 100%)";
             return (
               <Box
                 key={i}
-                onClick={() => { 
-                  // When clicking a tab, update the URL so it's shareable and consistent
-                  navigate(`/portfolio/${encodeURIComponent(tab)}`); 
-                }}
+                onClick={() => navigate(`/portfolio/${encodeURIComponent(tab.label)}`)}
                 sx={{
                   position: "relative",
                   cursor: "pointer",
-                  // outer wrapper = 1px border via background color
-                  padding: "1px 1px 0px 1px",
-                  background: isActive ? PRIMARY : "rgba(255,255,255,0.2)",
+                  padding: "1px 1px 0",
+                  background: isActive
+                    ? PRIMARY
+                    : "linear-gradient(100deg, rgba(0,205,31,0.8), rgba(186,186,186,0.58) 20%, rgba(186,186,186,0.58) 80%, rgba(0,205,31,0.8))",
                   clipPath: CLIP,
-                  // right tabs are on top (cover left tab's right edge)
                   zIndex: isActive ? 10 : i + 1,
-                  marginLeft: i === 0 ? "0px" : "-18px",
-                  top: isActive ? "1px" : "0px",
+                  marginLeft: i === 0 ? "0px" : "-24px",
                   transition: "all 0.2s",
-                  filter: isActive ? "drop-shadow(0px -2px 10px rgba(0,205,31,0.55))" : "none",
+                  filter: isActive ? "drop-shadow(0 -5px 14px rgba(0,205,31,0.2))" : "none",
                   "&:hover": {
-                    background: isActive ? PRIMARY : "rgba(255,255,255,0.4)",
+                    filter: isActive ? "drop-shadow(0 -5px 14px rgba(0,205,31,0.28))" : "brightness(1.18)",
                   },
                 }}
               >
-                {/* inner fill */}
                 <Box sx={{
                   clipPath: CLIP,
-                  background: isActive ? "rgba(10,14,10,1)" : "rgba(20,28,22,1)",
-                  px: "32px", py: "12px",
+                  background: isActive
+                    ? PRIMARY
+                    : "linear-gradient(105deg, rgba(33,33,33,0.96), rgba(41,41,41,0.9))",
+                  px: "44px", py: "13px",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "14px", fontWeight: isActive ? 600 : 400,
-                  color: isActive ? PRIMARY : "rgba(255,255,255,0.7)",
+                  fontSize: "15px", fontWeight: isActive ? 700 : 400,
+                  color: isActive ? "#080808" : "rgba(255,255,255,0.82)",
                   transition: "all 0.2s",
                   whiteSpace: "nowrap",
                   userSelect: "none",
-                  "&:hover": { color: isActive ? PRIMARY : "#fff" }
+                  "&:hover": { color: isActive ? "#080808" : "#fff" }
                 }}>
-                  {tab}
+                  {tab.label}
                 </Box>
               </Box>
             );
@@ -228,7 +248,7 @@ export default function ProjectDetailPage() {
                   style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }} />
                 <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", zIndex: 3 }}>
                   <Tooltip title="Ask To AI" placement="left">
-                    <Box component="img" src="/assets/icons/AI.svg" alt="Ask To AI" sx={{ cursor: "pointer" }} />
+                    <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer" ,width:"40px"}} />
                   </Tooltip>
                   <Tooltip title="Maximize" placement="left" onClick={openLightbox}>
                     <Box component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />

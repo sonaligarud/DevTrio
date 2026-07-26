@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-export function useResizableChatbot(defaultPercentage = 30, storageKey = "chatbot_width_percentage") {
+export function useResizableChatbot(
+  defaultPercentage = 30,
+  storageKey = "chatbot_width_percentage",
+  minPercentage = 20,
+  maxPercentage = 50,
+  snapPercentage = null
+) {
   const [widthPercent, setWidthPercent] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved !== null) {
         const parsed = parseFloat(saved);
-        if (!isNaN(parsed) && parsed >= 20 && parsed <= 60) {
+        if (!isNaN(parsed) && parsed >= minPercentage && parsed <= maxPercentage) {
           return parsed;
         }
       }
@@ -19,6 +25,7 @@ export function useResizableChatbot(defaultPercentage = 30, storageKey = "chatbo
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
   const widthPercentRef = useRef(widthPercent);
+  const dragStartWidthRef = useRef(widthPercent);
 
   // Sync ref with state
   useEffect(() => {
@@ -27,6 +34,7 @@ export function useResizableChatbot(defaultPercentage = 30, storageKey = "chatbo
 
   const startDrag = useCallback((e) => {
     e.preventDefault();
+    dragStartWidthRef.current = widthPercentRef.current;
     setIsDragging(true);
   }, []);
 
@@ -57,23 +65,28 @@ export function useResizableChatbot(defaultPercentage = 30, storageKey = "chatbo
       const pixelWidth = rect.right - e.clientX;
       let percentage = (pixelWidth / rect.width) * 100;
 
-      if (percentage < 20) percentage = 20;
-      if (percentage > 60) percentage = 60;
+      if (percentage < minPercentage) percentage = minPercentage;
+      if (percentage > maxPercentage) percentage = maxPercentage;
 
       setWidthPercent(percentage);
     };
 
-    const handleMouseUp = () => {
+    const finishDrag = () => {
       setIsDragging(false);
+      const finalWidth = Array.isArray(snapPercentage)
+        ? snapPercentage[(snapPercentage.indexOf(dragStartWidthRef.current) + 1) % snapPercentage.length]
+        : snapPercentage === null ? widthPercentRef.current : snapPercentage;
+      widthPercentRef.current = finalWidth;
+      setWidthPercent(finalWidth);
       try {
-        localStorage.setItem(storageKey, widthPercentRef.current.toString());
+        localStorage.setItem(storageKey, finalWidth.toString());
       } catch (e) {
         console.error("Error saving chatbot width to localStorage:", e);
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseup", finishDrag);
 
     const handleTouchMove = (e) => {
       if (!containerRef.current || e.touches.length === 0) return;
@@ -82,31 +95,22 @@ export function useResizableChatbot(defaultPercentage = 30, storageKey = "chatbo
       const pixelWidth = rect.right - touch.clientX;
       let percentage = (pixelWidth / rect.width) * 100;
 
-      if (percentage < 20) percentage = 20;
-      if (percentage > 60) percentage = 60;
+      if (percentage < minPercentage) percentage = minPercentage;
+      if (percentage > maxPercentage) percentage = maxPercentage;
 
       setWidthPercent(percentage);
     };
 
-    const handleTouchEnd = () => {
-      setIsDragging(false);
-      try {
-        localStorage.setItem(storageKey, widthPercentRef.current.toString());
-      } catch (e) {
-        console.error("Error saving chatbot width to localStorage:", e);
-      }
-    };
-
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchend", finishDrag);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mouseup", finishDrag);
       window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchend", finishDrag);
     };
-  }, [isDragging, storageKey]);
+  }, [isDragging, storageKey, minPercentage, maxPercentage, snapPercentage]);
 
   return {
     widthPercent,

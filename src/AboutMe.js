@@ -158,7 +158,7 @@ const DEFAULT_WORK_CATEGORIES = [
 ];
 
 /* ── Category card with exact Figma SVG shape ── */
-function CategoryCard({ cat, onClick }) {
+function CategoryCard({ cat, onClick, compact }) {
   const [hovered, setHovered] = useState(false);
   const safeId = cat.label.replace(/\s+/g, "-");
 
@@ -174,7 +174,14 @@ function CategoryCard({ cat, onClick }) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      sx={{ position: "relative", cursor: "pointer", flexShrink: 0, width: "170px", height: "170px" }}
+      sx={{
+        position: "relative",
+        cursor: "pointer",
+        flexShrink: 0,
+        width: compact ? "100%" : "170px",
+        height: compact ? "auto" : "170px",
+        aspectRatio: compact ? "1.7 / 1" : undefined,
+      }}
     >
       {/* SVG card shape — exact Figma paths */}
       <svg
@@ -268,7 +275,7 @@ function CategoryCard({ cat, onClick }) {
 }
 
 /* ── Work tab ── */
-function WorkTab({ onClose, inline }) {
+function WorkTab({ onClose, inline, compact }) {
   const navigate = useNavigate();
   const [workCategories, setWorkCategories] = useState(DEFAULT_WORK_CATEGORIES);
 
@@ -293,17 +300,25 @@ function WorkTab({ onClose, inline }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, justifyContent: "center" }}>
       {/* Category cards */}
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0px",mt: "28px",  flex: "0 0 auto" }}>
+      <Box sx={{
+        display: compact ? "grid" : "flex",
+        gridTemplateColumns: compact ? "repeat(2, minmax(0, 1fr))" : undefined,
+        columnGap: compact ? "18px" : 0,
+        rowGap: compact ? "16px" : 0,
+        flexWrap: "wrap",
+        gap: "0px",
+        mt: "28px",
+        flex: "0 0 auto",
+      }}>
         {workCategories.map((cat) => (
-          <CategoryCard key={cat.label} cat={cat} onClick={() => handleCategoryClick(cat.label)} />
+          <CategoryCard key={cat.label} cat={cat} compact={compact} onClick={() => handleCategoryClick(cat.label)} />
         ))}
       </Box>
 
       {/* Bio + Download Resume */}
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "48px", alignItems: "center" }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
-          Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
-        </Typography>
+          Designing immersive, intuitive experiences, focused on clarity         </Typography>
         <DownloadResume />
       </Box>
     </Box>
@@ -383,7 +398,7 @@ function AboutMeTab({ mobile, inline }) {
 }
 
 /* ── Main modal content ── */
-function AboutMeContent({ onClose, mobile, inline }) {
+function AboutMeContent({ onClose, mobile, inline, compact = false }) {
   const [activeTab, setActiveTab] = useState("work");
 
   return (
@@ -418,7 +433,7 @@ function AboutMeContent({ onClose, mobile, inline }) {
 
       {/* Tab content */}
       {activeTab === "work"
-        ? <WorkTab onClose={onClose} inline={inline} />
+        ? <WorkTab onClose={onClose} inline={inline} compact={compact} />
         : <AboutMeTab mobile={mobile} inline={inline} />}
     </Box>
   );
