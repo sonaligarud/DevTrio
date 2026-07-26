@@ -35,7 +35,8 @@ const socialIcons = [
 
 /* ── Welcome split screen ── */
 function WelcomeScreen({ opacity }) {
-  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(33.3);
+  const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "home_chatbot_width_percentage_v2", 30, 50, [30, 50]);
+  const isHalfSplit = widthPercent === 50;
 
   return (
     <Box sx={{
@@ -134,7 +135,7 @@ function WelcomeScreen({ opacity }) {
           overflowY: "auto", // Allow scrolling if content doesn't fit
           "&::-webkit-scrollbar": { width: "4px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
-          p:"60px",
+          p: isHalfSplit ? "42px 48px" : "60px",
             border: "1px solid transparent",
 
     background: `
@@ -148,7 +149,7 @@ function WelcomeScreen({ opacity }) {
       ) border-box
     `,
         }}>
-          <AboutMeContent onClose={() => { }} mobile={false} inline={true} />
+          <AboutMeContent onClose={() => { }} mobile={false} inline={true} compact={isHalfSplit} />
         </Box>
 
         {/* Resize Handle */}

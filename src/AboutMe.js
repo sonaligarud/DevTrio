@@ -33,11 +33,11 @@ const ModalBox = styled(Box)(({ mobile }) => ({
 
 // Speech-bubble tab using SVG stroke for pixel-perfect border + curved pointer
 const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
-  const W = 130, H = 35, R = 2;
-  const pw = 12, ph =14; // pointer notch half-width and depth
+  const W = 156, H = 38, R = 4;
+  const pw = 11, ph = 14;
   const cx = W / 2;
-  const s = 0.5; // stroke width (half sits outside, so viewBox needs padding)
-  const P = 2; // padding so stroke isn't clipped
+  const s = active ? 0.85 : 0;
+  const P = 2;
 
   // Full shape path: rounded rect + curved U-notch at bottom center
   const path = [
@@ -69,20 +69,36 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
         cursor: "pointer",
         flexShrink: 0,
         margin: `${P}px`,
-        "&:hover .tab-label": { color: PRIMARY },
-        [`&:hover .tab-stroke`]: { stroke: PRIMARY },
+        "&:hover .tab-label": { color: active ? PRIMARY : "#fff" },
+        "&:hover .tab-shape": { filter: active ? "url(#active-tab-glow)" : "brightness(1.16)" },
       }}
     >
       <svg
         width={vw} height={vh}
         style={{ position: "absolute", top: 0, left: 0 }}
       >
+        <defs>
+          <linearGradient id="inactive-tab-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop stopColor="#292929" />
+            <stop offset="1" stopColor="#222222" />
+          </linearGradient>
+          <linearGradient id="active-tab-border" x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#A6A6A6" />
+            <stop offset="0.36" stopColor="#6D6D6D" />
+            <stop offset="0.58" stopColor="#00CD1F" />
+            <stop offset="1" stopColor="#00CD1F" />
+          </linearGradient>
+          <filter id="active-tab-glow" x="-20%" y="-25%" width="140%" height="180%">
+            <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#00CD1F" floodOpacity="0.24" />
+          </filter>
+        </defs>
         <path
           d={path}
-          fill="rgba(18,22,18,0.92)"
-          className="tab-stroke"
-          stroke={active ? PRIMARY : "rgba(255,255,255,0.13)"}
+          fill={active ? "#222222" : "url(#inactive-tab-fill)"}
+          className="tab-shape"
+          stroke={active ? "url(#active-tab-border)" : "transparent"}
           strokeWidth={s}
+          filter={active ? "url(#active-tab-glow)" : undefined}
         />
       </svg>
       <Box className="tab-label" sx={{
@@ -93,9 +109,9 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: "13px",
+        fontSize: "14px",
         fontWeight: 500,
-        color: active ? PRIMARY : "",
+        color: active ? PRIMARY : "rgba(255,255,255,0.88)",
         transition: "color 0.2s",
         userSelect: "none"
       }}>
@@ -158,7 +174,7 @@ const DEFAULT_WORK_CATEGORIES = [
 ];
 
 /* ── Category card with exact Figma SVG shape ── */
-function CategoryCard({ cat, onClick }) {
+function CategoryCard({ cat, onClick, compact }) {
   const [hovered, setHovered] = useState(false);
   const safeId = cat.label.replace(/\s+/g, "-");
 
@@ -174,7 +190,14 @@ function CategoryCard({ cat, onClick }) {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      sx={{ position: "relative", cursor: "pointer", flexShrink: 0, width: "170px", height: "170px" }}
+      sx={{
+        position: "relative",
+        cursor: "pointer",
+        flexShrink: 0,
+        width: compact ? "100%" : "170px",
+        height: compact ? "auto" : "170px",
+        aspectRatio: compact ? "1.7 / 1" : undefined,
+      }}
     >
       {/* SVG card shape — exact Figma paths */}
       <svg
@@ -268,7 +291,7 @@ function CategoryCard({ cat, onClick }) {
 }
 
 /* ── Work tab ── */
-function WorkTab({ onClose, inline }) {
+function WorkTab({ onClose, inline, compact }) {
   const navigate = useNavigate();
   const [workCategories, setWorkCategories] = useState(DEFAULT_WORK_CATEGORIES);
 
@@ -293,17 +316,25 @@ function WorkTab({ onClose, inline }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, justifyContent: "center" }}>
       {/* Category cards */}
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "0px",mt: "28px",  flex: "0 0 auto" }}>
+      <Box sx={{
+        display: compact ? "grid" : "flex",
+        gridTemplateColumns: compact ? "repeat(2, minmax(0, 1fr))" : undefined,
+        columnGap: compact ? "18px" : 0,
+        rowGap: compact ? "16px" : 0,
+        flexWrap: "wrap",
+        gap: "0px",
+        mt: "28px",
+        flex: "0 0 auto",
+      }}>
         {workCategories.map((cat) => (
-          <CategoryCard key={cat.label} cat={cat} onClick={() => handleCategoryClick(cat.label)} />
+          <CategoryCard key={cat.label} cat={cat} compact={compact} onClick={() => handleCategoryClick(cat.label)} />
         ))}
       </Box>
 
       {/* Bio + Download Resume */}
       <Box sx={{ display: "flex", justifyContent: "space-between", gap: 3, mt: "48px", alignItems: "center" }}>
         <Typography sx={{ fontSize: "13px", lineHeight: 1.75, textAlign: "left", flex: 1, maxWidth: "450px" }}>
-          Designing immersive, intuitive experiences, focused on clarity, precision, and meaningful user journeys.
-        </Typography>
+          Designing immersive, intuitive experiences, focused on clarity         </Typography>
         <DownloadResume />
       </Box>
     </Box>
@@ -383,7 +414,7 @@ function AboutMeTab({ mobile, inline }) {
 }
 
 /* ── Main modal content ── */
-function AboutMeContent({ onClose, mobile, inline }) {
+function AboutMeContent({ onClose, mobile, inline, compact = false }) {
   const [activeTab, setActiveTab] = useState("work");
 
   return (
@@ -418,7 +449,7 @@ function AboutMeContent({ onClose, mobile, inline }) {
 
       {/* Tab content */}
       {activeTab === "work"
-        ? <WorkTab onClose={onClose} inline={inline} />
+        ? <WorkTab onClose={onClose} inline={inline} compact={compact} />
         : <AboutMeTab mobile={mobile} inline={inline} />}
     </Box>
   );
