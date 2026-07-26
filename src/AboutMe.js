@@ -33,11 +33,11 @@ const ModalBox = styled(Box)(({ mobile }) => ({
 
 // Speech-bubble tab using SVG stroke for pixel-perfect border + curved pointer
 const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
-  const W = 130, H = 35, R = 2;
-  const pw = 12, ph =14; // pointer notch half-width and depth
+  const W = 156, H = 38, R = 4;
+  const pw = 11, ph = 14;
   const cx = W / 2;
-  const s = 0.5; // stroke width (half sits outside, so viewBox needs padding)
-  const P = 2; // padding so stroke isn't clipped
+  const s = active ? 0.85 : 0;
+  const P = 2;
 
   // Full shape path: rounded rect + curved U-notch at bottom center
   const path = [
@@ -69,20 +69,36 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
         cursor: "pointer",
         flexShrink: 0,
         margin: `${P}px`,
-        "&:hover .tab-label": { color: PRIMARY },
-        [`&:hover .tab-stroke`]: { stroke: PRIMARY },
+        "&:hover .tab-label": { color: active ? PRIMARY : "#fff" },
+        "&:hover .tab-shape": { filter: active ? "url(#active-tab-glow)" : "brightness(1.16)" },
       }}
     >
       <svg
         width={vw} height={vh}
         style={{ position: "absolute", top: 0, left: 0 }}
       >
+        <defs>
+          <linearGradient id="inactive-tab-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop stopColor="#292929" />
+            <stop offset="1" stopColor="#222222" />
+          </linearGradient>
+          <linearGradient id="active-tab-border" x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#A6A6A6" />
+            <stop offset="0.36" stopColor="#6D6D6D" />
+            <stop offset="0.58" stopColor="#00CD1F" />
+            <stop offset="1" stopColor="#00CD1F" />
+          </linearGradient>
+          <filter id="active-tab-glow" x="-20%" y="-25%" width="140%" height="180%">
+            <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#00CD1F" floodOpacity="0.24" />
+          </filter>
+        </defs>
         <path
           d={path}
-          fill="rgba(18,22,18,0.92)"
-          className="tab-stroke"
-          stroke={active ? PRIMARY : "rgba(255,255,255,0.13)"}
+          fill={active ? "#222222" : "url(#inactive-tab-fill)"}
+          className="tab-shape"
+          stroke={active ? "url(#active-tab-border)" : "transparent"}
           strokeWidth={s}
+          filter={active ? "url(#active-tab-glow)" : undefined}
         />
       </svg>
       <Box className="tab-label" sx={{
@@ -93,9 +109,9 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: "13px",
+        fontSize: "14px",
         fontWeight: 500,
-        color: active ? PRIMARY : "",
+        color: active ? PRIMARY : "rgba(255,255,255,0.88)",
         transition: "color 0.2s",
         userSelect: "none"
       }}>
