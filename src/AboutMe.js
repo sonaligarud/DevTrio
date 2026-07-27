@@ -70,7 +70,6 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
         flexShrink: 0,
         margin: `${P}px`,
         "&:hover .tab-label": { color: active ? PRIMARY : "#fff" },
-        "&:hover .tab-shape": { filter: active ? "url(#active-tab-glow)" : "brightness(1.16)" },
       }}
     >
       <svg
@@ -82,11 +81,17 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
             <stop stopColor="#292929" />
             <stop offset="1" stopColor="#222222" />
           </linearGradient>
-          <linearGradient id="active-tab-border" x1="0" y1="0" x2="1" y2="1">
-            <stop stopColor="#A6A6A6" />
-            <stop offset="0.36" stopColor="#6D6D6D" />
-            <stop offset="0.58" stopColor="#00CD1F" />
-            <stop offset="1" stopColor="#00CD1F" />
+          <linearGradient
+            id="active-tab-border"
+            x1="6%"
+            y1="0%"
+            x2="100%"
+            y2="20%"
+          >
+            <stop offset="0%" stop-color="#00CD1F" />
+            <stop offset="6%" stop-color="#8C8C8C" />
+            <stop offset="95%" stop-color="#8C8C8C" />
+            <stop offset="100%" stop-color="#00CD1F" />
           </linearGradient>
           <filter id="active-tab-glow" x="-20%" y="-25%" width="140%" height="180%">
             <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#00CD1F" floodOpacity="0.24" />
@@ -98,7 +103,6 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
           className="tab-shape"
           stroke={active ? "url(#active-tab-border)" : "transparent"}
           strokeWidth={s}
-          filter={active ? "url(#active-tab-glow)" : undefined}
         />
       </svg>
       <Box className="tab-label" sx={{
@@ -157,20 +161,20 @@ const experiences = [
 
 
 const ICON_MAP = {
-  "UI/UX":        "/assets/icons/UX.svg",
+  "UI/UX": "/assets/icons/UX.svg",
   "Social Media": "/assets/icons/social-media.svg",
-  "Video":        "/assets/icons/Video.svg",
-  "Videos":       "/assets/icons/Video.svg",
-  "Print Media":  "/assets/icons/print-designs.svg",
-  "Print-Designs":"/assets/icons/print-designs.svg",
-  "XR":           "/assets/icons/XR.svg",
+  "Video": "/assets/icons/Video.svg",
+  "Videos": "/assets/icons/Video.svg",
+  "Print Media": "/assets/icons/print-designs.svg",
+  "Print-Designs": "/assets/icons/print-designs.svg",
+  "XR": "/assets/icons/XR.svg",
 };
 
 const DEFAULT_WORK_CATEGORIES = [
-  { label: "UI/UX",        icon: "/assets/icons/UX.svg" },
+  { label: "UI/UX", icon: "/assets/icons/UX.svg" },
   { label: "Social Media", icon: "/assets/icons/social-media.svg" },
-  { label: "Video",        icon: "/assets/icons/Video.svg" },
-  { label: "Print Media",  icon: "/assets/icons/print-designs.svg" },
+  { label: "Video", icon: "/assets/icons/Video.svg" },
+  { label: "Print Media", icon: "/assets/icons/print-designs.svg" },
 ];
 
 /* ── Category card with exact Figma SVG shape ── */
@@ -209,16 +213,16 @@ function CategoryCard({ cat, onClick, compact }) {
         <defs>
           {/* Hover stroke gradient — exact from Figma */}
           <linearGradient id={`grad-hover-${safeId}`} x1="16.9732" y1="11.0129" x2="226.955" y2="108.074" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#8F8F8F"/>
-            <stop offset="0.265501" stopColor="#636363"/>
-            <stop offset="0.485577" stopColor="#00CD1F"/>
-            <stop offset="0.709213" stopColor="#636363"/>
-            <stop offset="1" stopColor="#8F8F8F"/>
+            <stop stopColor="#8F8F8F" />
+            <stop offset="0.265501" stopColor="#636363" />
+            <stop offset="0.485577" stopColor="#00CD1F" />
+            <stop offset="0.709213" stopColor="#636363" />
+            <stop offset="1" stopColor="#8F8F8F" />
           </linearGradient>
           {/* Hover glow filter */}
           <filter id={`glow-${safeId}`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
-            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
 
@@ -305,7 +309,7 @@ function WorkTab({ onClose, inline, compact }) {
           })));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleCategoryClick = (label) => {
@@ -375,9 +379,10 @@ function AboutMeTab({ mobile, inline }) {
       </Box>
 
       {/* Cert card */}
-      <CertCard sx={{ mb: 2.5,  border: "0.5px solid transparent",
+      <CertCard sx={{
+        mb: 2.5, border: "0.5px solid transparent",
 
-    background: `
+        background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
@@ -387,8 +392,8 @@ function AboutMeTab({ mobile, inline }) {
         #00CD1F 100%
       ) border-box
     `,
-          }}>
-        <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0}} />
+      }}>
+        <Box component="img" src="/assets/icons/UX-Certification.svg" alt="cert" sx={{ width: 40, height: 40, flexShrink: 0 }} />
         <Box sx={{ textAlign: "left" }}>
           <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "#fff" }}>
             UI/UX Design with Generative AI
@@ -423,7 +428,7 @@ function AboutMeContent({ onClose, mobile, inline, compact = false }) {
       <Box sx={{
         display: "flex", justifyContent: "space-between",
         alignItems: "flex-start",
-        mb: inline ? "24px":"24px",
+        mb: inline ? "24px" : "24px",
         ...(inline ? {} : { margin: "0px 90px", mb: "4px" }),
       }}>
         <Box sx={{ textAlign: "left" }}>
