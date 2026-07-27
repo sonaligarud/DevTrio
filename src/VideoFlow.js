@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback} from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
@@ -17,17 +17,20 @@ const framePath = (i) => {
 };
 
 const socialIcons = [
-  { label: "LinkedIn", icon: "/assets/icons/Property-lindedin.svg",link:"https://www.linkedin.com" },
-  { label: "Behance", icon: "/assets/icons/Property-behance.svg",link:"https://www.behance.net/pardessiaaec66"},
-  { label: "Dribbble", icon: "/assets/icons/Property-dribble.svg" ,link:"https://dribbble.com/pardessiaakash"},
-   {
+  { label: "LinkedIn", icon: "/assets/icons/lindedin.svg",
+    hoverIcon:"/assets/icons/withhover/linkedIn.svg", link: "https://www.linkedin.com" },
+  { label: "Behance", icon: "/assets/icons/behance.svg", hoverIcon:"/assets/icons/withhover/Behance.svg", link: "https://www.behance.net/pardessiaaec66" },
+  { label: "Dribbble", icon: "/assets/icons/dribble.svg", hoverIcon:"/assets/icons/withhover/Dribble.svg", link: "https://dribbble.com/pardessiaakash" },
+  {
     label: "Mobile",
-    icon: "/assets/icons/Property-mobile.svg",
+    icon: "/assets/icons/mobile.svg",
+    hoverIcon:"/assets/icons/withhover/Mobile.svg",
     link: "tel:+919011566393",
   },
   {
     label: "Mail",
-    icon: "/assets/icons/Property-email.svg",
+    icon: "/assets/icons/email.svg",
+    hoverIcon:"/assets/icons/withhover/Behance.svg",
     link: "mailto:pardessiaakash@gmail.com",
   },
 ];
@@ -76,7 +79,7 @@ function WelcomeScreen({ opacity }) {
           zIndex: 10,
           border: "1px solid transparent",
 
-    background: `
+          background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
@@ -88,57 +91,66 @@ function WelcomeScreen({ opacity }) {
     `,
           boxShadow: "0 0 0 1px rgba(0,0,0,0.4), 0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,205,31,0.25), inset 0 -1px 0 rgba(0,205,31,0.25)",
         }}>
-         {socialIcons.map(({ label, icon, link }) => (
-  <Box
-    key={label}
-    component="a"
-    href={link}
-    target="_blank"
-    rel="noopener noreferrer"
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 44,
-      height: 44,
-      borderRadius: "50%",
-      cursor: "pointer",
-      textDecoration: "none",
-    }}
-  >
-    <Box
-      component="img"
-      src={icon}
-      alt={label}
-      sx={{
-        width: 40,
-        height: 40,
-        opacity: 0.75,
-        filter: "brightness(0) invert(0.75)",
-      }}
-    />
-  </Box>
-))}
+          {socialIcons.map(({ label, icon, hoverIcon, link }) => (
+            <Box
+              key={label}
+              component="a"
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                textDecoration: "none",
+
+                "& img": {
+                  width: 40,
+                  height: 40,
+                  opacity: 0.75,
+                  filter: "brightness(0) invert(0.75)",
+                  transition: "all 0.3s ease",
+                },
+
+                "&:hover img": {
+                   width: 55,
+                  height: 55,
+                  content: `url(${hoverIcon})`, 
+                  opacity: 1,
+                  filter: "none",
+                },
+              }}
+            >
+              <Box
+                component="img"
+                src={icon}
+                alt={label}
+              />
+            </Box>
+          ))}
         </Box>
 
         {/* Left panel — col 9 */}
-        <Box 
+        <Box
           onWheel={(e) => e.stopPropagation()}
           sx={{
-          flex: 1,
-          minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderRadius: "16px",
-          overflowY: "auto", // Allow scrolling if content doesn't fit
-          "&::-webkit-scrollbar": { width: "4px" },
-          "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
-          p: isHalfSplit ? "42px 48px" : "60px",
+            flex: 1,
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderRadius: "16px",
+            overflowY: "auto", // Allow scrolling if content doesn't fit
+            "&::-webkit-scrollbar": { width: "4px" },
+            "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
+            p: isHalfSplit ? "42px 48px" : "60px",
             border: "1px solid transparent",
 
-    background: `
+            background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
@@ -148,7 +160,7 @@ function WelcomeScreen({ opacity }) {
         #00CD1F 100%
       ) border-box
     `,
-        }}>
+          }}>
           <AboutMeContent onClose={() => { }} mobile={false} inline={true} compact={isHalfSplit} />
         </Box>
 
@@ -475,7 +487,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
           pointerEvents: "none",
         }}>
           <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "capitalize" }}>
-            scroll <br/>down
+            scroll <br />down
           </Typography>
           <Box
             component="img"
@@ -489,13 +501,13 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
 
       {/* Scroll UP hint — on final UI screen */}
       {showScrollUpHint && (
-         <Box sx={{
+        <Box sx={{
           position: "fixed", bottom: 28, left: 28, zIndex: 99998,
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
           pointerEvents: "none",
         }}>
           <Typography sx={{ fontSize: "10px", letterSpacing: "3px", textTransform: "capitalize" }}>
-            scroll <br/>down
+            scroll <br />down
           </Typography>
           <Box
             component="img"

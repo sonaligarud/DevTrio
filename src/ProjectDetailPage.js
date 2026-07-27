@@ -119,18 +119,10 @@ export default function ProjectDetailPage() {
           width: 32, height: 32,
           cursor: "pointer",
           borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.12)",
           background: "rgba(255,255,255,0.02)",
           color: "rgba(255,255,255,0.6)",
           transition: "all 0.2s ease-in-out",
-          padding: "25px",
-          "&:hover": {
-            border: `1px solid ${PRIMARY}`,
-            background: "rgba(0,205,31,0.08)",
-            color: PRIMARY,
-            boxShadow: "0 0 10px rgba(0,205,31,0.3)",
-            transform: "scale(1.05)"
-          }
+          padding: "25px"
         }}>
           <img src="/assets/icons/home.png"/>
         </Box>
@@ -189,7 +181,6 @@ export default function ProjectDetailPage() {
           flex: 1,
           minWidth: 0,
           display: "flex", flexDirection: "column",
-          background: "rgba(11, 11, 11, 0.4)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
             border: "0.5px solid transparent",
