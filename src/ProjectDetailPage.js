@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
@@ -27,8 +30,14 @@ const orbVideos = [
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
   const { category: urlCategory } = useParams();
+  const theme = useTheme();
+  const isMobile = useMediaQuery("(max-width:768px)");
+
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "project_chatbot_width_percentage_v2", 30, 50, [30, 50]);
-  
+
+  // Mobile-only: is the chat panel slid in over the content?
+  const [mobileChatOpen, setMobileChatOpen] = useState(false);
+
   const [mainTabs, setMainTabs] = useState(() => PORTFOLIO_TABS.map((tab) => ({
     ...tab,
     category: tab.aliases[0],
@@ -87,8 +96,8 @@ export default function ProjectDetailPage() {
   }, [mainTab, mainTabs]);
 
   const activeProject = projects[subTab] || null;
-  const slides = activeProject && activeProject.slides && activeProject.slides.length > 0 
-      ? activeProject.slides 
+  const slides = activeProject && activeProject.slides && activeProject.slides.length > 0
+      ? activeProject.slides
       : ["/assets/images/projects/swift/1.jpg"]; // fallback
 
   const orb = orbVideos[mainTab % orbVideos.length];
@@ -108,11 +117,23 @@ export default function ProjectDetailPage() {
       backgroundRepeat: "no-repeat",
       display: "flex", flexDirection: "column",
       boxSizing: "border-box",
-      p: "12.5vh 10.5vw",
+      p: { xs: "20px 16px", md: "12.5vh 10.5vw" },
       color: "#fff",
+      position: "relative",
     }}>
       {/* MAIN TABS */}
-      <Box sx={{ display: "flex", width: "100%", pr: `${widthPercent}%`, alignItems: "center", justifyContent: "flex-start", gap: "12px", mb: "0px", flexShrink: 0, position: "relative", zIndex: 2 }}>
+      <Box sx={{
+        display: "flex",
+        width: "100%",
+        pr: { xs: 0, md: `${widthPercent}%` },
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: "12px",
+        mb: { xs: "-2px", md: "0px" },
+        flexShrink: 0,
+        position: "relative",
+        zIndex: 2,
+      }}>
         {/* Back Button */}
         <Box onClick={() => navigate("/")} sx={{
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -122,11 +143,18 @@ export default function ProjectDetailPage() {
           background: "rgba(255,255,255,0.02)",
           color: "rgba(255,255,255,0.6)",
           transition: "all 0.2s ease-in-out",
-          padding: "25px"
+          padding: "25px",
+          flexShrink: 0,
         }}>
           <img src="/assets/icons/home.png"/>
         </Box>
-        <Box sx={{ display: "flex", gap: "0px" }}>
+        <Box sx={{
+          display: "flex",
+          gap: "0px",
+          overflowX: { xs: "auto", md: "visible" },
+          "&::-webkit-scrollbar": { display: "none" },
+          scrollbarWidth: "none",
+        }}>
           {mainTabs.map((tab, i) => {
             const isActive = mainTab === i;
             const CLIP = "polygon(24px 0%, calc(100% - 24px) 0%, 100% 100%, 0% 100%)";
@@ -138,6 +166,7 @@ export default function ProjectDetailPage() {
                   position: "relative",
                   cursor: "pointer",
                   padding: "1px 1px 0",
+                  flexShrink: 0,
                   background: isActive
                     ? PRIMARY
                     : "linear-gradient(100deg, rgba(0,205,31,0.8), rgba(186,186,186,0.58) 20%, rgba(186,186,186,0.58) 80%, rgba(0,205,31,0.8))",
@@ -156,9 +185,11 @@ export default function ProjectDetailPage() {
                   background: isActive
                     ? PRIMARY
                     : "linear-gradient(105deg, rgba(33,33,33,0.96), rgba(41,41,41,0.9))",
-                  px: "44px", py: "13px",
+                  px: { xs: "28px", md: "44px" },
+                  py: "13px",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "15px", fontWeight: isActive ? 700 : 400,
+                  fontSize: { xs: "13px", md: "15px" },
+                  fontWeight: isActive ? 700 : 400,
                   color: isActive ? "#080808" : "rgba(255,255,255,0.82)",
                   transition: "all 0.2s",
                   whiteSpace: "nowrap",
@@ -173,19 +204,26 @@ export default function ProjectDetailPage() {
         </Box>
       </Box>
 
-      {/* CONTENT ROW — col 8 + col 4 */}
-      <Box ref={containerRef} sx={{ display: "flex", flex: 1, gap: "0px", minHeight: 0, overflow: "visible" }}>
+      {/* CONTENT ROW — col 8 + col 4 (desktop) / stacked+overlay (mobile) */}
+      <Box ref={containerRef} sx={{
+        display: "flex",
+        flex: 1,
+        gap: "0px",
+        minHeight: 0,
+        overflow: "visible",
+        position: "relative",
+      }}>
 
-        {/* LEFT PANEL — col 8 */}
+        {/* LEFT PANEL */}
         <Box sx={{
           flex: 1,
           minWidth: 0,
           display: "flex", flexDirection: "column",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-            border: "0.5px solid transparent",
+          border: "0.5px solid transparent",
 
-    background: `
+          background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
@@ -195,21 +233,32 @@ export default function ProjectDetailPage() {
         #00CD1F 100%
       ) border-box
     `,
-          
+
           borderRadius: "10px",
           overflow: "hidden",
           minHeight: 0,
         }}>
           {/* SUB TABS */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, pt: 2, pb: 1, flexShrink: 0 }}>
+          <Box sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            px: 2, pt: 2, pb: 1,
+            flexShrink: 0,
+            overflowX: { xs: "auto", md: "visible" },
+            "&::-webkit-scrollbar": { display: "none" },
+            scrollbarWidth: "none",
+          }}>
             {!loading && projects.length === 0 && (
               <Box sx={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", p: 1 }}>No projects found for this category.</Box>
             )}
             {projects.map((proj, i) => (
               <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
                 borderRadius: "8px", cursor: "pointer",
-                padding: "10px 30px",
+                padding: { xs: "9px 18px", md: "10px 30px" },
                 fontSize: "13px", fontWeight: 500,
+                flexShrink: 0,
+                whiteSpace: "nowrap",
                 color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
                 border: subTab === i ? "1px solid transparent": "1px solid rgba(255,255,255,0.08)",
                 background:
@@ -228,10 +277,10 @@ export default function ProjectDetailPage() {
             ))}
           </Box>
 
-          {/* SLIDER */}
-          <Box sx={{ position: "relative", flex: 1, display: "flex", alignItems: "center", px: 1, minHeight: 0 }}>
-            <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="prev" />
+          {/* SLIDER — same carousel on mobile, just smaller controls */}
+          <Box sx={{ position: "relative", flex: 1, display: "flex", alignItems: "center", px: { xs: 0.5, md: 1 }, minHeight: 0 }}>
+            <IconButton onClick={prev} sx={{ position: "absolute", left: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined }} />
             </IconButton>
             <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 1, height: "100%" }}>
               <Box sx={{ flex: "0 0 100%", position: "relative" }}>
@@ -239,7 +288,7 @@ export default function ProjectDetailPage() {
                   style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }} />
                 <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", zIndex: 3 }}>
                   <Tooltip title="Ask To AI" placement="left">
-                    <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer" ,width:"40px"}} />
+                    <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
                   </Tooltip>
                   <Tooltip title="Maximize" placement="left" onClick={openLightbox}>
                     <Box component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
@@ -247,8 +296,8 @@ export default function ProjectDetailPage() {
                 </Box>
               </Box>
             </Box>
-            <IconButton onClick={next} sx={{ position: "absolute", right: 8, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" />
+            <IconButton onClick={next} sx={{ position: "absolute", right: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined }} />
             </IconButton>
           </Box>
 
@@ -265,15 +314,83 @@ export default function ProjectDetailPage() {
           </Box>
         </Box>
 
-        {/* Resize Handle */}
-        <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
+        {/* --- DESKTOP: resizable side-by-side chatbot --- */}
+        {!isMobile && (
+          <>
+            <ResizeHandle onMouseDown={handleMouseDown} isDragging={isDragging} />
+            <ChatbotPanel
+              orb={orb}
+              chips={["View Case Study", "About Akash"]}
+              wrapperSx={{ width: `${widthPercent}%`, flexShrink: 0, minWidth: 0, height: "100%" }}
+            />
+          </>
+        )}
 
-        {/* RIGHT PANEL — col 4 */}
-        <ChatbotPanel
-          orb={orb}
-          chips={["View Case Study", "About Akash"]}
-          wrapperSx={{ width: `${widthPercent}%`, flexShrink: 0, minWidth: 0, height: "100%" }}
-        />
+        {/* --- MOBILE: slide-in overlay chatbot + green edge handle --- */}
+        {isMobile && (
+          <>
+            {/* Dim backdrop behind the panel when open */}
+            <Box
+              onClick={() => setMobileChatOpen(false)}
+              sx={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.55)",
+                opacity: mobileChatOpen ? 1 : 0,
+                pointerEvents: mobileChatOpen ? "auto" : "none",
+                transition: "opacity 0.3s ease",
+                zIndex: 40,
+              }}
+            />
+
+            {/* Sliding chat panel — comes in from the right, over the left content */}
+            <Box
+              sx={{
+                position: "fixed",
+                top: 0, left: 0,
+                width: "100vw",
+                height: "100vh",
+                zIndex: 50,
+                p: "12px",
+                boxSizing: "border-box",
+                transform: mobileChatOpen ? "translateX(0)" : "translateX(100%)",
+                transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+            >
+              <ChatbotPanel
+                orb={orb}
+                chips={["View Case Study", "About Akash"]}
+                wrapperSx={{ width: "100%", height: "100%" }}
+              />
+            </Box>
+
+            {/* Green edge handle — always visible, toggles the panel */}
+            <Box
+              onClick={() => setMobileChatOpen((p) => !p)}
+              sx={{
+                position: "fixed",
+                right: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 34,
+                height: 96,
+                background: PRIMARY,
+                borderRadius: "14px 0 0 14px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 55,
+                boxShadow: "0 0 18px rgba(0,205,31,0.5)",
+                transition: "right 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+            >
+              {mobileChatOpen
+                ? <ChevronRightIcon sx={{ color: "#08120a" }} />
+                : <ChevronLeftIcon sx={{ color: "#08120a" }} />}
+            </Box>
+          </>
+        )}
       </Box>
 
       {/* LIGHTBOX */}
@@ -281,6 +398,7 @@ export default function ProjectDetailPage() {
         <Box sx={{
           position: "fixed", inset: 0, zIndex: 999,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          px: { xs: 2, md: 0 },
         }} onClick={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}>
          <Box
   sx={{
@@ -310,15 +428,15 @@ boxShadow: `
   }}
 >
 
-            <IconButton onClick={lbPrev} sx={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="prev"/>
+            <IconButton onClick={lbPrev} sx={{ position: "absolute",  top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined,left: isMobile ? 0 :10 }} />
             </IconButton>
             <Box sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
               <img src={slides[lightboxIndex]} alt={`slide ${lightboxIndex + 1}`}
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
-            <IconButton onClick={lbNext} sx={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" />
+            <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined,right: isMobile ? 0 :10  }} />
             </IconButton>
 
             <Tooltip title="Minimize" placement="left">
