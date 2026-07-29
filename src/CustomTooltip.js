@@ -21,7 +21,7 @@ const StyledTooltip = styled(({ className, ...props }) => (
     border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "14px",
     padding: "14px",
-    maxWidth: 220,
+    maxWidth: 210,
     boxShadow: "0 18px 45px rgba(0,0,0,.55)",
     position: "relative",
     overflow: "visible",
@@ -31,12 +31,11 @@ const StyledTooltip = styled(({ className, ...props }) => (
     color: "#202323",
   },
 
-  // Bottom notch
   [`& .${tooltipClasses.tooltip}::after`]: {
     content: '""',
     position: "absolute",
     bottom: "-6px",
-    left: "28px",
+    left: "24px",
     width: "28px",
     height: "10px",
     background: "#202323",
@@ -44,22 +43,35 @@ const StyledTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-
 export default function CustomTooltip({
   title,
   children,
   placement = "top",
 }) {
-  const [open, setOpen] = useState(true); // Open by default
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <StyledTooltip
       open={open}
-      placement={placement}
       arrow
+      placement={placement}
+      onOpen={handleOpen}
+      onClose={handleClose}
+      disableFocusListener
+      disableTouchListener
       slotProps={{
         popper: {
-          sx: { zIndex: 9999999 },
+          sx: {
+            zIndex: 999999,
+          },
         },
       }}
       title={
@@ -79,6 +91,11 @@ export default function CustomTooltip({
               bgcolor: "#343838",
               color: "#fff",
               border: "1px solid rgba(0,255,120,.35)",
+
+              "&:hover": {
+                bgcolor: "#404444",
+              },
+
               "& svg": {
                 fontSize: 14,
               },
@@ -89,8 +106,10 @@ export default function CustomTooltip({
 
           <Typography
             sx={{
-              fontSize: 15,
               color: "#fff",
+              fontSize: "15px",
+              lineHeight: 1.4,
+              fontWeight: 400,
               mb: 1.5,
             }}
           >
@@ -102,12 +121,13 @@ export default function CustomTooltip({
               width: "100%",
               height: 2,
               bgcolor: "rgba(255,255,255,.25)",
-              borderRadius: 2,
+              borderRadius: 5,
+              overflow: "hidden",
             }}
           >
             <Box
               sx={{
-                width: "70%",
+                width: "72%",
                 height: "100%",
                 bgcolor: "#00CD1F",
               }}
@@ -116,7 +136,11 @@ export default function CustomTooltip({
         </Box>
       }
     >
-      <Box display="inline-block">
+      <Box
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+        sx={{ display: "inline-flex" }}
+      >
         {children}
       </Box>
     </StyledTooltip>
