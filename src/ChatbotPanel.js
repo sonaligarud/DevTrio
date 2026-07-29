@@ -49,7 +49,7 @@ export default function ChatbotPanel({
 
       {/* Orb — top-right, overflows the frame */}
       <CustomTooltip title={
-        <>Ask anything<br />about me<br /><span style={{ color: "#00d2ff", textDecoration: "underline", cursor: "pointer" }}>clicking here</span></>
+        <>Ask anything<br />about me<br />clicking here</>
       } placement="left">
         <Box sx={{
           position: "absolute",
