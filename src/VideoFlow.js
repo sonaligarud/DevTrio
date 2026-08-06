@@ -18,19 +18,19 @@ const framePath = (i) => {
 
 const socialIcons = [
   { label: "LinkedIn", icon: "/assets/icons/lindedin.svg",
-    hoverIcon:"/assets/icons/withhover/linkedIn.svg", link: "https://www.linkedin.com" },
-  { label: "Behance", icon: "/assets/icons/behance.svg", hoverIcon:"/assets/icons/withhover/Behance.svg", link: "https://www.behance.net/pardessiaaec66" },
-  { label: "Dribbble", icon: "/assets/icons/dribble.svg", hoverIcon:"/assets/icons/withhover/Dribble.svg", link: "https://dribbble.com/pardessiaakash" },
+    hoverIcon:"/assets/icons/withhover/linkedIn.png", link: "https://www.linkedin.com" },
+  { label: "Behance", icon: "/assets/icons/behance.svg", hoverIcon:"/assets/icons/withhover/behance.png", link: "https://www.behance.net/pardessiaaec66" },
+  { label: "Dribbble", icon: "/assets/icons/dribble.svg", hoverIcon:"/assets/icons/withhover/dribble.png", link: "https://dribbble.com/pardessiaakash" },
   {
     label: "Mobile",
     icon: "/assets/icons/mobile.svg",
-    hoverIcon:"/assets/icons/withhover/Mobile.svg",
+    hoverIcon:"/assets/icons/withhover/mobile.png",
     link: "tel:+919011566393",
   },
   {
     label: "Mail",
     icon: "/assets/icons/email.svg",
-    hoverIcon:"/assets/icons/withhover/Behance.svg",
+    hoverIcon:"/assets/icons/withhover/mail.png",
     link: "mailto:pardessiaakash@gmail.com",
   },
 ];
@@ -143,13 +143,13 @@ function WelcomeScreen({ opacity }) {
             flexDirection: "column",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            borderRadius: "16px",
+            borderRadius: "20px",
             overflowY: "auto", // Allow scrolling if content doesn't fit
             "&::-webkit-scrollbar": { width: "4px" },
             "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
             p: isHalfSplit ? "42px 48px" : "60px",
             border: "1px solid transparent",
-
+            opacity: 0.95,
             background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
