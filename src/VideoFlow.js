@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
+import MobileWelcomeScreen from "./MobileWelcomeScreen";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -18,19 +19,19 @@ const framePath = (i) => {
 
 const socialIcons = [
   { label: "LinkedIn", icon: "/assets/icons/lindedin.svg",
-    hoverIcon:"/assets/icons/withhover/linkedIn.svg", link: "https://www.linkedin.com" },
-  { label: "Behance", icon: "/assets/icons/behance.svg", hoverIcon:"/assets/icons/withhover/Behance.svg", link: "https://www.behance.net/pardessiaaec66" },
-  { label: "Dribbble", icon: "/assets/icons/dribble.svg", hoverIcon:"/assets/icons/withhover/Dribble.svg", link: "https://dribbble.com/pardessiaakash" },
+    hoverIcon:"/assets/icons/withhover/linkedIn.png", link: "https://www.linkedin.com" },
+  { label: "Behance", icon: "/assets/icons/behance.svg", hoverIcon:"/assets/icons/withhover/behance.png", link: "https://www.behance.net/pardessiaaec66" },
+  { label: "Dribbble", icon: "/assets/icons/dribble.svg", hoverIcon:"/assets/icons/withhover/dribble.png", link: "https://dribbble.com/pardessiaakash" },
   {
     label: "Mobile",
     icon: "/assets/icons/mobile.svg",
-    hoverIcon:"/assets/icons/withhover/Mobile.svg",
+    hoverIcon:"/assets/icons/withhover/mobile.png",
     link: "tel:+919011566393",
   },
   {
     label: "Mail",
     icon: "/assets/icons/email.svg",
-    hoverIcon:"/assets/icons/withhover/Behance.svg",
+    hoverIcon:"/assets/icons/withhover/mail.png",
     link: "mailto:pardessiaakash@gmail.com",
   },
 ];
@@ -40,6 +41,13 @@ const socialIcons = [
 function WelcomeScreen({ opacity }) {
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "home_chatbot_width_percentage_v2", 30, 50, [30, 50]);
   const isHalfSplit = widthPercent === 50;
+  const isMobile = useMediaQuery("(max-width:768px)");
+
+  if (isMobile) {
+    return (
+      <MobileWelcomeScreen opacity={opacity} socialIcons={socialIcons} />
+    );
+  }
 
   return (
     <Box sx={{
@@ -143,13 +151,13 @@ function WelcomeScreen({ opacity }) {
             flexDirection: "column",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            borderRadius: "16px",
+            borderRadius: "20px",
             overflowY: "auto", // Allow scrolling if content doesn't fit
             "&::-webkit-scrollbar": { width: "4px" },
             "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.15)", borderRadius: "4px" },
             p: isHalfSplit ? "42px 48px" : "60px",
             border: "1px solid transparent",
-
+            opacity: 0.95,
             background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
@@ -189,16 +197,20 @@ function WelcomeScreen({ opacity }) {
 
 export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpenChatbot, introComplete }) {
   const canvasRef = useRef(null);
+  const isMobile = useMediaQuery("(max-width:768px)");
 
-  const posRef = useRef(skipIntro ? END_FRAME : 0);
-  const targetPosRef = useRef(skipIntro ? END_FRAME : 0);
+  // On mobile, skip animation entirely — always show UI at full opacity
+  const effectiveSkipIntro = skipIntro || isMobile;
+
+  const posRef = useRef(effectiveSkipIntro ? END_FRAME : 0);
+  const targetPosRef = useRef(effectiveSkipIntro ? END_FRAME : 0);
   const animIdRef = useRef(null);
   const cacheRef = useRef({});
   const lastDrawnRef = useRef(-1);
-  const uiShownRef = useRef(skipIntro ? true : false);
+  const uiShownRef = useRef(effectiveSkipIntro ? true : false);
 
   // welcome UI opacity — driven by frame position
-  const [welcomeOpacity, setWelcomeOpacity] = useState(skipIntro ? 1 : 0);
+  const [welcomeOpacity, setWelcomeOpacity] = useState(effectiveSkipIntro ? 1 : 0);
 
   // keep introComplete accessible in wheel handler via ref
   const reversingRef = useRef(false);
@@ -347,7 +359,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
     resize();
     window.addEventListener("resize", resize);
 
-    const start = skipIntro ? END_FRAME : 0;
+    const start = effectiveSkipIntro ? END_FRAME : 0;
     posRef.current = start;
     targetPosRef.current = start;
     loadAround(start, 20);
@@ -406,8 +418,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
 
 
 
-  const showScrollUpHint = welcomeOpacity >= 1;
-  const showScrollEntry = currentFrame < STOP_FRAME && !stopped;
+  const showScrollUpHint = welcomeOpacity >= 1 && !isMobile;
+  const showScrollEntry = currentFrame < STOP_FRAME && !stopped && !isMobile;
 
   return (
     <>
@@ -480,7 +492,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       {/* Scroll gif — bottom left, frame 1–5 (gif only) */}
 
       {/* Scroll gif + text — bottom left, after frame 6 until welcome UI */}
-      {currentFrame > 6 && welcomeOpacity === 0 && (
+      {currentFrame > 6 && welcomeOpacity === 0 && !isMobile && (
         <Box sx={{
           position: "fixed", bottom: 28, left: 28, zIndex: 99998,
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
