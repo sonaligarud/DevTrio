@@ -32,7 +32,7 @@ const ModalBox = styled(Box)(({ mobile }) => ({
 }));
 
 // Speech-bubble tab using SVG stroke for pixel-perfect border + curved pointer
-const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
+export const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
   const W = 156, H = 38, R = 4;
   const pw = 11, ph = 14;
   const cx = W / 2;

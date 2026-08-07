@@ -158,6 +158,7 @@ function MobileAboutTab() {
 export default function MobileWelcomeScreen({ opacity, socialIcons }) {
   const [activeTab, setActiveTab] = useState("work");
   const [mobileChatOpen, setMobileChatOpen] = useState(false);
+  const [chatTooltipDismissed, setChatTooltipDismissed] = useState(false);
 
   return (
     <Box
@@ -229,6 +230,7 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
           gap: "10px",
           mt: "14px",
           mb: "env(safe-area-inset-bottom, 8px)",
+          position: "relative",
         }}
       >
         {socialIcons.map(({ label, icon, link }) => (
@@ -294,8 +296,7 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
       <Box
         onClick={() => setMobileChatOpen((p) => !p)}
         sx={{
-          position: "fixed", right: 0, top: "50%",
-          transform: "translateY(-50%)",
+          position: "fixed", right: 0, bottom: "40px",
           width: 34, height: 96,
           background: PRIMARY,
           borderRadius: "14px 0 0 14px",
@@ -308,6 +309,36 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
           ? <ChevronRightIcon sx={{ color: "#08120a" }} />
           : <ChevronLeftIcon sx={{ color: "#08120a" }} />}
       </Box>
+
+      {/* "Click to talk with AI" tooltip bubble */}
+      {!mobileChatOpen && !chatTooltipDismissed && (
+        <Box sx={{
+          position: "fixed", right: 44, bottom: "58px",
+          zIndex: 56,
+          background: "rgba(20,24,20,0.95)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: "10px",
+          px: "12px", py: "8px",
+          display: "flex", alignItems: "center", gap: "8px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+          whiteSpace: "nowrap",
+        }}>
+          <Box sx={{ fontSize: "12px", color: "#fff", lineHeight: 1.4 }}>
+            Click to<br />talk with AI
+          </Box>
+          <Box
+            onClick={(e) => { e.stopPropagation(); setChatTooltipDismissed(true); }}
+            sx={{
+              width: 18, height: 18, borderRadius: "50%",
+              background: "rgba(255,255,255,0.12)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", flexShrink: 0,
+              fontSize: "11px", color: "rgba(255,255,255,0.7)",
+              "&:active": { background: "rgba(255,255,255,0.2)" },
+            }}
+          >✕</Box>
+        </Box>
+      )}
     </Box>
   );
 }
