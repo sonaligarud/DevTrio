@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 
 // Shared persistent audio state so all pages share the same mute toggle
 let globalAudio = null;
@@ -17,6 +17,7 @@ function getAudio() {
 
 export default function AudioButton() {
   const [muted, setMuted] = useState(globalMuted);
+  const isMobile = useMediaQuery("(max-width:768px)");
 
   // Subscribe to global state changes
   useEffect(() => {
@@ -35,6 +36,8 @@ export default function AudioButton() {
     globalMuted = !globalMuted;
     listeners.forEach((fn) => fn(globalMuted));
   };
+
+  if (isMobile) return null;
 
   return (
     <Box sx={{

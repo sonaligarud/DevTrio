@@ -125,7 +125,7 @@ const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
   );
 });
 
-const ExpCard = styled(Box)({
+export const ExpCard = styled(Box)({
   background: "rgba(255,255,255,0.04)",
   border: "1px solid rgba(255,255,255,0.09)",
   borderRadius: "12px",
@@ -136,7 +136,7 @@ const ExpCard = styled(Box)({
   "&:hover": { border: `1px solid ${primaryAlpha(0.35)}` },
 });
 
-const CertCard = styled(Box)({
+export const CertCard = styled(Box)({
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
@@ -151,7 +151,7 @@ const CertCard = styled(Box)({
 });
 
 /* ── Data ── */
-const experiences = [
+export const experiences = [
   { company: "Publicis Sapient", role: "Art Director", period: "2022 – Present" },
   { company: "Evonix", role: "Art Director", period: "2019 – 2022" },
   { company: "Creative Studio", role: "Project Manager", period: "2018 – 2019" },
@@ -160,7 +160,7 @@ const experiences = [
 ];
 
 
-const ICON_MAP = {
+export const ICON_MAP = {
   "UI/UX": "/assets/icons/UX.svg",
   "Social Media": "/assets/icons/social-media.svg",
   "Video": "/assets/icons/Video.svg",
@@ -170,7 +170,7 @@ const ICON_MAP = {
   "XR": "/assets/icons/XR.svg",
 };
 
-const DEFAULT_WORK_CATEGORIES = [
+export const DEFAULT_WORK_CATEGORIES = [
   { label: "UI/UX", icon: "/assets/icons/UX.svg" },
   { label: "Social Media", icon: "/assets/icons/social-media.svg" },
   { label: "Video", icon: "/assets/icons/Video.svg" },
@@ -178,7 +178,7 @@ const DEFAULT_WORK_CATEGORIES = [
 ];
 
 /* ── Category card with exact Figma SVG shape ── */
-function CategoryCard({ cat, onClick, compact }) {
+export function CategoryCard({ cat, onClick, compact }) {
   const [hovered, setHovered] = useState(false);
   const safeId = cat.label.replace(/\s+/g, "-");
 

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import { AboutMeContent } from "./AboutMe";
 import AudioButton from "./AudioButton";
 import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
+import MobileWelcomeScreen from "./MobileWelcomeScreen";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -40,6 +41,13 @@ const socialIcons = [
 function WelcomeScreen({ opacity }) {
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "home_chatbot_width_percentage_v2", 30, 50, [30, 50]);
   const isHalfSplit = widthPercent === 50;
+  const isMobile = useMediaQuery("(max-width:768px)");
+
+  if (isMobile) {
+    return (
+      <MobileWelcomeScreen opacity={opacity} socialIcons={socialIcons} />
+    );
+  }
 
   return (
     <Box sx={{
@@ -189,16 +197,20 @@ function WelcomeScreen({ opacity }) {
 
 export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpenChatbot, introComplete }) {
   const canvasRef = useRef(null);
+  const isMobile = useMediaQuery("(max-width:768px)");
 
-  const posRef = useRef(skipIntro ? END_FRAME : 0);
-  const targetPosRef = useRef(skipIntro ? END_FRAME : 0);
+  // On mobile, skip animation entirely — always show UI at full opacity
+  const effectiveSkipIntro = skipIntro || isMobile;
+
+  const posRef = useRef(effectiveSkipIntro ? END_FRAME : 0);
+  const targetPosRef = useRef(effectiveSkipIntro ? END_FRAME : 0);
   const animIdRef = useRef(null);
   const cacheRef = useRef({});
   const lastDrawnRef = useRef(-1);
-  const uiShownRef = useRef(skipIntro ? true : false);
+  const uiShownRef = useRef(effectiveSkipIntro ? true : false);
 
   // welcome UI opacity — driven by frame position
-  const [welcomeOpacity, setWelcomeOpacity] = useState(skipIntro ? 1 : 0);
+  const [welcomeOpacity, setWelcomeOpacity] = useState(effectiveSkipIntro ? 1 : 0);
 
   // keep introComplete accessible in wheel handler via ref
   const reversingRef = useRef(false);
@@ -347,7 +359,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
     resize();
     window.addEventListener("resize", resize);
 
-    const start = skipIntro ? END_FRAME : 0;
+    const start = effectiveSkipIntro ? END_FRAME : 0;
     posRef.current = start;
     targetPosRef.current = start;
     loadAround(start, 20);
@@ -406,8 +418,8 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
 
 
 
-  const showScrollUpHint = welcomeOpacity >= 1;
-  const showScrollEntry = currentFrame < STOP_FRAME && !stopped;
+  const showScrollUpHint = welcomeOpacity >= 1 && !isMobile;
+  const showScrollEntry = currentFrame < STOP_FRAME && !stopped && !isMobile;
 
   return (
     <>
@@ -480,7 +492,7 @@ export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpen
       {/* Scroll gif — bottom left, frame 1–5 (gif only) */}
 
       {/* Scroll gif + text — bottom left, after frame 6 until welcome UI */}
-      {currentFrame > 6 && welcomeOpacity === 0 && (
+      {currentFrame > 6 && welcomeOpacity === 0 && !isMobile && (
         <Box sx={{
           position: "fixed", bottom: 28, left: 28, zIndex: 99998,
           display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
