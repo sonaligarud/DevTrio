@@ -33,6 +33,7 @@ export default function ProjectDetailPage() {
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "project_chatbot_width_percentage_v2", 30, 50, [30, 50]);
 
   const [mobileChatOpen, setMobileChatOpen] = useState(false);
+  const [chatTooltipDismissed, setChatTooltipDismissed] = useState(false);
   const [mobileRotated, setMobileRotated] = useState(false);
 
   const [mainTabs, setMainTabs] = useState(() => PORTFOLIO_TABS.map((tab) => ({
@@ -378,8 +379,7 @@ export default function ProjectDetailPage() {
             <Box
               onClick={() => setMobileChatOpen((p) => !p)}
               sx={{
-                position: "fixed", right: 0, top: "50%",
-                transform: "translateY(-50%)",
+                position: "fixed", right: 0, bottom: "150px",
                 width: 34, height: 96,
                 background: PRIMARY,
                 borderRadius: "14px 0 0 14px",
@@ -393,7 +393,36 @@ export default function ProjectDetailPage() {
                 ? <ChevronRightIcon sx={{ color: "#08120a" }} />
                 : <ChevronLeftIcon sx={{ color: "#08120a" }} />}
             </Box>
-          </>
+
+            {/* "Click to talk with AI" tooltip bubble */}
+            {!mobileChatOpen && !chatTooltipDismissed && (
+              <Box sx={{
+                position: "fixed", right: 44, bottom: "168px",
+                zIndex: 56,
+                background: "rgba(20,24,20,0.95)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: "10px",
+                px: "12px", py: "8px",
+                display: "flex", alignItems: "center", gap: "8px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                whiteSpace: "nowrap",
+              }}>
+                <Box sx={{ fontSize: "12px", color: "#fff", lineHeight: 1.4 }}>
+                  Click to<br />talk with AI
+                </Box>
+                <Box
+                  onClick={(e) => { e.stopPropagation(); setChatTooltipDismissed(true); }}
+                  sx={{
+                    width: 18, height: 18, borderRadius: "50%",
+                    background: "rgba(255,255,255,0.12)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", flexShrink: 0,
+                    fontSize: "11px", color: "rgba(255,255,255,0.7)",
+                    "&:active": { background: "rgba(255,255,255,0.2)" },
+                  }}
+                >✕</Box>
+              </Box>
+            )}          </>
         )}
       </Box>
 
