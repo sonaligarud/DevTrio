@@ -6,6 +6,7 @@ import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 import MobileWelcomeScreen from "./MobileWelcomeScreen";
+import AnimatedTooltip from "./AnimatedTooltip";
 
 const STOP_FRAME = 10;
 const STOP_FRAME_END = 20;
@@ -42,6 +43,13 @@ function WelcomeScreen({ opacity }) {
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "home_chatbot_width_percentage_v2", 30, 50, [30, 50]);
   const isHalfSplit = widthPercent === 50;
   const isMobile = useMediaQuery("(max-width:768px)");
+
+  // Desktop-only onboarding hints — one pointing at the assistant avatar,
+  // one pointing at the chat input. Both self-dismiss (progress bar) or
+  // can be closed manually; AnimatedTooltip also no-ops on mobile itself,
+  // this state just avoids re-showing them once dismissed.
+  const [showAvatarHint, setShowAvatarHint] = useState(true);
+  const [showInputHint, setShowInputHint] = useState(true);
 
   if (isMobile) {
     return (
@@ -187,6 +195,29 @@ function WelcomeScreen({ opacity }) {
           <ChatbotPanel
             chips={["View Case Study", "How I Design", "Start Chat"]}
             wrapperSx={{ height: "100%" }}
+          />
+
+          {/* Hint: points up-right at the assistant avatar in the top-right corner.
+              Nudge the top/right offsets to line up with the avatar's real
+              position once it's rendered (it visually floats above this panel). */}
+          <Box sx={{ position: "absolute", top: "-28%", right: "65%", zIndex: 50 }}>
+            <AnimatedTooltip
+              text={"Ask anything\nabout me\nclicking here"}
+              curve="down-right"
+              visible={showAvatarHint}
+              onDismiss={() => setShowAvatarHint(false)}
+            />
+          </Box>
+        </Box>
+
+        {/* Hint: points up-right at the chat input, anchored near the bottom
+            of the left panel like in the reference screenshot. */}
+        <Box sx={{ position: "absolute", left: "2%", bottom: -138, zIndex: 50 }}>
+          <AnimatedTooltip
+            text={"Ask anything\nabout me\nclicking here"}
+            curve="up-right"
+            visible={showInputHint}
+            onDismiss={() => setShowInputHint(false)}
           />
         </Box>
 
