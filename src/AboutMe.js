@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Modal, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, Modal, useMediaQuery, useTheme, Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -81,17 +81,21 @@ export const Tab = React.forwardRef(({ active, onClick, children }, ref) => {
             <stop stopColor="#292929" />
             <stop offset="1" stopColor="#222222" />
           </linearGradient>
+          {/* Active border: diagonal green glow from top-right corner to
+              bottom-left corner, grey through the middle — matches the
+              reference screenshot and the same corner-glow pattern used
+              elsewhere in the app (social pill, panel borders, etc). */}
           <linearGradient
             id="active-tab-border"
-            x1="6%"
-            y1="0%"
-            x2="100%"
-            y2="20%"
+            x1="100%"
+            y1="10%"
+            x2="0%"
+            y2="100%"
           >
-            <stop offset="0%" stop-color="#00CD1F" />
+            <stop offset="6%" stop-color="#00CD1F" />
             <stop offset="6%" stop-color="#8C8C8C" />
             <stop offset="95%" stop-color="#8C8C8C" />
-            <stop offset="100%" stop-color="#00CD1F" />
+            <stop offset="10%" stop-color="#00CD1F" />
           </linearGradient>
           <filter id="active-tab-glow" x="-20%" y="-25%" width="140%" height="180%">
             <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#00CD1F" floodOpacity="0.24" />
@@ -441,10 +445,13 @@ function AboutMeContent({ onClose, mobile, inline, compact = false }) {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: "4px" }}>
-          <Tab active={activeTab === "work" ? 1 : 0} onClick={() => setActiveTab("work")}>
+          <CustomTooltip title="View My Work" placement="top">
+             <Tab active={activeTab === "work" ? 1 : 0} onClick={() => setActiveTab("work")}>
             Work
           </Tab>
-          <CustomTooltip title="click to see about me" placement="top">
+          </CustomTooltip>
+         
+          <CustomTooltip title="View About Me" placement="top">
             <Tab active={activeTab === "about" ? 1 : 0} onClick={() => setActiveTab("about")}>
               About Me
             </Tab>

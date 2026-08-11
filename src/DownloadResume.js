@@ -30,7 +30,7 @@ const buttonStyles = {
 function DownloadResume({ sx }) {
   return (
     <CustomTooltip
-      title={<>You can download the resume by clicking here</>}
+      title={<>Click to Download</>}
       placement="top"
     >
       <Button

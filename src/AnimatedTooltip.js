@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Box, Typography, useMediaQuery } from "@mui/material";
-
+import { Box, IconButton, Typography, useMediaQuery } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 /**
  * AnimatedTooltip
  * ----------------
@@ -80,17 +80,17 @@ export default function AnimatedTooltip({
       <Box
         sx={{
           position: "relative",
-          borderRadius: "14px",
-          p: "14px 30px 12px 16px",
-          background: "rgba(20,22,20,0.85)",
+          borderRadius: "24px",
+          p: "14px 25px",
+          background: "linear-gradient(135deg, #1a1d1a 0%, #0d0f0d 100%)",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03)",
           animation: "tooltipPopIn 0.35s ease",
         }}
       >
-        <Box
+        {/* <Box
           component="button"
           aria-label="Dismiss hint"
           onClick={dismiss}
@@ -114,15 +114,41 @@ export default function AnimatedTooltip({
           }}
         >
           ×
-        </Box>
+        </Box> */}
+         <IconButton
+            size="small"
+             aria-label="Dismiss hint"
+              onClick={dismiss}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              width: 18,
+              height: 18,
+              bgcolor: "#343838",
+              color: "#fff",
+              border: "1px solid rgba(0,255,120,.35)",
+
+              "&:hover": {
+                bgcolor: "#404444",
+              },
+
+              "& svg": {
+                fontSize: 14,
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
 
         <Typography
           sx={{
-            color: "#fff",
+            color: "rgba(255,255,255,0.9)",
             fontSize: "14px",
-            fontWeight: 600,
-            lineHeight: 1.4,
+            fontWeight: 500,
+            lineHeight: 1.5,
             whiteSpace: "pre-line",
+            letterSpacing: "0.02em",
           }}
         >
           {text}

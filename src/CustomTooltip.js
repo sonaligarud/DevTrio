@@ -4,42 +4,37 @@ import { styled } from "@mui/material/styles";
 import {
   Box,
   Typography,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip
     {...props}
     arrow
     classes={{ popper: className }}
+     PopperProps={{
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, -12],
+          },
+        },
+      ],
+    }}
   />
 ))(() => ({
   [`& .${tooltipClasses.tooltip}`]: {
-    background:
-      "linear-gradient(180deg, #303534 0%, #202323 100%)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "14px",
-    padding: "14px",
-    maxWidth: 210,
-    boxShadow: "0 18px 45px rgba(0,0,0,.55)",
+    background: "linear-gradient(135deg, #1a1d1a 0%, #0d0f0d 100%)",
+    border: "1px solid rgba(255,255,255,0.05)",
+    borderRadius: "10px",
+    padding: "6px 12px",
+    maxWidth: "auto",
+    boxShadow: "0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.03)",
     position: "relative",
     overflow: "visible",
   },
-
-  [`& .${tooltipClasses.arrow}`]: {
-    color: "#202323",
-  },
-
-  [`& .${tooltipClasses.tooltip}::after`]: {
-    content: '""',
-    position: "absolute",
-    bottom: "-6px",
-    left: "24px",
-    width: "28px",
-    height: "10px",
-    background: "#202323",
-    clipPath: "polygon(0 0,100% 0,82% 100%,18% 100%)",
+  "& .MuiTooltip-arrow": {
+    display: "none",
   },
 }));
 
@@ -75,64 +70,18 @@ export default function CustomTooltip({
         },
       }}
       title={
-        <Box sx={{ position: "relative", pr: 3 }}>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen(false);
-            }}
-            sx={{
-              position: "absolute",
-              top: -8,
-              right: -8,
-              width: 24,
-              height: 24,
-              bgcolor: "#343838",
-              color: "#fff",
-              border: "1px solid rgba(0,255,120,.35)",
-
-              "&:hover": {
-                bgcolor: "#404444",
-              },
-
-              "& svg": {
-                fontSize: 14,
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-
+        <Box sx={{ position: "relative" }}>
           <Typography
             sx={{
-              color: "#fff",
-              fontSize: "15px",
-              lineHeight: 1.4,
-              fontWeight: 400,
-              mb: 1.5,
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "13px",
+              lineHeight: 1.5,
+              fontWeight: 500,
+              letterSpacing: "0.02em",
             }}
           >
             {title}
           </Typography>
-
-          <Box
-            sx={{
-              width: "100%",
-              height: 2,
-              bgcolor: "rgba(255,255,255,.25)",
-              borderRadius: 5,
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                width: "72%",
-                height: "100%",
-                bgcolor: "#00CD1F",
-              }}
-            />
-          </Box>
         </Box>
       }
     >

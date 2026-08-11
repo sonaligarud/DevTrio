@@ -8,6 +8,7 @@ import ChatbotPanel from "./ChatbotPanel";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 import { fetchCategories, fetchProjects } from "./api/chatApi";
+import CustomTooltip from "./CustomTooltip";
 
 const PRIMARY = "#00CD1F";
 
@@ -132,7 +133,8 @@ export default function ProjectDetailPage() {
         zIndex: 2,
       }}>
         {/* Back Button */}
-        <Box onClick={() => navigate("/")} sx={{
+         <CustomTooltip title="Back to Home" placement="top">
+            <Box onClick={() => navigate("/")} sx={{
           display: "flex", alignItems: "center", justifyContent: "center",
           width: 32, height: 32,
           cursor: "pointer",
@@ -145,6 +147,8 @@ export default function ProjectDetailPage() {
         }}>
           <img src="/assets/icons/home.png" alt="Home" />
         </Box>
+         </CustomTooltip>
+      
         <Box sx={{
           display: "flex",
           gap: "0px",
@@ -282,13 +286,13 @@ export default function ProjectDetailPage() {
                 <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
                   {/* AI icon — desktop only */}
                   {!isMobile && (
-                    <Tooltip title="Ask To AI" placement="left">
-                      <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
-                    </Tooltip>
+                       <CustomTooltip title="Ask To AI" placement="top">
+                         <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
+                       </CustomTooltip>
                   )}
                   {/* Rotate icon — mobile only */}
                   {isMobile && (
-                    <Tooltip title="Rotate" placement="left">
+                    <Tooltip title="Rotate" placement="top">
                       <Box
                         onClick={toggleRotate}
                         sx={{
@@ -311,9 +315,9 @@ export default function ProjectDetailPage() {
                       </Box>
                     </Tooltip>
                   )}
-                  <Tooltip title="Maximize" placement="left" onClick={openLightbox}>
-                    <Box component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
-                  </Tooltip>
+                  <CustomTooltip title="Maximize" placement="top">
+                    <Box onClick={openLightbox} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
+                  </CustomTooltip>
                 </Box>
               </Box>
             </Box>
@@ -454,7 +458,8 @@ export default function ProjectDetailPage() {
             <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
               <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined, right: isMobile ? 0 : 10 }} />
             </IconButton>
-            <Tooltip title="Minimize" placement="left">
+            
+            <CustomTooltip title="Minimize" placement="top">
               <Box
                 component="img"
                 src="/assets/icons/minimize.png"
@@ -462,7 +467,7 @@ export default function ProjectDetailPage() {
                 onClick={() => setLightboxOpen(false)}
                 sx={{ position: "absolute", bottom: 10, right: 10, zIndex: 2, cursor: "pointer" }}
               />
-            </Tooltip>
+            </CustomTooltip>
           </Box>
           <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
             {slides.map((_, i) => (
