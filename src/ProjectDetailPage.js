@@ -448,15 +448,15 @@ export default function ProjectDetailPage() {
             `,
             boxShadow: "0 0 2px rgba(0,255,133,.25), inset 0 0 1px rgba(255,255,255,.05)",
           }}>
-            <IconButton onClick={lbPrev} sx={{ position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined, left: isMobile ? 0 : 10 }} />
+            <IconButton onClick={lbPrev} sx={{ position: "absolute", top: "50%",left:"0px", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined }} />
             </IconButton>
             <Box sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
               <img src={slides[lightboxIndex]} alt={`slide ${lightboxIndex + 1}`}
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
-            <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined, right: isMobile ? 0 : 10 }} />
+            <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", right:"0px",transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined}} />
             </IconButton>
             
             <CustomTooltip title="Minimize" placement="top">
