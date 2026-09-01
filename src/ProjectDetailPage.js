@@ -29,7 +29,7 @@ const orbVideos = [
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
   const { category: urlCategory } = useParams();
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
 
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "project_chatbot_width_percentage_v2", 30, 50, [30, 50]);
 
@@ -267,77 +267,110 @@ export default function ProjectDetailPage() {
 
           {/* SLIDER */}
           <Box sx={{ position: "relative", flex: 1, display: "flex", alignItems: "center", px: { xs: 0.5, md: 1 }, minHeight: 0 }}>
-            <IconButton onClick={prev} sx={{ position: "absolute", left: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined }} />
-            </IconButton>
+            {/* Desktop: Show slider with navigation */}
+            {!isMobile && (
+              <>
+                <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
+                  <img src="/assets/icons/right.svg" alt="prev" />
+                </IconButton>
 
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 0, height: "100%" }}>
-              <Box sx={{
-                flex: "0 0 100%",
-                position: "relative",
-                transform: isMobile && mobileRotated ? "rotate(90deg) scale(0.75)" : "none",
-                transition: "transform 0.4s ease-in-out",
-              }}>
-                <img
-                  src={slides[slideIndex]}
-                  alt={`slide ${slideIndex + 1}`}
-                  style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
-                />
-                <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
-                  {/* AI icon — desktop only */}
-                  {!isMobile && (
-                       <CustomTooltip title="Ask To AI" placement="top">
-                         <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
-                       </CustomTooltip>
-                  )}
-                  {/* Rotate icon — mobile only */}
-                  {isMobile && (
-                    <Tooltip title="Rotate" placement="top">
-                      <Box
-                        onClick={toggleRotate}
-                        sx={{
-                          width: 36, height: 36,
-                          borderRadius: "50%",
-                          background: "rgba(0,0,0,0.65)",
-                          border: `1.5px solid ${PRIMARY}`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          cursor: "pointer",
-                          transition: "background 0.2s",
-                          "&:hover": { background: "rgba(0,205,31,0.15)" },
-                        }}
-                      >
-                        <ScreenRotationIcon sx={{
-                          color: PRIMARY,
-                          fontSize: 20,
-                          transform: mobileRotated ? "rotate(90deg)" : "none",
-                          transition: "transform 0.4s",
-                        }} />
-                      </Box>
-                    </Tooltip>
-                  )}
-                  <CustomTooltip title="Maximize" placement="top">
-                    <Box onClick={openLightbox} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
-                  </CustomTooltip>
+                <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 0, height: "100%" }}>
+                  <Box sx={{
+                    flex: "0 0 100%",
+                    position: "relative",
+                  }}>
+                    <img
+                      src={slides[slideIndex]}
+                      alt={`slide ${slideIndex + 1}`}
+                      style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
+                    />
+                    <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
+                      {/* AI icon — desktop only */}
+                      <CustomTooltip title="Ask To AI" placement="top">
+                        <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
+                      </CustomTooltip>
+                      <CustomTooltip title="Maximize" placement="top">
+                        <Box onClick={openLightbox} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
+                      </CustomTooltip>
+                    </Box>
+                  </Box>
                 </Box>
+
+                <IconButton onClick={next} sx={{ position: "absolute", right: 8, zIndex: 2, p: 0 }}>
+                  <img src="/assets/icons/left.svg" alt="next" />
+                </IconButton>
+              </>
+            )}
+
+            {/* Mobile: Show all images stacked vertically */}
+            {isMobile && (
+              <Box sx={{ 
+                width: "100%", 
+                height: "100%", 
+                overflowY: "auto", 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 2,
+                px: 1,
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-thumb": { background: "rgba(0,205,31,0.4)", borderRadius: "2px" },
+              }}>
+                {slides.map((slide, index) => (
+                  <Box key={index} sx={{ position: "relative", flexShrink: 0 }}>
+                    <img
+                      src={slide}
+                      alt={`slide ${index + 1}`}
+                      style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
+                    />
+                    <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
+                      {/* Rotate icon — mobile only (COMMENTED OUT) */}
+                      {/* {isMobile && (
+                        <Tooltip title="Rotate" placement="top">
+                          <Box
+                            onClick={toggleRotate}
+                            sx={{
+                              width: 36, height: 36,
+                              borderRadius: "50%",
+                              background: "rgba(0,0,0,0.65)",
+                              border: `1.5px solid ${PRIMARY}`,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              cursor: "pointer",
+                              transition: "background 0.2s",
+                              "&:hover": { background: "rgba(0,205,31,0.15)" },
+                            }}
+                          >
+                            <ScreenRotationIcon sx={{
+                              color: PRIMARY,
+                              fontSize: 20,
+                              transform: mobileRotated ? "rotate(90deg)" : "none",
+                              transition: "transform 0.4s",
+                            }} />
+                          </Box>
+                        </Tooltip>
+                      )} */}
+                      <CustomTooltip title="Maximize" placement="top">
+                        <Box onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
+                      </CustomTooltip>
+                    </Box>
+                  </Box>
+                ))}
               </Box>
+            )}
+          </Box>
+
+          {/* DOTS - Desktop only */}
+          {!isMobile && (
+            <Box sx={{ display: "flex", gap: 1, py:4, justifyContent: "center", flexShrink: 0 }}>
+              {slides.map((_, i) => (
+                <Box key={i} onClick={() => setSlideIndex(i)} sx={{
+                  width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
+                  transition: "all 0.3s",
+                  background: i === slideIndex ? PRIMARY : "transparent",
+                  border: i === slideIndex ? `2px solid ${PRIMARY}` : "2px solid #555",
+                }} />
+              ))}
             </Box>
-
-            <IconButton onClick={next} sx={{ position: "absolute", right: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined }} />
-            </IconButton>
-          </Box>
-
-          {/* DOTS */}
-          <Box sx={{ display: "flex", gap: 1, py:4, justifyContent: "center", flexShrink: 0 }}>
-            {slides.map((_, i) => (
-              <Box key={i} onClick={() => setSlideIndex(i)} sx={{
-                width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
-                transition: "all 0.3s",
-                background: i === slideIndex ? PRIMARY : "transparent",
-                border: i === slideIndex ? `2px solid ${PRIMARY}` : "2px solid #555",
-              }} />
-            ))}
-          </Box>
+          )}
         </Box>
 
         {/* DESKTOP: resizable chatbot */}

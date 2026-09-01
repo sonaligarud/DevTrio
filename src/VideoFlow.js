@@ -42,7 +42,7 @@ const socialIcons = [
 function WelcomeScreen({ opacity }) {
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "home_chatbot_width_percentage_v2", 30, 50, [30, 50]);
   const isHalfSplit = widthPercent === 50;
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
 
   // Desktop-only onboarding hints — one pointing at the assistant avatar,
   // one pointing at the chat input. Both self-dismiss (progress bar) or
@@ -228,7 +228,7 @@ function WelcomeScreen({ opacity }) {
 
 export default function VideoFlow({ onComplete, onFrameChange, skipIntro, onOpenChatbot, introComplete }) {
   const canvasRef = useRef(null);
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
 
   // On mobile, skip animation entirely — always show UI at full opacity
   const effectiveSkipIntro = skipIntro || isMobile;
