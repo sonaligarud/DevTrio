@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, InputBase, IconButton, CircularProgress } from "@mui/material";
+import { Box, Typography, InputBase, IconButton, CircularProgress, useMediaQuery } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
 import CustomTooltip from "./CustomTooltip";
@@ -25,6 +25,7 @@ export default function ChatbotPanel({
   chips = ["View Case Study", "How I Design", "Start Chat"],
   wrapperSx = {},
 }) {
+  const isMobile = useMediaQuery("(max-width:1024px)")
   const { messages, isLoading, sendMessage, messagesEndRef } = useChatContext();
   const [inputValue, setInputValue] = useState("");
 
@@ -47,26 +48,28 @@ export default function ChatbotPanel({
     /* Outer wrapper — position:relative so orb can overflow */
     <Box sx={{ position: "relative", display: "flex", flexDirection: "column", height: "100%", ...wrapperSx }}>
 
-      {/* Orb — top-right, overflows the frame */}
-      <CustomTooltip title={
-        <>Ask anything<br />about me<br />clicking here</>
-      } placement="left">
-        <Box sx={{
-          position: "absolute",
-          top: -44, right: -44,
-          width: 110, height: 110,
-          borderRadius: "50%",
-          background: "rgba(0,0,0,0.6)",
-          border: "1.5px solid rgba(0,255,150,0.3)",
-          boxShadow: "0 0 32px rgba(0,255,150,0.2), inset 0 0 20px rgba(0,255,150,0.07)",
-          overflow: "hidden",
-          zIndex: 20,
-          flexShrink: 0,
-        }}>
-          <video key={orb} src={orb} autoPlay loop muted playsInline
-            style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
-        </Box>
-      </CustomTooltip>
+      {/* Orb — top-right, overflows the frame (Desktop only) */}
+      {!isMobile && (
+        <CustomTooltip title={
+          <>Ask anything<br />about me<br />clicking here</>
+        } placement="left">
+          <Box sx={{
+            position: "absolute",
+            top: -44, right: -44,
+            width: 110, height: 110,
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.6)",
+            border: "1.5px solid rgba(0,255,150,0.3)",
+            boxShadow: "0 0 32px rgba(0,255,150,0.2), inset 0 0 20px rgba(0,255,150,0.07)",
+            overflow: "hidden",
+            zIndex: 20,
+            flexShrink: 0,
+          }}>
+            <video key={orb} src={orb} autoPlay loop muted playsInline
+              style={{ width: "160%", height: "160%", objectFit: "cover", mixBlendMode: "screen", marginLeft: "-30%", marginTop: "-30%" }} />
+          </Box>
+        </CustomTooltip>
+      )}
 
       {/* HUD frame + content */}
       <Box sx={{
@@ -81,11 +84,11 @@ export default function ChatbotPanel({
         zIndex: 1,
         transform: "translateZ(0)", // Force compositing so maskImage properly clips the scrolling child
     
-        clipPath: "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+        clipPath: isMobile ? "none" : "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
         
-        // This mask cuts a perfect circle out of the top right corner to hug the orb
-        maskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
-        WebkitMaskImage: "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
+        // This mask cuts a perfect circle out of the top right corner to hug the orb (Desktop only)
+        maskImage: isMobile ? "none" : "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
+        WebkitMaskImage: isMobile ? "none" : "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
         
       border: "1px solid transparent",
 
@@ -105,7 +108,8 @@ export default function ChatbotPanel({
           onWheel={(e) => e.stopPropagation()}
           sx={{
           flex: 1, overflowY: "auto",
-          pt: "75px", px: "20px", pb: "8px", // Increased pt to 75px so messages start below the orb
+          pt: isMobile ? "20px" : "75px", // Adjusted pt for mobile (no orb) vs desktop (orb present)
+          px: "20px", pb: "8px",
           "&::-webkit-scrollbar": { width: "3px" },
           "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
           textAlign:"left"
