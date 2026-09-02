@@ -148,16 +148,82 @@ export default function ProjectDetailPage() {
           <img src="/assets/icons/home.png" alt="Home" />
         </Box>
          </CustomTooltip>
-      
+
         <Box sx={{
           display: "flex",
-          gap: "0px",
+          gap: { xs: "10px", md: "0px" },
           overflowX: { xs: "auto", md: "visible" },
           "&::-webkit-scrollbar": { display: "none" },
           scrollbarWidth: "none",
         }}>
           {mainTabs.map((tab, i) => {
             const isActive = mainTab === i;
+
+            // ---- MOBILE: speech-bubble tabs — pure CSS (border-radius + clip-path), no SVG ----
+            if (isMobile) {
+              return (
+                <Box
+                  key={i}
+                  onClick={() => navigate(`/portfolio/${encodeURIComponent(tab.label)}`)}
+                  sx={{
+                    position: "relative",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                    mb: "14px", // reserve space below for the tail
+                  }}
+                >
+                  {/* Shape layer: rounded pill body */}
+                  <Box
+                    sx={{
+                      borderRadius: isActive ? "6px" :"1px",
+                      background: isActive ? PRIMARY : "rgba(30,30,30,0.92)",
+                      border: "none",
+                      boxShadow: isActive
+                        ? "0 6px 10px rgba(0,205,31,0.45)"
+                        : "0 2px 4px rgba(0,0,0,0.35)",
+                      px: "18px",
+                      pt: "10px",
+                      pb: "10px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        fontSize: "13px",
+                        fontWeight: isActive ? 700 : 500,
+                        whiteSpace: "nowrap",
+                        textAlign: "center",
+                        userSelect: "none",
+                        color: isActive ? "#080808" : "rgba(255,255,255,0.78)",
+                        transition: "color 0.2s",
+                      }}
+                    >
+                      {tab.label}
+                    </Box>
+                  </Box>
+
+                  {/* Tail layer: small square rotated 45deg, centered under the pill */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: "-6px",
+                      left: "50%",
+                      transform: "translateX(-50%) rotate(45deg)",
+                      width: "14px",
+                      height: "14px",
+                      borderRadius: "1px",
+                      background: isActive ? PRIMARY : "",
+                      border: "none",
+                      borderTop: "none",
+                      borderLeft: "none",
+                      zIndex: -1,
+                    }}
+                  />
+                </Box>
+              );
+            }
+
+            // ---- DESKTOP: original overlapping chevron tabs (unchanged) ----
             const CLIP = "polygon(24px 0%, calc(100% - 24px) 0%, 100% 100%, 0% 100%)";
             return (
               <Box
@@ -248,20 +314,39 @@ export default function ProjectDetailPage() {
               <Box sx={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", p: 1 }}>No projects found for this category.</Box>
             )}
             {projects.map((proj, i) => (
-              <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
-                borderRadius: "8px", cursor: "pointer",
-                padding: { xs: "9px 18px", md: "10px 30px" },
-                fontSize: "13px", fontWeight: 500,
-                flexShrink: 0,
-                whiteSpace: "nowrap",
-                color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
-                border: subTab === i ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
-                background: subTab === i
-                  ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
-                     linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
-                  : "rgba(255,255,255,0.02)",
-                transition: "all 0.2s",
-              }}>{proj.title}</Box>
+              <Box key={i} sx={{ position: "relative", flexShrink: 0, mb: { xs: isMobile && subTab === i ? "6px" : 0, md: 0 } }}>
+                <Box onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
+                  borderRadius: "8px", cursor: "pointer",
+                  padding: { xs: "9px 18px", md: "10px 30px" },
+                  fontSize: "13px", fontWeight: 500,
+                  flexShrink: 0,
+                  whiteSpace: "nowrap",
+                  color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
+                  border: subTab === i ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
+                  background: subTab === i
+                    ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+                       linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
+                    : "rgba(255,255,255,0.02)",
+                  transition: "all 0.2s",
+                }}>{proj.title}</Box>
+
+                {/* Bottom pill — mobile only, active sub-tab only */}
+                {isMobile && subTab === i && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: "-6px",
+                      left: "50%",
+                      transform: "translateX(-50%) rotate(45deg)",
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "1px",
+                      background: PRIMARY,
+                      zIndex: -1,
+                    }}
+                  />
+                )}
+              </Box>
             ))}
           </Box>
 
