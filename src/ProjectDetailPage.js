@@ -9,6 +9,7 @@ import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 import { fetchCategories, fetchProjects } from "./api/chatApi";
 import CustomTooltip from "./CustomTooltip";
+import { Tab } from "./AboutMe";
 
 const PRIMARY = "#00CD1F";
 
@@ -313,41 +314,42 @@ export default function ProjectDetailPage() {
             {!loading && projects.length === 0 && (
               <Box sx={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", p: 1 }}>No projects found for this category.</Box>
             )}
-            {projects.map((proj, i) => (
-              <Box key={i} sx={{ position: "relative", flexShrink: 0, mb: { xs: isMobile && subTab === i ? "6px" : 0, md: 0 } }}>
-                <Box onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
-                  borderRadius: "8px", cursor: "pointer",
-                  padding: { xs: "9px 18px", md: "10px 30px" },
-                  fontSize: "13px", fontWeight: 500,
-                  flexShrink: 0,
-                  whiteSpace: "nowrap",
-                  color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
-                  border: subTab === i ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
-                  background: subTab === i
-                    ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
-                       linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
-                    : "rgba(255,255,255,0.02)",
-                  transition: "all 0.2s",
-                }}>{proj.title}</Box>
-
-                {/* Bottom pill — mobile only, active sub-tab only */}
-                {isMobile && subTab === i && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      bottom: "-6px",
-                      left: "50%",
-                      transform: "translateX(-50%) rotate(45deg)",
-                      width: "10px",
-                      height: "10px",
-                      borderRadius: "1px",
-                      background: PRIMARY,
-                      zIndex: -1,
-                    }}
-                  />
-                )}
-              </Box>
-            ))}
+            {projects.map((proj, i) => {
+              const isActive = subTab === i;
+              
+              // Mobile: use AboutMe Tab component (SVG speech bubble)
+              if (isMobile) {
+                return (
+                  <Tab
+                    key={i}
+                    active={isActive ? 1 : 0}
+                    onClick={() => { setSubTab(i); setSlideIndex(0); }}
+                  >
+                    {proj.title}
+                  </Tab>
+                );
+              }
+              
+              // Desktop: keep original style
+              return (
+                <Box key={i} sx={{ position: "relative", flexShrink: 0 }}>
+                  <Box onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
+                    borderRadius: "8px", cursor: "pointer",
+                    padding: "10px 30px",
+                    fontSize: "13px", fontWeight: 500,
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
+                    color: isActive ? PRIMARY : "rgba(255,255,255,0.4)",
+                    border: isActive ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
+                    background: isActive
+                      ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+                         linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
+                      : "rgba(255,255,255,0.02)",
+                    transition: "all 0.2s",
+                  }}>{proj.title}</Box>
+                </Box>
+              );
+            })}
           </Box>
 
           {/* SLIDER */}
