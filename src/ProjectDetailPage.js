@@ -492,7 +492,7 @@ export default function ProjectDetailPage() {
               zIndex: 50, p: "12px",
               boxSizing: "border-box",
               transform: mobileChatOpen ? "translateX(0)" : "translateX(100%)",
-              transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+              transition: "transform 0.90s cubic-bezier(0.4, 0, 0.2, 1)",
             }}>
               <ChatbotPanel
                 orb={orb}
@@ -510,7 +510,7 @@ export default function ProjectDetailPage() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", zIndex: 55,
                 boxShadow: "0 0 18px rgba(0,205,31,0.5)",
-                transition: "right 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "right 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
               {mobileChatOpen

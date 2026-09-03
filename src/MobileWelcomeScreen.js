@@ -284,7 +284,7 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
         zIndex: 50, p: "12px",
         boxSizing: "border-box",
         transform: mobileChatOpen ? "translateX(0)" : "translateX(100%)",
-        transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "transform 0.90s cubic-bezier(0.4, 0, 0.2, 1)",
       }}>
         <ChatbotPanel
           chips={["View Case Study", "How I Design", "Start Chat"]}
