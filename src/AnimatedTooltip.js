@@ -7,7 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
  * Small "hint" bubble with:
  *  - a curved, dashed arrow that draws itself in and points at a target element
  *  - a green progress-bar underline that fills over `duration` ms, then auto-dismisses
- *  - desktop-only (hidden below 768px, matching the app's existing breakpoint)
+ *  - desktop-only (hidden below 1024px, matching the app's existing breakpoint)
  *
  * Usage (absolute-position it relative to a positioned ancestor near your target):
  *
@@ -31,7 +31,7 @@ export default function AnimatedTooltip({
   curve = "down-right",
   width = 220,
 }) {
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
   const [closing, setClosing] = useState(false);
   const timerRef = useRef(null);
   const uid = useId().replace(/:/g, "");

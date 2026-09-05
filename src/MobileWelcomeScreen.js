@@ -71,7 +71,7 @@ function MobileWorkTab() {
           mt: "30px",
         }}
       >
-       Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966.
+        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966.
       </Typography>
       <Box sx={{ mt: "30px" }}>
         <DownloadResume />
@@ -209,11 +209,9 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
           <Tab active={activeTab === "work" ? 1 : 0} onClick={() => setActiveTab("work")}>
             Work
           </Tab>
-          <CustomTooltip title="click to see about me" placement="top">
-            <Tab active={activeTab === "about" ? 1 : 0} onClick={() => setActiveTab("about")}>
-              About Me
-            </Tab>
-          </CustomTooltip>
+          <Tab active={activeTab === "about" ? 1 : 0} onClick={() => setActiveTab("about")}>
+            About Me
+          </Tab>
         </Box>
 
         {/* Tab content */}
@@ -223,14 +221,22 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
       </Box>
 
       {/* Social icons row */}
+      <Box sx={{
+          position: "relative"}}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
+          alignItems: "center",
           gap: "10px",
-          mt: "14px",
-          mb: "env(safe-area-inset-bottom, 8px)",
-          position: "relative",
+          position: "absolute",
+          borderRadius: "20px",
+          border: "1px solid transparent",
+          background:
+            "linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box, linear-gradient(11deg, #00CD1F 0%, #8C8C8C 6%, #8C8C8C 95%, #00CD1F 100%) border-box",
+          padding: "10px 30px",
+    left: "13%",
+    top: "-35px"
         }}
       >
         {socialIcons.map(({ label, icon, link }) => (
@@ -243,24 +249,21 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
             sx={{
               width: 44,
               height: 44,
-              borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               textDecoration: "none",
-              background: "rgba(255,255,255,0.04)",
-              "&:active": { background: primaryAlpha(0.12) },
             }}
           >
             <Box
               component="img"
               src={icon}
               alt={label}
-              sx={{ width: 20, height: 20, filter: "brightness(0) invert(0.7)" }}
+              sx={{ width: 48, height: 48, filter: "brightness(0) invert(0.7)" }}
             />
           </Box>
         ))}
+      </Box>
       </Box>
 
       {/* ── Chatbot drawer (same as ProjectDetailPage) ── */}
@@ -284,7 +287,7 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
         zIndex: 50, p: "12px",
         boxSizing: "border-box",
         transform: mobileChatOpen ? "translateX(0)" : "translateX(100%)",
-        transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: "transform 0.90s cubic-bezier(0.4, 0, 0.2, 1)",
       }}>
         <ChatbotPanel
           chips={["View Case Study", "How I Design", "Start Chat"]}

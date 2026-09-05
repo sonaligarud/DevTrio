@@ -9,6 +9,7 @@ import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 import { fetchCategories, fetchProjects } from "./api/chatApi";
 import CustomTooltip from "./CustomTooltip";
+import { Tab } from "./AboutMe";
 
 const PRIMARY = "#00CD1F";
 
@@ -29,7 +30,7 @@ const orbVideos = [
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
   const { category: urlCategory } = useParams();
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
 
   const { widthPercent, isDragging, handleMouseDown, containerRef } = useResizableChatbot(30, "project_chatbot_width_percentage_v2", 30, 50, [30, 50]);
 
@@ -148,16 +149,82 @@ export default function ProjectDetailPage() {
           <img src="/assets/icons/home.png" alt="Home" />
         </Box>
          </CustomTooltip>
-      
+
         <Box sx={{
           display: "flex",
-          gap: "0px",
+          gap: { xs: "10px", md: "0px" },
           overflowX: { xs: "auto", md: "visible" },
           "&::-webkit-scrollbar": { display: "none" },
           scrollbarWidth: "none",
         }}>
           {mainTabs.map((tab, i) => {
             const isActive = mainTab === i;
+
+            // ---- MOBILE: speech-bubble tabs — pure CSS (border-radius + clip-path), no SVG ----
+            if (isMobile) {
+              return (
+                <Box
+                  key={i}
+                  onClick={() => navigate(`/portfolio/${encodeURIComponent(tab.label)}`)}
+                  sx={{
+                    position: "relative",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                    mb: "14px", // reserve space below for the tail
+                  }}
+                >
+                  {/* Shape layer: rounded pill body */}
+                  <Box
+                    sx={{
+                      borderRadius: isActive ? "6px" :"1px",
+                      background: isActive ? PRIMARY : "rgba(30,30,30,0.92)",
+                      border: "none",
+                      boxShadow: isActive
+                        ? "0 6px 10px rgba(0,205,31,0.45)"
+                        : "0 2px 4px rgba(0,0,0,0.35)",
+                      px: "18px",
+                      pt: "10px",
+                      pb: "10px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        fontSize: "13px",
+                        fontWeight: isActive ? 700 : 500,
+                        whiteSpace: "nowrap",
+                        textAlign: "center",
+                        userSelect: "none",
+                        color: isActive ? "#080808" : "rgba(255,255,255,0.78)",
+                        transition: "color 0.2s",
+                      }}
+                    >
+                      {tab.label}
+                    </Box>
+                  </Box>
+
+                  {/* Tail layer: small square rotated 45deg, centered under the pill */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: "-6px",
+                      left: "50%",
+                      transform: "translateX(-50%) rotate(45deg)",
+                      width: "14px",
+                      height: "14px",
+                      borderRadius: "1px",
+                      background: isActive ? PRIMARY : "",
+                      border: "none",
+                      borderTop: "none",
+                      borderLeft: "none",
+                      zIndex: -1,
+                    }}
+                  />
+                </Box>
+              );
+            }
+
+            // ---- DESKTOP: original overlapping chevron tabs (unchanged) ----
             const CLIP = "polygon(24px 0%, calc(100% - 24px) 0%, 100% 100%, 0% 100%)";
             return (
               <Box
@@ -247,97 +314,150 @@ export default function ProjectDetailPage() {
             {!loading && projects.length === 0 && (
               <Box sx={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", p: 1 }}>No projects found for this category.</Box>
             )}
-            {projects.map((proj, i) => (
-              <Box key={i} onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
-                borderRadius: "8px", cursor: "pointer",
-                padding: { xs: "9px 18px", md: "10px 30px" },
-                fontSize: "13px", fontWeight: 500,
-                flexShrink: 0,
-                whiteSpace: "nowrap",
-                color: subTab === i ? PRIMARY : "rgba(255,255,255,0.4)",
-                border: subTab === i ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
-                background: subTab === i
-                  ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
-                     linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
-                  : "rgba(255,255,255,0.02)",
-                transition: "all 0.2s",
-              }}>{proj.title}</Box>
-            ))}
+            {projects.map((proj, i) => {
+              const isActive = subTab === i;
+              
+              // Mobile: use AboutMe Tab component (SVG speech bubble)
+              if (isMobile) {
+                return (
+                  <Tab
+                    key={i}
+                    active={isActive ? 1 : 0}
+                    onClick={() => { setSubTab(i); setSlideIndex(0); }}
+                  >
+                    {proj.title}
+                  </Tab>
+                );
+              }
+              
+              // Desktop: keep original style
+              return (
+                <Box key={i} sx={{ position: "relative", flexShrink: 0 }}>
+                  <Box onClick={() => { setSubTab(i); setSlideIndex(0); }} sx={{
+                    borderRadius: "8px", cursor: "pointer",
+                    padding: "10px 30px",
+                    fontSize: "13px", fontWeight: 500,
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
+                    color: isActive ? PRIMARY : "rgba(255,255,255,0.4)",
+                    border: isActive ? "1px solid transparent" : "1px solid rgba(255,255,255,0.08)",
+                    background: isActive
+                      ? `linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
+                         linear-gradient(11deg, #00CD1F 0%, #8C8C8C 16%, #8C8C8C 85%, #00CD1F 100%) border-box`
+                      : "rgba(255,255,255,0.02)",
+                    transition: "all 0.2s",
+                  }}>{proj.title}</Box>
+                </Box>
+              );
+            })}
           </Box>
 
           {/* SLIDER */}
           <Box sx={{ position: "relative", flex: 1, display: "flex", alignItems: "center", px: { xs: 0.5, md: 1 }, minHeight: 0 }}>
-            <IconButton onClick={prev} sx={{ position: "absolute", left: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined }} />
-            </IconButton>
+            {/* Desktop: Show slider with navigation */}
+            {!isMobile && (
+              <>
+                <IconButton onClick={prev} sx={{ position: "absolute", left: 8, zIndex: 2, p: 0 }}>
+                  <img src="/assets/icons/right.svg" alt="prev" />
+                </IconButton>
 
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 0, height: "100%" }}>
-              <Box sx={{
-                flex: "0 0 100%",
-                position: "relative",
-                transform: isMobile && mobileRotated ? "rotate(90deg) scale(0.75)" : "none",
-                transition: "transform 0.4s ease-in-out",
-              }}>
-                <img
-                  src={slides[slideIndex]}
-                  alt={`slide ${slideIndex + 1}`}
-                  style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
-                />
-                <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
-                  {/* AI icon — desktop only */}
-                  {!isMobile && (
-                       <CustomTooltip title="Ask To AI" placement="top">
-                         <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
-                       </CustomTooltip>
-                  )}
-                  {/* Rotate icon — mobile only */}
-                  {isMobile && (
-                    <Tooltip title="Rotate" placement="top">
-                      <Box
-                        onClick={toggleRotate}
-                        sx={{
-                          width: 36, height: 36,
-                          borderRadius: "50%",
-                          background: "rgba(0,0,0,0.65)",
-                          border: `1.5px solid ${PRIMARY}`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          cursor: "pointer",
-                          transition: "background 0.2s",
-                          "&:hover": { background: "rgba(0,205,31,0.15)" },
-                        }}
-                      >
-                        <ScreenRotationIcon sx={{
-                          color: PRIMARY,
-                          fontSize: 20,
-                          transform: mobileRotated ? "rotate(90deg)" : "none",
-                          transition: "transform 0.4s",
-                        }} />
-                      </Box>
-                    </Tooltip>
-                  )}
-                  <CustomTooltip title="Maximize" placement="top">
-                    <Box onClick={openLightbox} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
-                  </CustomTooltip>
+                <Box sx={{ flex: 1, display: "flex", alignItems: "center", p: 0, height: "100%" }}>
+                  <Box sx={{
+                    flex: "0 0 100%",
+                    position: "relative",
+                  }}>
+                    <img
+                      src={slides[slideIndex]}
+                      alt={`slide ${slideIndex + 1}`}
+                      style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
+                    />
+                    <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
+                      {/* AI icon — desktop only */}
+                      <CustomTooltip title="Ask To AI" placement="top">
+                        <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "40px" }} />
+                      </CustomTooltip>
+                      <CustomTooltip title="Maximize" placement="top">
+                        <Box onClick={openLightbox} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
+                      </CustomTooltip>
+                    </Box>
+                  </Box>
                 </Box>
+
+                <IconButton onClick={next} sx={{ position: "absolute", right: 8, zIndex: 2, p: 0 }}>
+                  <img src="/assets/icons/left.svg" alt="next" />
+                </IconButton>
+              </>
+            )}
+
+            {/* Mobile: Show all images stacked vertically */}
+            {isMobile && (
+              <Box sx={{ 
+                width: "100%", 
+                height: "100%", 
+                overflowY: "auto", 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 2,
+                px: 1,
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-thumb": { background: "rgba(0,205,31,0.4)", borderRadius: "2px" },
+              }}>
+                {slides.map((slide, index) => (
+                  <Box key={index} sx={{ position: "relative", flexShrink: 0 }}>
+                    <img
+                      src={slide}
+                      alt={`slide ${index + 1}`}
+                      style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
+                    />
+                    <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
+                      {/* Rotate icon — mobile only (COMMENTED OUT) */}
+                      {/* {isMobile && (
+                        <Tooltip title="Rotate" placement="top">
+                          <Box
+                            onClick={toggleRotate}
+                            sx={{
+                              width: 36, height: 36,
+                              borderRadius: "50%",
+                              background: "rgba(0,0,0,0.65)",
+                              border: `1.5px solid ${PRIMARY}`,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              cursor: "pointer",
+                              transition: "background 0.2s",
+                              "&:hover": { background: "rgba(0,205,31,0.15)" },
+                            }}
+                          >
+                            <ScreenRotationIcon sx={{
+                              color: PRIMARY,
+                              fontSize: 20,
+                              transform: mobileRotated ? "rotate(90deg)" : "none",
+                              transition: "transform 0.4s",
+                            }} />
+                          </Box>
+                        </Tooltip>
+                      )} */}
+                      <CustomTooltip title="Maximize" placement="top">
+                        <Box onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer" }} />
+                      </CustomTooltip>
+                    </Box>
+                  </Box>
+                ))}
               </Box>
+            )}
+          </Box>
+
+          {/* DOTS - Desktop only */}
+          {!isMobile && (
+            <Box sx={{ display: "flex", gap: 1, py:4, justifyContent: "center", flexShrink: 0 }}>
+              {slides.map((_, i) => (
+                <Box key={i} onClick={() => setSlideIndex(i)} sx={{
+                  width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
+                  transition: "all 0.3s",
+                  background: i === slideIndex ? PRIMARY : "transparent",
+                  border: i === slideIndex ? `2px solid ${PRIMARY}` : "2px solid #555",
+                }} />
+              ))}
             </Box>
-
-            <IconButton onClick={next} sx={{ position: "absolute", right: { xs: 2, md: 8 }, zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined }} />
-            </IconButton>
-          </Box>
-
-          {/* DOTS */}
-          <Box sx={{ display: "flex", gap: 1, py:4, justifyContent: "center", flexShrink: 0 }}>
-            {slides.map((_, i) => (
-              <Box key={i} onClick={() => setSlideIndex(i)} sx={{
-                width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
-                transition: "all 0.3s",
-                background: i === slideIndex ? PRIMARY : "transparent",
-                border: i === slideIndex ? `2px solid ${PRIMARY}` : "2px solid #555",
-              }} />
-            ))}
-          </Box>
+          )}
         </Box>
 
         {/* DESKTOP: resizable chatbot */}
@@ -372,7 +492,7 @@ export default function ProjectDetailPage() {
               zIndex: 50, p: "12px",
               boxSizing: "border-box",
               transform: mobileChatOpen ? "translateX(0)" : "translateX(100%)",
-              transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+              transition: "transform 0.90s cubic-bezier(0.4, 0, 0.2, 1)",
             }}>
               <ChatbotPanel
                 orb={orb}
@@ -390,7 +510,7 @@ export default function ProjectDetailPage() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", zIndex: 55,
                 boxShadow: "0 0 18px rgba(0,205,31,0.5)",
-                transition: "right 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "right 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
               {mobileChatOpen

@@ -17,7 +17,7 @@ function getAudio() {
 
 export default function AudioButton() {
   const [muted, setMuted] = useState(globalMuted);
-  const isMobile = useMediaQuery("(max-width:768px)");
+  const isMobile = useMediaQuery("(max-width:1024px)");
 
   // Subscribe to global state changes
   useEffect(() => {
