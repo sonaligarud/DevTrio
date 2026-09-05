@@ -220,23 +220,23 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
         </Box>
       </Box>
 
-      {/* Social icons row */}
-      <Box sx={{
-          position: "relative"}}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           gap: "10px",
-          position: "absolute",
           borderRadius: "20px",
           border: "1px solid transparent",
           background:
             "linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box, linear-gradient(11deg, #00CD1F 0%, #8C8C8C 6%, #8C8C8C 95%, #00CD1F 100%) border-box",
           padding: "10px 30px",
-    left: "13%",
-    top: "-35px"
+          mt: "-35px",       // pulls it up to overlap the card, same visual as before
+          mx: "auto",        // centers it horizontally
+          width: "fit-content",
+          position: "relative",
+          zIndex: 10,        // stays above the card's bottom edge
+          flexShrink: 0,     // don't let flex column squash it
         }}
       >
         {socialIcons.map(({ label, icon, link }) => (
@@ -249,23 +249,23 @@ export default function MobileWelcomeScreen({ opacity, socialIcons }) {
             sx={{
               width: 44,
               height: 44,
+              borderRadius: "50%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               textDecoration: "none",
+              flexShrink: 0,
             }}
           >
             <Box
               component="img"
               src={icon}
               alt={label}
-              sx={{ width: 48, height: 48, filter: "brightness(0) invert(0.7)" }}
+              sx={{ width: 45, height: 45, filter: "brightness(0) invert(0.85)" }}
             />
           </Box>
         ))}
       </Box>
-      </Box>
-
       {/* ── Chatbot drawer (same as ProjectDetailPage) ── */}
       {/* Backdrop */}
       <Box
