@@ -59,12 +59,6 @@ const CategoryTab = styled(Box)(({ active }) => ({
   "&:hover": { color: active ? "#00CD1F" : "#888" },
 }));
 
-const ActiveTabLine = styled(Box)({
-  height: "2px",
-  background: "linear-gradient(90deg, transparent 14px, #00CD1F calc(14px), #00CD1F calc(100% - 14px), transparent calc(100% - 14px))",
-  position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 4, pointerEvents: "none",
-});
-
 const CategoryCard = styled(Box)({
   background: "rgba(255,255,255,0.05)",
   border: "1px solid rgba(255,255,255,0.1)",

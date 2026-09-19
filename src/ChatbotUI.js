@@ -204,7 +204,7 @@ export default function ChatbotUI({ onClose }) {
         }
     };
 
-    const { isListening, interimText, error: speechError, toggleListening, isProcessing } = useSpeech({
+    const { isListening, interimText, toggleListening, isProcessing } = useSpeech({
         onTranscript: (text) => {
             setInputValue((prev) => (prev ? prev + " " + text : text));
         },

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography, useMediaQuery } from "@mui/material";
 
 // Shared persistent audio state so all pages share the same mute toggle

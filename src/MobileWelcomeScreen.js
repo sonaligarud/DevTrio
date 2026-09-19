@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Box, tableBodyClasses, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { PRIMARY, primaryAlpha } from "./theme";
+import { PRIMARY} from "./theme";
 import {
   Tab,
   ExpCard,
@@ -15,7 +15,6 @@ import {
 } from "./AboutMe";
 import { fetchCategories } from "./api/chatApi";
 import DownloadResume from "./DownloadResume";
-import CustomTooltip from "./CustomTooltip";
 import ChatbotPanel from "./ChatbotPanel";
 
 /* ── Work tab ── */

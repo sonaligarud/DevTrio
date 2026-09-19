@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, IconButton, Tooltip, useMediaQuery } from "@mui/material";
+import { Box, IconButton,useMediaQuery } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ScreenRotationIcon from "@mui/icons-material/ScreenRotation";
 import ChatbotPanel from "./ChatbotPanel";
 import { useChatContext } from "./ChatContext";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
@@ -62,7 +61,6 @@ export default function ProjectDetailPage() {
 
   const [mobileChatOpen, setMobileChatOpen] = useState(false);
   const [chatTooltipDismissed, setChatTooltipDismissed] = useState(false);
-  const [mobileRotated, setMobileRotated] = useState(false);
 
   const [mainTabs, setMainTabs] = useState(() => PORTFOLIO_TABS.map((tab) => ({
     ...tab,
@@ -149,7 +147,6 @@ export default function ProjectDetailPage() {
   const lbNext = () => setLightboxIndex((p) => (p + 1) % slides.length);
   const lbPrev = () => setLightboxIndex((p) => (p === 0 ? slides.length - 1 : p - 1));
   const openLightbox = () => { setLightboxIndex(slideIndex); setLightboxOpen(true); };
-  const toggleRotate = () => setMobileRotated((p) => !p);
 
   const handleAskAI = (index = slideIndex) => {
     if (index >= 0 && index < SLIDE_PROMPTS.length) {
