@@ -5,6 +5,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ScreenRotationIcon from "@mui/icons-material/ScreenRotation";
 import ChatbotPanel from "./ChatbotPanel";
+import { useChatContext } from "./ChatContext";
 import { useResizableChatbot } from "./hooks/useResizableChatbot";
 import ResizeHandle from "./ResizeHandle";
 import { fetchCategories, fetchProjects } from "./api/chatApi";
@@ -25,6 +26,31 @@ const orbVideos = [
   "/assets/orb/Listening State.mp4",
   "/assets/orb/Searching State.mp4",
   "/assets/orb/Speaking State.mp4",
+];
+
+const SLIDE_PROMPTS = [
+  `Project Scope & Requirements\nNova: "I can explain the project scope, summarize the key requirements, or walk you through the goals and constraints."`,
+  `Competitor SWOT Analysis\nNova: "I can explain the competitor SWOT analysis, summarize the key market insights, or walk you through the opportunities identified for SwiftConnect."`,
+  `The "SwiftConnect" Opportunity\nNova: "I can explain the SwiftConnect opportunity, summarize the user and business gaps, or walk you through the opportunity behind the solution."`,
+  `User Research & Synthesis\nNova: "I can explain the user research, summarize the key insights, or walk you through how the findings shaped the design direction."`,
+  `Survey Questions (Quantitative) – Report\nNova: "I can explain the survey results, summarize the key data-driven insights, or walk you through how the findings influenced the design."`,
+  `Stakeholder & Admin Interviews – Qualitative\nNova: "I can explain the interview findings, summarize the key qualitative insights, or walk you through how stakeholder needs shaped the product direction."`,
+  `Top Pain Points (Ranking)\nNova: "I can explain the top pain points, summarize their impact, or walk you through how they were prioritized."`,
+  `Actionable Observations\nNova: "I can explain the key observations, summarize the most important findings, or walk you through how they became design opportunities."`,
+  `Sample Demographics & Behavior\nNova: "I can explain the user demographics, summarize the key behavioral patterns, or walk you through what these insights mean for the product."`,
+  `Problem Statement\nNova: "I can explain the core problem, summarize who it affects, or walk you through why solving it matters."`,
+  `Affinity Mapping\nNova: "I can explain the affinity mapping process, summarize the key themes, or walk you through how research data was grouped into insights."`,
+  `Empathy Map: The Support Agent (Peak Season)\nNova: "I can explain the Support Agent empathy map, summarize their key needs and frustrations, or walk you through their peak-season experience."`,
+  `User Personas\nNova: "I can introduce the user personas, summarize their goals and frustrations, or walk you through how they influenced the design."`,
+  `Support Agent Journey Map\nNova: "I can explain the Support Agent journey, summarize the key pain points, or walk you through the opportunities identified at each stage."`,
+  `Information Architecture\nNova: "I can explain the Information Architecture, summarize the content structure, or walk you through how it helps users find information."`,
+  `User Task Flow\nNova: "I can explain the user task flow, summarize the key steps, or walk you through how users complete their primary task."`,
+  `Phase 1: Initial High-Fidelity Iteration (Pre-Usability Testing)\nNova: "I can explain the initial high-fidelity design, summarize the key UX decisions, or walk you through the thinking behind this iteration."`,
+  `Usability Testing Data Report\nNova: "I can explain the usability testing results, summarize the key findings, or walk you through what was improved based on user feedback."`,
+  `Colours\nNova: "I can explain the colour system, summarize the visual decisions, or walk you through how colour supports hierarchy and accessibility."`,
+  `Typography\nNova: "I can explain the typography system, summarize the type choices, or walk you through how typography supports readability and hierarchy."`,
+  `Space & Radius\nNova: "I can explain the spacing and radius system, summarize the visual rules, or walk you through how they create consistency across the interface."`,
+  `Final High-Fidelity Solution (Validated & Optimized)\nNova: "I can explain the final solution, summarize the key improvements, or walk you through how research and testing shaped the final experience."`
 ];
 
 export default function ProjectDetailPage() {
@@ -49,6 +75,7 @@ export default function ProjectDetailPage() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [requestedAIInput, setRequestedAIInput] = useState(null);
 
   useEffect(() => {
     fetchCategories().then(data => {
@@ -95,8 +122,25 @@ export default function ProjectDetailPage() {
 
   const activeProject = projects[subTab] || null;
   const slides = activeProject && activeProject.slides && activeProject.slides.length > 0
-      ? activeProject.slides
-      : ["/assets/images/projects/swift/1.jpg"]; // fallback
+    ? activeProject.slides
+    : ["/assets/images/projects/swift/1.jpg"]; // fallback
+
+  const { setMode, setProjectId } = useChatContext();
+
+  useEffect(() => {
+    if (activeProject && activeProject.id) {
+      setMode("web");
+      setProjectId(String(activeProject.id));
+    } else {
+      setMode("ai");
+      setProjectId("");
+    }
+
+    return () => {
+      setMode("ai");
+      setProjectId("");
+    };
+  }, [activeProject, setMode, setProjectId]);
 
   const orb = orbVideos[mainTab % orbVideos.length];
 
@@ -106,6 +150,20 @@ export default function ProjectDetailPage() {
   const lbPrev = () => setLightboxIndex((p) => (p === 0 ? slides.length - 1 : p - 1));
   const openLightbox = () => { setLightboxIndex(slideIndex); setLightboxOpen(true); };
   const toggleRotate = () => setMobileRotated((p) => !p);
+
+  const handleAskAI = (index = slideIndex) => {
+    if (index >= 0 && index < SLIDE_PROMPTS.length) {
+      const rawPrompt = SLIDE_PROMPTS[index];
+      // Extract only the topic title (the part before the newline/Nova: description)
+      // and form a clean question so the intent classifier routes it correctly.
+      const topicTitle = rawPrompt.split('\n')[0].trim();
+      const cleanQuestion = `Tell me about the ${topicTitle} for this project.`;
+      setRequestedAIInput({ text: cleanQuestion, timestamp: Date.now() });
+      if (isMobile) {
+        setMobileChatOpen(true);
+      }
+    }
+  };
 
   return (
     <Box sx={{
@@ -134,21 +192,21 @@ export default function ProjectDetailPage() {
         zIndex: 2,
       }}>
         {/* Back Button */}
-         <CustomTooltip title="Back to Home" placement="top">
-            <Box onClick={() => navigate("/")} sx={{
-          display: "flex", alignItems: "center", justifyContent: "center",
-          width: 32, height: 32,
-          cursor: "pointer",
-          borderRadius: "8px",
-          background: "rgba(255,255,255,0.02)",
-          color: "rgba(255,255,255,0.6)",
-          transition: "all 0.2s ease-in-out",
-          padding: "25px",
-          flexShrink: 0,
-        }}>
-          <img src="/assets/icons/home.png" alt="Home" />
-        </Box>
-         </CustomTooltip>
+        <CustomTooltip title="Back to Home" placement="top">
+          <Box onClick={() => navigate("/")} sx={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            width: 32, height: 32,
+            cursor: "pointer",
+            borderRadius: "8px",
+            background: "rgba(255,255,255,0.02)",
+            color: "rgba(255,255,255,0.6)",
+            transition: "all 0.2s ease-in-out",
+            padding: "25px",
+            flexShrink: 0,
+          }}>
+            <img src="/assets/icons/home.png" alt="Home" />
+          </Box>
+        </CustomTooltip>
 
         <Box sx={{
           display: "flex",
@@ -176,7 +234,7 @@ export default function ProjectDetailPage() {
                   {/* Shape layer: rounded pill body */}
                   <Box
                     sx={{
-                      borderRadius: isActive ? "6px" :"1px",
+                      borderRadius: isActive ? "6px" : "1px",
                       background: isActive ? PRIMARY : "rgba(30,30,30,0.92)",
                       border: "none",
                       boxShadow: isActive
@@ -297,7 +355,7 @@ export default function ProjectDetailPage() {
           borderRadius: "20px",
           overflow: "hidden",
           minHeight: 0,
-          opacity:0.95
+          opacity: 0.95
         }}>
 
           {/* SUB TABS */}
@@ -316,7 +374,7 @@ export default function ProjectDetailPage() {
             )}
             {projects.map((proj, i) => {
               const isActive = subTab === i;
-              
+
               // Mobile: use AboutMe Tab component (SVG speech bubble)
               if (isMobile) {
                 return (
@@ -329,7 +387,7 @@ export default function ProjectDetailPage() {
                   </Tab>
                 );
               }
-              
+
               // Desktop: keep original style
               return (
                 <Box key={i} sx={{ position: "relative", flexShrink: 0 }}>
@@ -374,7 +432,7 @@ export default function ProjectDetailPage() {
                     <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
                       {/* AI icon — desktop only */}
                       <CustomTooltip title="Ask To AI" placement="top">
-                        <Box component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer",marginLeft:"12px" }} />
+                        <Box onClick={() => handleAskAI(slideIndex)} component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", marginLeft: "12px", width: "40px" }} />
                       </CustomTooltip>
                       <CustomTooltip title="Maximize" placement="top">
                         <Box onClick={openLightbox} component="img" src="/assets/icons/extend.png" alt="Maximize" sx={{ cursor: "pointer"}} />
@@ -391,12 +449,12 @@ export default function ProjectDetailPage() {
 
             {/* Mobile: Show all images stacked vertically */}
             {isMobile && (
-              <Box sx={{ 
-                width: "100%", 
-                height: "100%", 
-                overflowY: "auto", 
-                display: "flex", 
-                flexDirection: "column", 
+              <Box sx={{
+                width: "100%",
+                height: "100%",
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
                 gap: 2,
                 px: 1,
                 "&::-webkit-scrollbar": { width: "4px" },
@@ -410,31 +468,10 @@ export default function ProjectDetailPage() {
                       style={{ width: "100%", display: "block", borderRadius: "12px", objectFit: "contain" }}
                     />
                     <Box sx={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", gap: "6px", zIndex: 3 }}>
-                      {/* Rotate icon — mobile only (COMMENTED OUT) */}
-                      {/* {isMobile && (
-                        <Tooltip title="Rotate" placement="top">
-                          <Box
-                            onClick={toggleRotate}
-                            sx={{
-                              width: 36, height: 36,
-                              borderRadius: "50%",
-                              background: "rgba(0,0,0,0.65)",
-                              border: `1.5px solid ${PRIMARY}`,
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              cursor: "pointer",
-                              transition: "background 0.2s",
-                              "&:hover": { background: "rgba(0,205,31,0.15)" },
-                            }}
-                          >
-                            <ScreenRotationIcon sx={{
-                              color: PRIMARY,
-                              fontSize: 20,
-                              transform: mobileRotated ? "rotate(90deg)" : "none",
-                              transition: "transform 0.4s",
-                            }} />
-                          </Box>
-                        </Tooltip>
-                      )} */}
+                      <CustomTooltip title="Ask To AI" placement="top">
+                        <Box onClick={() => handleAskAI(index)} component="img" src="/assets/icons/AI.png" alt="Ask To AI" sx={{ cursor: "pointer", width: "36px" }} />
+                      </CustomTooltip>
+
                       <CustomTooltip title="Maximize" placement="top">
                         <Box onClick={() => { setLightboxIndex(index); setLightboxOpen(true); }} component="img" src="/assets/images/extend.svg" alt="Maximize" sx={{ cursor: "pointer", width: "40px" }} />
                       </CustomTooltip>
@@ -447,7 +484,7 @@ export default function ProjectDetailPage() {
 
           {/* DOTS - Desktop only */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 1, py:4, justifyContent: "center", flexShrink: 0 }}>
+            <Box sx={{ display: "flex", gap: 1, py: 4, justifyContent: "center", flexShrink: 0 }}>
               {slides.map((_, i) => (
                 <Box key={i} onClick={() => setSlideIndex(i)} sx={{
                   width: 10, height: 10, borderRadius: "50%", cursor: "pointer",
@@ -468,6 +505,7 @@ export default function ProjectDetailPage() {
               orb={orb}
               chips={["View Case Study", "About Akash"]}
               wrapperSx={{ width: `${widthPercent}%`, flexShrink: 0, minWidth: 0, height: "100%" }}
+              requestedInput={requestedAIInput}
             />
           </>
         )}
@@ -498,6 +536,7 @@ export default function ProjectDetailPage() {
                 orb={orb}
                 chips={["View Case Study", "About Akash"]}
                 wrapperSx={{ width: "100%", height: "100%" }}
+                requestedInput={requestedAIInput}
               />
             </Box>
             <Box
@@ -568,16 +607,17 @@ export default function ProjectDetailPage() {
             `,
             boxShadow: "0 0 2px rgba(0,255,133,.25), inset 0 0 1px rgba(255,255,255,.05)",
           }}>
-            <IconButton onClick={lbPrev} sx={{ position: "absolute", top: "50%",left:"0px", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+            <IconButton onClick={lbPrev} sx={{ position: "absolute", top: "50%", left: "0px", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
               <img src="/assets/icons/right.svg" alt="prev" style={{ width: isMobile ? 50 : undefined }} />
             </IconButton>
             <Box sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
               <img src={slides[lightboxIndex]} alt={`slide ${lightboxIndex + 1}`}
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
             </Box>
-            <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", right:"0px",transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
-              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined}} />
+            <IconButton onClick={lbNext} sx={{ position: "absolute", top: "50%", right: "0px", transform: "translateY(-50%)", zIndex: 2, p: 0 }}>
+              <img src="/assets/icons/left.svg" alt="next" style={{ width: isMobile ? 50 : undefined }} />
             </IconButton>
+            <CustomTooltip title="Minimize" placement="top">
               <Box
                 component="img"
                 src="/assets/icons/minimize.png"
@@ -585,6 +625,7 @@ export default function ProjectDetailPage() {
                 onClick={() => setLightboxOpen(false)}
                 sx={{ position: "absolute", bottom: 10, right: 10, zIndex: 2, cursor: "pointer" }}
               />
+            </CustomTooltip>
           </Box>
           <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
             {slides.map((_, i) => (

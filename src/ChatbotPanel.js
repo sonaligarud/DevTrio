@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, InputBase, IconButton, CircularProgress, useMediaQuery } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MicIcon from "@mui/icons-material/Mic";
@@ -24,10 +24,17 @@ export default function ChatbotPanel({
   hudBg = "/assets/images/hud/portfolio-chantbot.svg",
   chips = ["View Case Study", "How I Design", "Start Chat"],
   wrapperSx = {},
+  requestedInput = null,
 }) {
   const isMobile = useMediaQuery("(max-width:1024px)")
   const { messages, isLoading, sendMessage, messagesEndRef } = useChatContext();
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (requestedInput?.text) {
+      setInputValue(requestedInput.text);
+    }
+  }, [requestedInput]);
 
   const handleSend = () => {
     if (inputValue.trim()) { sendMessage(inputValue); setInputValue(""); }
@@ -78,21 +85,21 @@ export default function ChatbotPanel({
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderRadius: "20px",
-         opacity:0.95,
+        opacity: 0.95,
         overflow: "hidden",
         position: "relative",
         zIndex: 1,
         transform: "translateZ(0)", // Force compositing so maskImage properly clips the scrolling child
-    
+
         clipPath: isMobile ? "none" : "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-        
+
         // This mask cuts a perfect circle out of the top right corner to hug the orb (Desktop only)
         maskImage: isMobile ? "none" : "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
         WebkitMaskImage: isMobile ? "none" : "radial-gradient(circle at calc(100% - 11px) 11px, transparent 61px, black 61.5px)",
-        
-      border: "1px solid transparent",
 
-    background: `
+        border: "1px solid transparent",
+
+        background: `
       linear-gradient(50deg, #0A0A0A 0%, #1B1B1B 100%) padding-box,
       linear-gradient(
         11deg,
@@ -104,16 +111,16 @@ export default function ChatbotPanel({
     `,
       }}>
         {/* Messages area */}
-        <Box 
+        <Box
           onWheel={(e) => e.stopPropagation()}
           sx={{
-          flex: 1, overflowY: "auto",
-          pt: isMobile ? "20px" : "75px", // Adjusted pt for mobile (no orb) vs desktop (orb present)
-          px: "20px", pb: "8px",
-          "&::-webkit-scrollbar": { width: "3px" },
-          "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
-          textAlign:"left"
-        }}>
+            flex: 1, overflowY: "auto",
+            pt: isMobile ? "20px" : "75px", // Adjusted pt for mobile (no orb) vs desktop (orb present)
+            px: "20px", pb: "8px",
+            "&::-webkit-scrollbar": { width: "3px" },
+            "&::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.1)", borderRadius: "2px" },
+            textAlign: "left"
+          }}>
           {messages.length === 0 ? (
             /* Greeting bubble */
             <Box sx={{
@@ -168,7 +175,7 @@ export default function ChatbotPanel({
         {/* Input bar */}
         <Box sx={{ px: "15px", pb: "20px", pt: "10px" }}>
           <Box sx={{
-            display: "flex", alignItems: "center", gap: "9px",
+            display: "flex", alignItems: "flex-end", gap: "9px",
             minHeight: "54px",
             boxSizing: "border-box",
             background: "rgba(61, 76, 75, 0.92)",
@@ -176,16 +183,29 @@ export default function ChatbotPanel({
             borderRadius: "7px",
             boxShadow: "0 10px 24px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.04)",
             px: "12px",
+            py: "8px",
           }}>
             <InputBase
+              multiline
+              maxRows={6}
               placeholder={isListening ? "Listening..." + (interimText ? ` ${interimText}` : "") : "Ask anything"}
               fullWidth value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               disabled={isLoading || isProcessing}
               sx={{
                 color: "#f4f6f5", fontSize: "14px",
-                "& input::placeholder": { color: isListening ? PRIMARY : "rgba(255,255,255,0.62)", opacity: 1 },
+                lineHeight: 1.5,
+                pt: "7px",
+                pb: "7px",
+                "& textarea::placeholder": { color: isListening ? PRIMARY : "rgba(255,255,255,0.62)", opacity: 1 },
+                "& textarea::-webkit-scrollbar": { width: "4px" },
+                "& textarea::-webkit-scrollbar-thumb": { background: "rgba(255,255,255,0.2)", borderRadius: "2px" },
               }}
             />
             <IconButton onClick={toggleListening} size="small"
