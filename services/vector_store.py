@@ -11,7 +11,7 @@ ChromaDB stores data locally in CHROMA_PERSIST_DIR (defaults to ./chroma_db).
 
 import os
 import logging
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
@@ -22,7 +22,7 @@ load_dotenv()
 logger = logging.getLogger("services")
 
 
-def _get_provider_aware_chroma_settings() -> tuple[str, str]:
+def _get_provider_aware_chroma_settings() -> Tuple[str, str]:
     """
     Returns (persist_dir, collection_name) scoped to the current LLM provider.
 

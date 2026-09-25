@@ -62,8 +62,11 @@ def fetch_projects_from_db():
 
             # Build a rich textual content blob for semantic search
             content = f"Project Title: {title}\n"
-            if short_desc or desc:
-                content += f"Description: {short_desc or desc}\n"
+            # Include BOTH short description AND full description so all content is searchable
+            if short_desc:
+                content += f"Short Description: {short_desc}\n"
+            if desc:
+                content += f"Description: {desc}\n"
             if category:
                 content += f"Category: {category}\n"
             if tech:
@@ -76,17 +79,32 @@ def fetch_projects_from_db():
                 content += f"Problem Solved: {problem}\n"
             if motivation:
                 content += f"Motivation: {motivation}\n"
-            if key_features:
-                feats = key_features if isinstance(key_features, list) else _json.loads(key_features)
+
+            def _parse_json_list(raw):
+                """Safely parse a JSON list from a raw DB string. Returns [] on failure."""
+                if not raw:
+                    return []
+                if isinstance(raw, list):
+                    return raw
+                try:
+                    parsed = _json.loads(raw)
+                    if isinstance(parsed, list):
+                        return parsed
+                except Exception:
+                    pass
+                return []
+
+            feats = _parse_json_list(key_features)
+            if feats:
                 content += f"Key Features: {', '.join(feats)}\n"
-            if results:
-                res = results if isinstance(results, list) else _json.loads(results)
+            res = _parse_json_list(results)
+            if res:
                 content += f"Results: {'; '.join(res)}\n"
-            if tags:
-                t = tags if isinstance(tags, list) else _json.loads(tags)
+            t = _parse_json_list(tags)
+            if t:
                 content += f"Tags: {', '.join(t)}\n"
-            if keywords:
-                kw = keywords if isinstance(keywords, list) else _json.loads(keywords)
+            kw = _parse_json_list(keywords)
+            if kw:
                 content += f"Keywords: {', '.join(kw)}\n"
 
             documents.append({
